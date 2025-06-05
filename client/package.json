@@ -13,6 +13,11 @@
     "@tailwindcss/vite": "^4.1.7",
     "autoprefixer": "^10.4.21",
     "axios": "^1.9.0",
+<<<<<<< HEAD
+    "firebase": "^11.8.1",
+=======
+    "lucide-react": "^0.513.0",
+>>>>>>> dev
     "postcss": "^8.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

@@ -1,18 +1,19 @@
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Theatres from './pages/Theatres';
+import Seats from './pages/Seats';
+import Info from './pages/Info';
 
-interface AppProps {
-    text: string;
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/theatres" element={<Theatres />} />
+        <Route path="/seats" element={<Seats />} />
+        <Route path="/info" element={<Info />} />
+      </Routes>
+    </Router>
+  );
 }
-
-function App({text = "Hello World"}: AppProps) {
-
-    return (
-        <>
-            <h1 className="text-3xl font-bold underline text-green-800">
-                {text}
-            </h1>
-        </>
-    )
-}
-
-export default App;
