@@ -1,22 +1,22 @@
-import React from 'react';
-import Header from '../components/Header';
-import SearchBar from '../components/SearchBar';
-import MovieCard from '../components/MovieCard';
-
-const movies = [1,2,3,4,5,6]; // placeholder
-// bg-[#242424]
+import React from "react";
+import Header from "../components/Header";
+import SearchBar from "../components/SearchBar";
+import InfoInform from "../components/Info";
+import ScheduleHeader from "../components/ScheduleShow";
+import { MovieContainer } from "../components/MovieContainer";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#171c20] text-white">
       <Header />
-      <div className="p-4">
+      <div className="px-[20px] sm:px-[60px] md:px-[100px] lg:px-[180px]">
         <SearchBar />
-        <h2 className="text-lg font-semibold mt-6 mb-4">Showing Today</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {movies.map((m, i) => <MovieCard key={i} />)}
-        </div>
+        <InfoInform />
+        <ScheduleHeader />
+        <MovieContainer />
       </div>
+      <Footer/>
     </div>
   );
-} 
+}
