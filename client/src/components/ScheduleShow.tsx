@@ -7,9 +7,11 @@ type CalendarDay = {
 };
 
 export default function ScheduleHeader() {
+
   const [activeTab, setActiveTab] = useState<"now" | "upcoming">("now");
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
+  //Show the Schedule day of movie showwww !!
   const getNext6Days = (): CalendarDay[] => {
     const result: CalendarDay[] = [];
     const today = new Date();
@@ -27,6 +29,8 @@ export default function ScheduleHeader() {
 
     return result;
   };
+
+  //Show the upcoming Schedule month of movie showwww !!
 
   const getUpcomingMonths = (): string[] => {
     const result: string[] = [];
@@ -48,38 +52,29 @@ export default function ScheduleHeader() {
 
   return (
     <div className="mt-8 mb-5">
+
+      {/* The navbar which navigate user to show of movie showing */}
       <div className="flex gap-6 text-xl font-bold mb-4 flex-wrap">
-        <button
-          onClick={() => handleTabChange("now")}
-          className={`transition-colors ${
-            activeTab === "now" ? "text-white border-b-2 border-white" : "text-gray-400"
-          }`}
-        >
+        <button onClick={() => handleTabChange("now")} className={`transition-colors
+          ${ activeTab === "now" ? "text-white border-b-2 border-white" : "text-gray-400"}`}>
           Now Showing
         </button>
         <span className="text-gray-500">|</span>
-        <button
-          onClick={() => handleTabChange("upcoming")}
-          className={`transition-colors ${
-            activeTab === "upcoming" ? "text-white border-b-2 border-white" : "text-gray-400"
-          }`}
-        >
+        <button onClick={() => handleTabChange("upcoming")} className={`transition-colors 
+          ${activeTab === "upcoming" ? "text-white border-b-2 border-white" : "text-gray-400"}`}>
           Upcoming
         </button>
       </div>
 
       <div className="flex flex-wrap gap-3 justify-start">
+        {/* It check whether user want to see upcoming show or the currently showw */}
         {activeTab === "now" ? (
           getNext6Days().map((c, idx) => (
-            <div
-              key={idx}
-              onClick={() => setSelectedIndex(idx)}
+            <div key={idx} onClick={() => setSelectedIndex(idx)}
               className={`cursor-pointer flex flex-col items-center rounded border-2
-                ${
-                  idx === selectedIndex ? "border-red-500" : "border-gray-700"
-                }
+                ${idx === selectedIndex ? "border-red-500" : "border-gray-700"}
                 px-1 py-1
-                w-14 sm:w-16 md:w-20 lg:w-24 xl:w-28
+                w-15 sm:w-16 md:w-20 lg:w-24 xl:w-28
                 min-w-[60px]
                 `}
             >

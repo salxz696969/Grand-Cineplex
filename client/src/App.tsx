@@ -6,6 +6,7 @@ import Seats from './pages/Seats';
 import Info from './pages/Info';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
+import MovieChosen from './pages/MovieChose';
 
 export default function App() {
   return (
@@ -17,6 +18,8 @@ export default function App() {
         <Route path="/info" element={<Info />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/SignIn" element={<SignIn />} />
+        <Route path="/movie/:id" element={<MovieChosen/>} />
+
       </Routes>
     </Router>
   );
