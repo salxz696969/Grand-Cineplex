@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import pool from "./utils/db";
+import { db } from './db';
+import {movies} from "./db/schema/movies";
 
 const app: Express = express();
 
@@ -9,14 +10,9 @@ app.use(cors());
 app.use(express.json());
 
 // Basic route
-app.get('/', (req: Request, res: Response) => {
-    pool.query('SELECT * FROM movies', (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-      }
-
-      res.json("executed query");
-    })
+app.get('/', async (req: Request, res: Response) => {
+   const result = await db.select().from(movies);
+   res.json(result);
 });
 
 export default app;
