@@ -1,9 +1,13 @@
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Data } from "../components/FakeData";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { FaCalendarAlt, FaClock, FaFilm, FaStar, FaGlobe } from "react-icons/fa";
-import React, { useState } from "react";
+
+import MovieHeader from "../components/MovieHeader";
+import Tabs from "../components/Tab";
+import ShowtimeTab from "../components/ShowtimeTab";
+import DetailTab from "../components/DetailTab";
 
 interface Movie {
   id: number;
@@ -13,7 +17,7 @@ interface Movie {
   image: string;
   genre: string;
   overview: string;
-  rating: string;
+  rating: number;
   director: string;
   cast: string;
   language: string;
@@ -58,95 +62,19 @@ export default function MovieChosen() {
       <Header />
 
       <div className="px-[20px] sm:px-[60px] md:px-[100px] lg:px-[180px] py-6">
-        <div className="bg-[#171717] rounded-2xl flex flex-col sm:flex-row gap-20 items-center sm:items-start px-6 py-8 sm:px-20 sm:py-14">
-          {/* Left side: image */}
-          <img
-            src={movie.image}
-            alt={movie.title}
-            className="rounded-2xl w-64 h-80 sm:w-72 sm:h-96 object-cover"
-          />
+        <MovieHeader movie={movie} />
 
-          {/* Right side: details */}
-          <div className="flex flex-col gap-4 flex-1 text-center sm:text-left">
-            <h1 className="font-bold text-4xl mb-2">{movie.title}</h1>
+        <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-            <div className="flex items-center justify-center sm:justify-start gap-3 text-lg">
-              <FaFilm className="text-red-500" />
-              <p className="text-gray-400 font-semibold">Genre:</p>
-              <p className="text-white">{movie.genre}</p>
-            </div>
-
-            <div className="flex items-center justify-center sm:justify-start gap-3 text-lg">
-              <FaCalendarAlt className="text-red-500" />
-              <p className="text-gray-400">{movie.releaseDate}</p>
-            </div>
-
-            <div className="flex items-center justify-center sm:justify-start gap-3 text-lg">
-              <FaClock className="text-red-500" />
-              <p className="text-gray-400">Duration:</p>
-              <span className="text-white">{movie.duration}</span>
-            </div>
-
-            <div className="flex items-center justify-center sm:justify-start gap-3 text-lg">
-              <FaStar className="text-yellow-400" />
-              <p className="text-gray-400">Rating:</p>
-              <span className="text-white">{movie.rating}</span>
-            </div>
-
-            <div className="flex items-center justify-center sm:justify-start gap-3 text-lg">
-              <FaGlobe className="text-green-400" />
-              <p className="text-gray-400">Language:</p>
-              <span className="text-white">{movie.language}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs: Showtime | Detail */}
-        <div className="mt-8 border-b border-gray-600 flex gap-6 text-xl font-bold cursor-pointer select-none">
-          <div
-            className={`pb-2 ${activeTab === "showtime" ? "text-white border-b-2 border-white" : "text-gray-400"}`}
-            onClick={() => setActiveTab("showtime")}
-          >
-            Showtime
-          </div>
-          <div
-            className={`pb-2 ${activeTab === "detail" ? "text-white border-b-2 border-white" : "text-gray-400"}`}
-            onClick={() => setActiveTab("detail")}
-          >
-            Detail
-          </div>
-        </div>
-
-        {/* Tab content */}
         <div className="mt-4">
           {activeTab === "showtime" && (
-            <div className="flex flex-wrap gap-3 justify-start">
-              {days.map((c, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedIndex(idx)}
-                  className={`cursor-pointer flex flex-col items-center rounded border-2
-                    ${idx === selectedIndex ? "border-red-500" : "border-gray-700"}
-                    px-2 py-2
-                    w-28 sm:w-32 md:w-36 lg:w-40 xl:w-40
-                    min-w-[64px]
-                  `}
-                >
-                  <p className="font-semibold text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base">
-                    {c.day}
-                  </p>
-                  <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl">{c.number}</p>
-                  <p className="text-gray-400 text-[8px] sm:text-[9px] md:text-xs">{c.month}</p>
-                </div>
-              ))}
-            </div>
+            <ShowtimeTab
+              days={days}
+              selectedIndex={selectedIndex}
+              onSelect={setSelectedIndex}
+            />
           )}
-
-          {activeTab === "detail" && (
-            <div className="text-gray-300 text-lg leading-relaxed whitespace-pre-line">
-              {movie.overview}
-            </div>
-          )}
+          {activeTab === "detail" && <DetailTab overview={movie.overview} />}
         </div>
       </div>
 

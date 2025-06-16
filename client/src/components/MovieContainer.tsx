@@ -1,23 +1,51 @@
 import React, { useState, useEffect } from "react";
 import MovieCard from "../components/MovieCard";
-import { Data } from "../components/FakeData";
+import { fetchMovies, Movie } from "../services/api";
 
-export const MovieContainer: React.FC = () => {
-  const [movie, setMovie] = useState([]);
+interface MovieContainerProps {
+  movies?: Movie[];
+}
+
+// This component can load and display movies using the `movies` prop directly,
+// It just a mock test with the fake data which not connect with backend yet
+
+
+export const MovieContainer: React.FC<MovieContainerProps> = ({ movies }) => {
+  const [movieList, setMovieList] = useState<Movie[]>(movies || []);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
 
   useEffect(() => {
-    // future data fetching logic
-  }, []);
+    if (movies && movies.length > 0) {
+      setMovieList(movies);
+      return;
+    }
+
+    const loadMovies = async () => {
+      setIsLoading(true);
+      setIsError(null);
+      try {
+        const data = await fetchMovies();
+        setMovieList(data);
+      } catch (error: any) {
+        setIsError(error.message || "Unknown error");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMovies();
+  }, [movies]);
+
+  if (isLoading) return <p className="text-white">Loading movies...</p>;
+  if (isError) return <p className="text-red-500">Error: {isError}</p>;
 
   return (
     <div className="grid gap-5 custom-cols">
-      {isLoading && <p>The Movie is Loading...</p>}
-      {isError && <p className="text-red-500">Error to fetch this article</p>}
-      {Data.map((movie, i) => (
+      {movieList.length === 0 && <p className="text-white">No movies found.</p>}
+      {movieList.map((movie) => (
         <MovieCard
-          key={i}
+          key={movie.id}
           id={movie.id}
           title={movie.title}
           releaseDate={movie.releaseDate}
@@ -28,3 +56,5 @@ export const MovieContainer: React.FC = () => {
     </div>
   );
 };
+
+export default MovieContainer;
