@@ -524,4 +524,4 @@ INSERT INTO payments (booking_id, amount, method, status) VALUES
 
 
 
-    UPDATE screenings SET screening_date = '2025-06-17' WHERE id IN (1,2,3,4,5,6,7);
+    UPDATE screenings SET screening_date = '2025-10-23' WHERE id IN (29);
