@@ -3,11 +3,12 @@ import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import MovieCard from '../components/MovieCard';
 
-const movies = [1,2,3,4]; // placeholder
+const movies = [1,2,3,4,5,6]; // placeholder
+// bg-[#242424]
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#171c20] text-white">
       <Header />
       <div className="p-4">
         <SearchBar />

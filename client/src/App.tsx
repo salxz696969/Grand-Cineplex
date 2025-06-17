@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Theatres from './pages/Theatres';
 import Seats from './pages/Seats';
 import Info from './pages/Info';
+import SignUp from './pages/SignUp';
+import SignIn from './pages/SignIn';
 
 export default function App() {
   return (
@@ -13,6 +15,8 @@ export default function App() {
         <Route path="/theatres" element={<Theatres />} />
         <Route path="/seats" element={<Seats />} />
         <Route path="/info" element={<Info />} />
+        <Route path="/SignUp" element={<SignUp />} />
+        <Route path="/SignIn" element={<SignIn />} />
       </Routes>
     </Router>
   );
