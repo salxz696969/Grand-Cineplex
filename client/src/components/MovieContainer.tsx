@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import MovieCard from "../components/MovieCard";
-import { currentShow } from "./FakeData";
+import { currentShow, upcomingShow } from "./FakeData"; // Assuming you have upcomingShow as well
 
 export interface Movie {
   id: number;
@@ -18,9 +18,10 @@ export interface Movie {
 
 interface MovieContainerProps {
   searchTerm: string;
+  activeTab: "now" | "upcoming";
 }
 
-const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm }) => {
+const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }) => {
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,8 +38,15 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm }) => {
       try {
         setIsLoading(true);
         setIsError(null);
-        setAllMovies(currentShow);
-        setMovieList(currentShow);
+
+        // Load movies based on activeTab
+        if (activeTab === "now") {
+          setAllMovies(currentShow);
+          setMovieList(currentShow);
+        } else {
+          setAllMovies(upcomingShow);
+          setMovieList(upcomingShow);
+        }
       } catch (error: any) {
         setIsError(error.message || "Failed to load movies");
         setAllMovies([]);
@@ -49,10 +57,9 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm }) => {
     };
 
     loadMovies();
-  }, []);
+  }, [activeTab]);
 
   useEffect(() => {
-    // Clear timers before running new search
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
     if (noResultTimeout.current) clearTimeout(noResultTimeout.current);
 
@@ -66,7 +73,6 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm }) => {
       return;
     }
 
-    // Check if matches exist immediately
     const filtered = allMovies.filter((movie) =>
       movie.title.toLowerCase().includes(trimmedTerm)
     );
@@ -75,7 +81,6 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm }) => {
       setIsSearching(false);
       setMovieList(filtered);
     } else {
-      // No matches found: show loading first
       setIsSearching(true);
       setMovieList([]);
 

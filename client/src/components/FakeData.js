@@ -172,34 +172,34 @@ export const currentShow = [
 
 export const upcomingShow = [
   {
-    id: 1,
+    id: 13,
     title: "Witch Returns, The",
     releaseDate: "18 Jun 2025",
     duration: "1h 30min",
     image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001903",
     genre: "Horror",
-    overview:
-      "NA",
+    overview: "NA",
     rating: 8.3,
     director: "",
     cast: "",
     language: "English",
   },
   {
-    id: 2,
+    id: 14,
     title: "Elio",
     releaseDate: "19 Jun 2025",
     duration: "1h 38min",
     image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001854",
     genre: "Animation",
-    overview: "Elio, a space fanatic with an active imagination, finds himself on a cosmic misadventure where he must form new bonds with alien lifeforms, navigate a crisis of intergalactic proportions and somehow discover who he is truly meant to be.",
+    overview:
+      "Elio, a space fanatic with an active imagination, finds himself on a cosmic misadventure where he must form new bonds with alien lifeforms, navigate a crisis of intergalactic proportions and somehow discover who he is truly meant to be.",
     rating: 7.5,
     director: "",
     cast: "",
     language: "English",
   },
   {
-    id: 3,
+    id: 15,
     title: "28 Years Later",
     releaseDate: "19 Jun 2025",
     duration: "1h 55min",
@@ -213,7 +213,7 @@ export const upcomingShow = [
     language: "English",
   },
   {
-    id: 4,
+    id: 16,
     title: "Pernikahan Arwah",
     releaseDate: "20 Jun 2025",
     duration: "1h 41min",
@@ -227,7 +227,7 @@ export const upcomingShow = [
     language: "Khmer",
   },
   {
-    id: 5,
+    id: 17,
     title: "Dendam Malam Kelam",
     releaseDate: "23 Jun 2025",
     duration: "1h 44min",
@@ -241,7 +241,7 @@ export const upcomingShow = [
     language: "English",
   },
   {
-    id: 6,
+    id: 18,
     title: "Lovesick",
     releaseDate: "25 Jun 2025",
     duration: "1h 51min",
@@ -255,21 +255,20 @@ export const upcomingShow = [
     language: "Korean",
   },
   {
-    id: 7,
+    id: 19,
     title: "Hand, The",
     releaseDate: "26 Jun 2025",
     duration: "1h 33min",
     image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001957",
     genre: "Horror",
-    overview:
-      "NA",
+    overview: "NA",
     rating: 7.4,
     director: "",
     cast: "",
     language: "Khmer",
   },
   {
-    id: 8,
+    id: 20,
     title: "F1",
     releaseDate: "26 Jun 2025",
     duration: "2h 35min",
@@ -283,20 +282,21 @@ export const upcomingShow = [
     language: "English",
   },
   {
-    id: 9,
+    id: 21,
     title: "Pembantaian Dukun Santet",
     releaseDate: "27 Jun 2025",
     duration: "1h 32min",
     image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001976",
     genre: "Horror",
-    overview: "A community conflict occurred, those accused of being witch doctors were killed without having the chance to defend themselves. Chaos was everywhere.",
+    overview:
+      "A community conflict occurred, those accused of being witch doctors were killed without having the chance to defend themselves. Chaos was everywhere.",
     rating: 7.3,
     director: "",
     cast: "",
     language: "Indo",
   },
   {
-    id: 10,
+    id: 22,
     title: "M3GAN 2.0",
     releaseDate: "27 Jun 2025",
     duration: "2h 0min",
@@ -310,7 +310,7 @@ export const upcomingShow = [
     language: "English",
   },
   {
-    id: 11,
+    id: 23,
     title: "Ritual, The",
     releaseDate: "30 Jun 2025",
     duration: "1h 47min",
@@ -321,9 +321,10 @@ export const upcomingShow = [
     rating: 9.3,
     director: "",
     cast: "Tom Cruise",
-    language: "English"
+    language: "English",
   },
-]
+];
+
 
 export const Info = [
   { image: pic15 },

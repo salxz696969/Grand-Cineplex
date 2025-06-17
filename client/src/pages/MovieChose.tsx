@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { currentShow } from "../components/FakeData";
+import { currentShow, upcomingShow } from "../components/FakeData"; // <-- import upcomingShow too
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -31,7 +31,11 @@ type CalendarDay = {
 
 export default function MovieChosen() {
   const { id } = useParams<{ id: string }>();
-  const movie: Movie | undefined = currentShow.find((m) => m.id === Number(id));
+  // Search both currentShow and upcomingShow
+  const movie: Movie | undefined =
+    currentShow.find((m) => m.id === Number(id)) ||
+    upcomingShow.find((m) => m.id === Number(id)); // <-- check upcomingShow too
+
   const [activeTab, setActiveTab] = useState<"showtime" | "detail">("showtime");
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
@@ -68,11 +72,7 @@ export default function MovieChosen() {
 
         <div className="mt-4">
           {activeTab === "showtime" && (
-            <ShowtimeTab
-              days={days}
-              selectedIndex={selectedIndex}
-              onSelect={setSelectedIndex}
-            />
+            <ShowtimeTab days={days} selectedIndex={selectedIndex} onSelect={setSelectedIndex} />
           )}
           {activeTab === "detail" && <DetailTab overview={movie.overview} />}
         </div>

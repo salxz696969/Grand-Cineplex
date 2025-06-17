@@ -10,36 +10,48 @@ type CalendarDay = {
 interface ScheduleHeaderProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
+  activeTab: "now" | "upcoming";
+  setActiveTab: React.Dispatch<React.SetStateAction<"now" | "upcoming">>;
 }
 
-export default function ScheduleHeader({ searchTerm, setSearchTerm }: ScheduleHeaderProps) {
-  const [activeTab, setActiveTab] = useState<"now" | "upcoming">("now");
+export default function ScheduleHeader({
+  searchTerm,
+  setSearchTerm,
+  activeTab,
+  setActiveTab,
+}: ScheduleHeaderProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
   const getNext6Days = (): CalendarDay[] => {
-    const result: CalendarDay[] = [];
+    const days: CalendarDay[] = [];
     const today = new Date();
+
     for (let i = 0; i < 6; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      result.push({
+
+      days.push({
+        day: i === 0 ? "Today" : weekDays[date.getDay()],
         number: date.getDate(),
-        day: i === 0 ? "Today" : date.toLocaleDateString("en-US", { weekday: "short" }),
-        month: date.toLocaleDateString("en-US", { month: "short" }),
+        month: months[date.getMonth()],
       });
     }
-    return result;
+    return days;
   };
 
   const getUpcomingMonths = (): string[] => {
-    const result: string[] = [];
+    const monthsList: string[] = [];
     const today = new Date();
+
     for (let i = 0; i < 6; i++) {
       const date = new Date(today);
       date.setMonth(today.getMonth() + i);
-      result.push(date.toLocaleDateString("en-US", { month: "long" }));
+      monthsList.push(date.toLocaleDateString("en-US", { month: "long" }));
     }
-    return result;
+    return monthsList;
   };
 
   const handleTabChange = (tab: "now" | "upcoming") => {
@@ -81,9 +93,7 @@ export default function ScheduleHeader({ searchTerm, setSearchTerm }: ScheduleHe
                     idx === selectedIndex ? "border-red-500" : "border-gray-700"
                   } px-1 py-1 w-15 sm:w-16 md:w-20 lg:w-24 xl:w-28 min-w-[60px]`}
                 >
-                  <p className="font-semibold text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base">
-                    {c.day}
-                  </p>
+                  <p className="font-semibold text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base">{c.day}</p>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl">{c.number}</p>
                   <p className="text-gray-400 text-[8px] sm:text-[9px] md:text-xs">{c.month}</p>
                 </div>
