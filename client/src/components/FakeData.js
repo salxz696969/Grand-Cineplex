@@ -1,6 +1,6 @@
 import pic15 from "../assets/Poster/pic15.jpg";
 
-export const Data = [
+export const currentShow = [
   {
     id: 1,
     title: "Ballerina",
@@ -168,6 +168,162 @@ export const Data = [
     language: "Korean",
   },
 ];
+
+
+export const upcomingShow = [
+  {
+    id: 1,
+    title: "Witch Returns, The",
+    releaseDate: "18 Jun 2025",
+    duration: "1h 30min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001903",
+    genre: "Horror",
+    overview:
+      "NA",
+    rating: 8.3,
+    director: "",
+    cast: "",
+    language: "English",
+  },
+  {
+    id: 2,
+    title: "Elio",
+    releaseDate: "19 Jun 2025",
+    duration: "1h 38min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001854",
+    genre: "Animation",
+    overview: "Elio, a space fanatic with an active imagination, finds himself on a cosmic misadventure where he must form new bonds with alien lifeforms, navigate a crisis of intergalactic proportions and somehow discover who he is truly meant to be.",
+    rating: 7.5,
+    director: "",
+    cast: "",
+    language: "English",
+  },
+  {
+    id: 3,
+    title: "28 Years Later",
+    releaseDate: "19 Jun 2025",
+    duration: "1h 55min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001855",
+    genre: "Horror",
+    overview:
+      "A group of survivors of the rage virus lives on a small island. When one of the group leaves the island on a mission into the mainland, he discovers secrets, wonders, and horrors that have mutated not only the infected but other survivors.",
+    rating: 9.0,
+    director: "",
+    cast: "",
+    language: "English",
+  },
+  {
+    id: 4,
+    title: "Pernikahan Arwah",
+    releaseDate: "20 Jun 2025",
+    duration: "1h 41min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001959",
+    genre: "Horror",
+    overview:
+      "A couple, Salim and Tasya, who are preparing for their wedding. However, their happy plans are disrupted when Salim's aunt, his only blood relative, dies.",
+    rating: 7.8,
+    director: "",
+    cast: "",
+    language: "Khmer",
+  },
+  {
+    id: 5,
+    title: "Dendam Malam Kelam",
+    releaseDate: "23 Jun 2025",
+    duration: "1h 44min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001940",
+    genre: "Horror",
+    overview:
+      "Jefri and Sarah, a couple who are having an affair. The two of them have to desperately create an alibi after Sofia, Jefri's legal wife, is killed and her body disappears.",
+    rating: 7.6,
+    director: "",
+    cast: "",
+    language: "English",
+  },
+  {
+    id: 6,
+    title: "Lovesick",
+    releaseDate: "25 Jun 2025",
+    duration: "1h 51min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001971",
+    genre: "Romance",
+    overview:
+      "In order to avoid being expelled from school, Ye Zi Jie lied and pretended to be sick. He used all kinds of tricks, including putting panda make-up to pretend to look pale, riding his bike into a fence, or even telling his teacher he was not fine to order to sleep at the school health room. Unexpectedly, the teacher sent Ye Zi, the class monitor who has the same name as him, to show special concern. She always has evidence about his fake illness, and she follows closely just to confirm whether he is really sick or not. Gradually, the two get to know each other better in the spy-to-spy interaction, and become closer and closer...",
+    rating: 8.2,
+    director: "",
+    cast: "",
+    language: "Korean",
+  },
+  {
+    id: 7,
+    title: "Hand, The",
+    releaseDate: "26 Jun 2025",
+    duration: "1h 33min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001957",
+    genre: "Horror",
+    overview:
+      "NA",
+    rating: 7.4,
+    director: "",
+    cast: "",
+    language: "Khmer",
+  },
+  {
+    id: 8,
+    title: "F1",
+    releaseDate: "26 Jun 2025",
+    duration: "2h 35min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001856",
+    genre: "Drama",
+    overview:
+      "Follows a Formula One driver who comes out of retirement to mentor and team with a younger driver.",
+    rating: 7.9,
+    director: "",
+    cast: "",
+    language: "English",
+  },
+  {
+    id: 9,
+    title: "Pembantaian Dukun Santet",
+    releaseDate: "27 Jun 2025",
+    duration: "1h 32min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001976",
+    genre: "Horror",
+    overview: "A community conflict occurred, those accused of being witch doctors were killed without having the chance to defend themselves. Chaos was everywhere.",
+    rating: 7.3,
+    director: "",
+    cast: "",
+    language: "Indo",
+  },
+  {
+    id: 10,
+    title: "M3GAN 2.0",
+    releaseDate: "27 Jun 2025",
+    duration: "2h 0min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001941",
+    genre: "Horror",
+    overview:
+      "Two years after M3GAN's rampage, her creator, Gemma, resorts to resurrecting her infamous creation in order to take down Amelia, the military-grade weapon who was built by a defense contractor who stole M3GAN's underlying tech.",
+    rating: 8.5,
+    director: "",
+    cast: "",
+    language: "English",
+  },
+  {
+    id: 11,
+    title: "Ritual, The",
+    releaseDate: "30 Jun 2025",
+    duration: "1h 47min",
+    image: "https://tickets.legend.com.kh/CDN/media/entity/get/FilmPosterGraphic/HO00001922",
+    genre: "Horror",
+    overview:
+      "Two priests, one in crisis with his faith and the other confronting a turbulent past, must overcome their differences to perform a risky exorcism.",
+    rating: 9.3,
+    director: "",
+    cast: "Tom Cruise",
+    language: "English"
+  },
+]
 
 export const Info = [
   { image: pic15 },

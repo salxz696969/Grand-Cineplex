@@ -15,7 +15,14 @@ interface MovieHeaderProps {
 
 export default function MovieHeader({ movie }: MovieHeaderProps) {
   return (
-    <div className="bg-[#171717] rounded-2xl flex flex-col sm:flex-row gap-20 items-center sm:items-start px-6 py-8 sm:px-20 sm:py-14">
+    <div
+      className="
+        bg-[#171717] rounded-2xl flex flex-col
+        [@media(min-width:901px)]:flex-row gap-20
+        items-center [@media(min-width:901px)]:items-start
+        px-6 py-8 sm:px-20 sm:py-14
+      "
+    >
       {/* Left side: image */}
       <img
         src={movie.image}

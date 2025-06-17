@@ -1,58 +1,111 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MovieCard from "../components/MovieCard";
-import { fetchMovies, Movie } from "../services/api";
+import { currentShow } from "./FakeData";
 
-interface MovieContainerProps {
-  movies?: Movie[];
+export interface Movie {
+  id: number;
+  title: string;
+  releaseDate: string;
+  duration: string;
+  image: string;
+  genre: string;
+  overview: string;
+  rating: number;
+  director: string;
+  cast: string;
+  language: string;
 }
 
-// This component can load and display movies using the `movies` prop directly,
-// It just a mock test with the fake data which not connect with backend yet
+interface MovieContainerProps {
+  searchTerm: string;
+}
 
-
-export const MovieContainer: React.FC<MovieContainerProps> = ({ movies }) => {
-  const [movieList, setMovieList] = useState<Movie[]>(movies || []);
-  const [isLoading, setIsLoading] = useState(false);
+const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm }) => {
+  const [allMovies, setAllMovies] = useState<Movie[]>([]);
+  const [movieList, setMovieList] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (movies && movies.length > 0) {
-      setMovieList(movies);
-      return;
-    }
+  const [isSearching, setIsSearching] = useState(false);
+  const [showNoResults, setShowNoResults] = useState(false);
 
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noResultTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
     const loadMovies = async () => {
-      setIsLoading(true);
-      setIsError(null);
       try {
-        const data = await fetchMovies();
-        setMovieList(data);
+        setIsLoading(true);
+        setIsError(null);
+        setAllMovies(currentShow);
+        setMovieList(currentShow);
       } catch (error: any) {
-        setIsError(error.message || "Unknown error");
+        setIsError(error.message || "Failed to load movies");
+        setAllMovies([]);
+        setMovieList([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadMovies();
-  }, [movies]);
+  }, []);
+
+  useEffect(() => {
+    // Clear timers before running new search
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (noResultTimeout.current) clearTimeout(noResultTimeout.current);
+
+    setShowNoResults(false);
+
+    const trimmedTerm = searchTerm.trim().toLowerCase();
+
+    if (trimmedTerm === "") {
+      setIsSearching(false);
+      setMovieList(allMovies);
+      return;
+    }
+
+    // Check if matches exist immediately
+    const filtered = allMovies.filter((movie) =>
+      movie.title.toLowerCase().includes(trimmedTerm)
+    );
+
+    if (filtered.length > 0) {
+      setIsSearching(false);
+      setMovieList(filtered);
+    } else {
+      // No matches found: show loading first
+      setIsSearching(true);
+      setMovieList([]);
+
+      noResultTimeout.current = setTimeout(() => {
+        setIsSearching(false);
+        setShowNoResults(true);
+      }, 3000);
+    }
+  }, [searchTerm, allMovies]);
 
   if (isLoading) return <p className="text-white">Loading movies...</p>;
   if (isError) return <p className="text-red-500">Error: {isError}</p>;
+  if (isSearching) return <p className="text-white">Searching movies...</p>;
 
   return (
     <div className="grid gap-5 custom-cols">
-      {movieList.length === 0 && <p className="text-white">No movies found.</p>}
-      {movieList.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          id={movie.id}
-          title={movie.title}
-          releaseDate={movie.releaseDate}
-          duration={movie.duration}
-          image={movie.image}
-        />
-      ))}
+      {showNoResults ? (
+        <p className="text-white">No movies found.</p>
+      ) : (
+        movieList.map((movie) => (
+          <MovieCard
+            key={movie.id}
+            id={movie.id}
+            title={movie.title}
+            releaseDate={movie.releaseDate}
+            duration={movie.duration}
+            image={movie.image}
+          />
+        ))
+      )}
     </div>
   );
 };
