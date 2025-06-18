@@ -1,9 +1,9 @@
 import React from 'react';
-import Header from '../components/Header';
-import SearchBar from '../components/SearchBar';
-import TheatreShowtime from '../components/TheatreShowtime';
+import Header from '../../components/Header';
+import SearchBar from '../../components/SearchBar';
+import TheatreShowtime from '../../components/TheatreShowtime';
 
-const theatres = [1,2,3]; // placeholder
+const theatres = [1, 2, 3]; // placeholder
 
 export default function Theatres() {
   return (

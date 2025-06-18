@@ -1,9 +1,9 @@
 import React from 'react';
-import Header from '../components/Header';
-import SearchBar from '../components/SearchBar';
-import MovieCard from '../components/MovieCard';
+import Header from '../../components/Header';
+import SearchBar from '../../components/SearchBar';
+import MovieCard from '../../components/MovieCard';
 
-const movies = [1,2,3,4,5,6]; // placeholder
+const movies = [1, 2, 3, 4, 5, 6]; // placeholder
 // bg-[#242424]
 
 export default function Home() {

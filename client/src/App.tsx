@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Theatres from './pages/Theatres';
-import Seats from './pages/Seats';
-import Info from './pages/Info';
-import SignUp from './pages/SignUp';
-import SignIn from './pages/SignIn';
+import Home from './pages/customer/Home';
+import Theatres from './pages/customer/Theatres';
+import Seats from './pages/customer/Seats';
+import Info from './pages/customer/Info';
+import SignUp from './pages/customer/SignUp';
+import SignIn from './pages/customer/SignIn';
 
 export default function App() {
   return (
