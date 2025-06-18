@@ -25,7 +25,7 @@ export default function SignIn() {
 
     setError(null);
 
-    // Login API Call in this to login user
+    // TODO: Call your login API here
   };
 
   return (
@@ -35,23 +35,36 @@ export default function SignIn() {
         <div className="px-7 py-10 border border-[#a7aaac] w-96 rounded text-white">
           <form onSubmit={handleLogin} className="w-full fill">
             <h4 className="text-2xl mb-7">Login</h4>
+<<<<<<< HEAD:client/src/pages/cashier/SignIn.tsx
 
             <input type="text" placeholder="Email" className="input-box" value={email} onChange={(e) => setEmail(e.target.value)} />
 
             {/* invoke Password components when assign props to it */}
             <Password value={password} onChange={(e) => setPassword(e.target.value)} />
+=======
 
-            {/* Enable when it error on email, password */}
-            {error && (<p className="text-sm text-red-500 mb-3">{error}</p>)}
+            <input
+              type="text"
+              placeholder="Email"
+              className="input-box"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+>>>>>>> origin/Jack:client/src/pages/SignIn.tsx
 
-            <button type="submit" className="btn-primary h-10">Login</button>
+            {/* Password input component */}
+            <Password value={password} onChange={(e) => setPassword(e.target.value)} />
+
+            {/* Display error message if any */}
+            {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
+
+            <button type="submit" className="btn-primary h-10">
+              Login
+            </button>
 
             <p className="text-sm text-center mt-4">
               Not registered yet?{" "}
-              <Link
-                className="font-medium text-blue-500 underline"
-                to="/SignUp"
-              >
+              <Link className="font-medium text-blue-500 underline" to="/SignUp">
                 Create an Account
               </Link>
             </p>
