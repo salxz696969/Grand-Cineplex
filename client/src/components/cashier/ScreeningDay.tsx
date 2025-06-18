@@ -45,8 +45,8 @@ export default function ScreeningDay({ days, selectedIndex, onSelect }: Screenin
                         <p className="text-md font-semibold text-white">
                             {c.day}
                         </p>
-                        <p className="text-md font-semibold text-white">{c.number}</p>
-                        <p className="text-gray-400 text-sm text-white">{c.month}</p>
+                        <p className="text-md font-semibold text-gray-400">{c.number}</p>
+                        <p className="text-gray-400 text-sm ">{c.month}</p>
                     </div>
                 ))}
             </div>
