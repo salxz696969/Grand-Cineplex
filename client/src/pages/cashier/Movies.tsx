@@ -7,7 +7,9 @@ import MovieContainer from "../../components/cashier/MovieContainer";
 export default function Movies() {
     return (
         <div>
-            <Header />
+            <div className="relative">
+                <Header />
+            </div>
             <div className="min-h-screen content flex flex-col justify-start items-center bg-black">
                 <div className="flex flex-col max-w-5xl w-full justify-center items-center">
                     <div className="flex flex-wrap-reverse p-4 w-full justify-between items-center gap-4 px-4 lg:flex-row lg:gap-20 lg:flex-nowrap">

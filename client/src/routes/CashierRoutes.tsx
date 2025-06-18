@@ -1,16 +1,13 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Movies from "../pages/cashier/Movies";
-import CashierSignIn from "../pages/cashier/SignIn";
+import MovieDetail from "../pages/cashier/MovieDetail";
 
 const CashierRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Movies />} />
-      {/* <Route path="/signin" element={<CashierSignIn />} /> */}
-    {/* //   <Route path="/booking" element={<CreateBooking />} />
-    //   <Route path="/seats" element={<SelectSeats />} />
-    //   <Route path="/payment" element={<ProcessPayment />} /> */}
+      <Route path="/detail" element={<MovieDetail />} />
     </Routes>
   );
 };
