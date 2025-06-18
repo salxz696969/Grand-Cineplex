@@ -47,3 +47,55 @@ export const getShowTimesBasedOnMovieId = async (
 		res.json(error).status(404);
 	}
 };
+
+export const addShowTime = async (req: Request, res: Response) => {
+    try {
+        const { movieId, theaterId, screeningDate, screeningTime, price } = req.body;
+		const createdAt = new Date();
+		if (!movieId || !theaterId || !screeningDate || !screeningTime) {
+			return res.status(400).json({ message: "Invalid input" });
+		}
+		const newShowTime = await db
+			.insert(screenings)
+			.values({ movieId, theaterId, screeningDate, screeningTime, price, createdAt })
+			.returning();
+		res.status(201).json(newShowTime);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
+}
+
+export const updateShowTime = async (req: Request, res: Response) => {
+    try {
+        const showTimeId = parseInt(req.params.id);
+        const { movieId, theaterId, screeningDate, screeningTime, price } = req.body;
+        const updatedAt = new Date();
+        if (!movieId || !theaterId || !screeningDate || !screeningTime) {
+            return res.status(400).json({ message: "Invalid input" });
+        }
+        const updatedShowTime = await db
+            .update(screenings)
+            .set({ movieId, theaterId, screeningDate, screeningTime, price, updatedAt })
+            .where(eq(screenings.id, showTimeId))
+            .returning();
+        res.status(200).json(updatedShowTime);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
+}
+
+export const deleteShowTime = async (req: Request, res: Response) => {
+    try {
+        const showTimeId = parseInt(req.params.id);
+        const deletedShowTime = await db
+            .delete(screenings)
+            .where(eq(screenings.id, showTimeId))
+            .returning();
+        if (deletedShowTime.length === 0) {
+            return res.status(404).json({ message: "Show time not found" });
+        }
+        res.status(200).json(deletedShowTime[0]);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", error });
+    }
+}   

@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { screenings } from "../db/schema/screenings";
 import { tickets } from "../db/schema/tickets";
 import { bookings } from "../db/schema/bookings";
+
 export const getAllSeatsBasedOnShowTime = async (
 	req: Request,
 	res: Response
@@ -33,5 +34,55 @@ export const getAllSeatsBasedOnShowTime = async (
 		res.status(200).json(availableSeats);
 	} catch (error) {
 		res.json(error).status(404);
+	}
+};
+
+export const addSeat = async (req: Request, res: Response) => {
+	try {
+		const { seatNumber, theaterId, rowNumber } = req.body;
+		if (!seatNumber || !theaterId || !rowNumber) {
+			return res.status(400).json({ message: "Invalid input" });
+		}
+		const newSeat = await db
+			.insert(seats)
+			.values({ seatNumber, theaterId, rowNumber })
+			.returning();
+		res.status(201).json(newSeat);
+	} catch (error) {
+		res.status(500).json({ message: "Internal server error", error });
+	}
+};
+
+export const updateSeat = async (req: Request, res: Response) => {
+	try {
+		const seatId = parseInt(req.params.id);
+		const { seatNumber, rowNumber, seatType } = req.body;
+		if (!seatNumber || !rowNumber) {
+			return res.status(400).json({ message: "Invalid input" });
+		}
+		const updatedSeat = await db
+			.update(seats)
+			.set({ seatNumber, rowNumber, seatType })
+			.where(eq(seats.id, seatId))
+			.returning();
+		res.status(200).json(updatedSeat);
+	} catch (error) {
+		res.status(500).json({ message: "Internal server error", error });
+	}
+};
+
+export const deleteSeat = async (req: Request, res: Response) => {
+	try {
+		const seatId = parseInt(req.params.id);
+		const deletedSeat = await db
+			.delete(seats)
+			.where(eq(seats.id, seatId))
+			.returning();
+		if (deletedSeat.length === 0) {
+			return res.status(404).json({ message: "Seat not found" });
+		}
+		res.status(200).json(deletedSeat);
+	} catch (error) {
+		res.status(500).json({ message: "Internal server error", error });
 	}
 };
