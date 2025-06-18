@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import MovieCard from "../components/MovieCard";
-import { currentShow, upcomingShow } from "../utils/FakeData"; // Assuming you have upcomingShow as well
+import MovieCard from "./MovieCard";
+import { currentShow, upcomingShow } from "../../utils/FakeData";
 
 export interface Movie {
   id: number;
@@ -21,7 +21,7 @@ interface MovieContainerProps {
   activeTab: "now" | "upcoming";
 }
 
-const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }) => {
+export default function MovieContainer({ searchTerm, activeTab }: MovieContainerProps) {
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,7 +96,7 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }
   if (isSearching) return <p className="text-white">Searching movies...</p>;
 
   return (
-    <div className="grid gap-5 custom-cols">
+    <div className="grid w-full gap-5 custom-cols mt-4 px-4">
       {showNoResults ? (
         <p className="text-white">No movies found.</p>
       ) : (
@@ -114,5 +114,3 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }
     </div>
   );
 };
-
-export default MovieContainer;

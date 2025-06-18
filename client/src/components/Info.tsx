@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Info } from "./FakeData";
+import { Info } from "../utils/FakeData";
 
 export default function InfoInform() {
   const [index, setIndex] = useState(0);
