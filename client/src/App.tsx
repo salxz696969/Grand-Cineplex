@@ -1,22 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/customer/Home';
-import Theatres from './pages/customer/Theatres';
-import Seats from './pages/customer/Seats';
-import Info from './pages/customer/Info';
-import SignUp from './pages/customer/SignUp';
-import SignIn from './pages/customer/SignIn';
+import CustomerRoutes from './routes/CustomerRoutes';
+import CashierRoutes from './routes/CashierRoutes';
+import ManagerRoutes from './routes/ManagerRoutes';
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/theatres" element={<Theatres />} />
-        <Route path="/seats" element={<Seats />} />
-        <Route path="/info" element={<Info />} />
-        <Route path="/SignUp" element={<SignUp />} />
-        <Route path="/SignIn" element={<SignIn />} />
+        <Route path="/*" element={<CustomerRoutes />} />
+        <Route path="/cashier/*" element={<CashierRoutes />} />
+        <Route path="/manager/*" element={<ManagerRoutes />} />
       </Routes>
     </Router>
   );

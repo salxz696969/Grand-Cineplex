@@ -1,8 +1,9 @@
+import React from "react";
 import Header from "../../components/Header";
 import Password from "../../components/Password";
 import { Link } from "react-router-dom";
 import { useState, FormEvent } from "react";
-import { ValidateEmail } from "../../components/support";
+import { ValidateEmail } from "../../utils/validation";
 
 export default function SignIn() {
   const [email, setEmail] = useState<string>("");
