@@ -11,7 +11,7 @@ export default function Movies() {
                 <Header />
             </div>
             <div className="min-h-screen content flex flex-col justify-start items-center bg-black">
-                <div className="flex flex-col max-w-5xl w-full justify-center items-center">
+                <div className="flex flex-col max-w-7xl w-full justify-center items-center">
                     <div className="flex flex-wrap-reverse p-4 w-full justify-between items-center gap-4 px-4 lg:flex-row lg:gap-20 lg:flex-nowrap">
                         <ScreeningDay days={[]} selectedIndex={0} onSelect={() => { }} />
                         <SearchBar searchTerm={""} setSearchTerm={() => { }} />
