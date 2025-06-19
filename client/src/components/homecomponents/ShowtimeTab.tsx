@@ -1,3 +1,6 @@
+
+// This component used in the Movie Choose , 
+// The objective of it is to design the tab that offer choice to user which is the showtime tab
 import React from "react";
 
 type CalendarDay = {

@@ -1,3 +1,6 @@
+// This is the movie cards for all movies
+
+
 import React from "react";
 import { Link } from "react-router-dom";
 

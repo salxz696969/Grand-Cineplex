@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import Theatres from './pages/Theatres';
+import Theatres from './pages/TheatreContainer';
 import Seats from './pages/Seats';
 import Info from './pages/Info';
 import SignUp from './pages/SignUp';

@@ -1,3 +1,5 @@
+// This is the footer for our website
+
 import React from "react";
 
 export default function Footer() {

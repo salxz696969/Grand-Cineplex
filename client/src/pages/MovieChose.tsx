@@ -1,26 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { currentShow, upcomingShow } from "../components/FakeData"; // <-- import upcomingShow too
-import Header from "../components/Header";
+import { currentShow, upcomingShowJune } from "../components/FakeData";
+import Header from "../components/homecomponents/Header";
 import Footer from "../components/Footer";
 
-import MovieHeader from "../components/MovieHeader";
-import Tabs from "../components/Tab";
-import ShowtimeTab from "../components/ShowtimeTab";
-import DetailTab from "../components/DetailTab";
+import MovieHeader from "../components/movie/MovieHeader";
+import Tabs from "../components/movie/Tab";
+import ShowtimeTab from "../components/homecomponents/ShowtimeTab";
+import DetailTab from "../components/movie/DetailTab";
 
 interface Movie {
   id: number;
   title: string;
-  releaseDate: string;
+  release_date: string;
   duration: string;
-  image: string;
+  poster_url: string;
   genre: string;
-  overview: string;
+  description: string;
   rating: number;
-  director: string;
-  cast: string;
   language: string;
+  trailer_url: string;
 }
 
 type CalendarDay = {
@@ -31,15 +30,37 @@ type CalendarDay = {
 
 export default function MovieChosen() {
   const { id } = useParams<{ id: string }>();
-  // Search both currentShow and upcomingShow
+
   const movie: Movie | undefined =
     currentShow.find((m) => m.id === Number(id)) ||
-    upcomingShow.find((m) => m.id === Number(id)); // <-- check upcomingShow too
+    upcomingShowJune.find((m) => m.id === Number(id));
 
   const [activeTab, setActiveTab] = useState<"showtime" | "detail">("showtime");
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  if (!movie) return <p className="text-white p-4">Movie not found</p>;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); // 0.5 second delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#171c20] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white text-sm">Loading movie details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!movie) {
+    return <p className="text-white p-4">Movie not found</p>;
+  }
 
   const getNext6Days = (): CalendarDay[] => {
     const result: CalendarDay[] = [];
@@ -74,7 +95,7 @@ export default function MovieChosen() {
           {activeTab === "showtime" && (
             <ShowtimeTab days={days} selectedIndex={selectedIndex} onSelect={setSelectedIndex} />
           )}
-          {activeTab === "detail" && <DetailTab overview={movie.overview} />}
+          {activeTab === "detail" && <DetailTab overview={movie.description} />}
         </div>
       </div>
 
@@ -82,3 +103,6 @@ export default function MovieChosen() {
     </div>
   );
 }
+
+
+// Do The Theater component here with the time show

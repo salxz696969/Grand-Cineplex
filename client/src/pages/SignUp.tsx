@@ -1,7 +1,7 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
-import Password from "../components/Password";
+import Header from "../components/homecomponents/Header";
+import Password from "../components/useraccess/password";
 import { ValidateEmail } from "../components/support";
 
 export default function SignUp() {
@@ -9,6 +9,15 @@ export default function SignUp() {
   const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); // 0.5 second delay
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,8 +39,19 @@ export default function SignUp() {
 
     setError(null);
 
-    // TODO: Call API here to create account
+    // Call API here to create account
   };
+
+  if (loading) {
+    return (
+      <div className="w-screen h-screen bg-[#171c20] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-screen h-screen bg-[#171c20] flex flex-col">

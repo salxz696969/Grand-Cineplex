@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import MovieCard from "../components/MovieCard";
-import { currentShow, upcomingShow } from "./FakeData"; // Assuming you have upcomingShow as well
+import MovieCard from "./MovieCard";
+import { currentShow, upcomingShowJune } from "../FakeData";
 
 export interface Movie {
   id: number;
   title: string;
-  releaseDate: string;
+  release_date: string;
   duration: string;
-  image: string;
+  poster_url: string;
   genre: string;
-  overview: string;
+  description: string;
   rating: number;
-  director: string;
-  cast: string;
   language: string;
+  trailer_url: string;
 }
 
 interface MovieContainerProps {
@@ -24,9 +23,8 @@ interface MovieContainerProps {
 const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }) => {
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
   const [movieList, setMovieList] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
-
   const [isSearching, setIsSearching] = useState(false);
   const [showNoResults, setShowNoResults] = useState(false);
 
@@ -39,19 +37,21 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }
         setIsLoading(true);
         setIsError(null);
 
-        // Load movies based on activeTab
-        if (activeTab === "now") {
-          setAllMovies(currentShow);
-          setMovieList(currentShow);
-        } else {
-          setAllMovies(upcomingShow);
-          setMovieList(upcomingShow);
-        }
+        // Simulate 0.5s loading delay
+        setTimeout(() => {
+          if (activeTab === "now") {
+            setAllMovies(currentShow);
+            setMovieList(currentShow);
+          } else {
+            setAllMovies(upcomingShowJune);
+            setMovieList(upcomingShowJune);
+          }
+          setIsLoading(false);
+        }, 500);
       } catch (error: any) {
         setIsError(error.message || "Failed to load movies");
         setAllMovies([]);
         setMovieList([]);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -87,27 +87,38 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }
       noResultTimeout.current = setTimeout(() => {
         setIsSearching(false);
         setShowNoResults(true);
-      }, 3000);
+      }, 2000);
     }
   }, [searchTerm, allMovies]);
 
-  if (isLoading) return <p className="text-white">Loading movies...</p>;
+  if (isLoading || isSearching) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white text-sm">
+            {isSearching ? "Searching movies..." : "Loading movies..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (isError) return <p className="text-red-500">Error: {isError}</p>;
-  if (isSearching) return <p className="text-white">Searching movies...</p>;
 
   return (
     <div className="grid gap-5 custom-cols">
       {showNoResults ? (
-        <p className="text-white">No movies found.</p>
+        <p className="text-white text-lg">No movies found.</p>
       ) : (
         movieList.map((movie) => (
           <MovieCard
             key={movie.id}
             id={movie.id}
             title={movie.title}
-            releaseDate={movie.releaseDate}
+            releaseDate={movie.release_date}
             duration={movie.duration}
-            image={movie.image}
+            image={movie.poster_url}
           />
         ))
       )}

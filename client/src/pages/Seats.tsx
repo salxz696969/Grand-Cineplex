@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from '../components/Header';
-import SeatGrid from '../components/SeatGrid';
+import Header from '../components/homecomponents/Header';
+
 
 export default function Seats() {
   return (
@@ -8,7 +8,6 @@ export default function Seats() {
       <Header />
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-4">Seats</h2>
-        <SeatGrid />
         <div className="flex justify-end mt-6">
           <button className="bg-blue-600 text-white px-6 py-2 rounded">Next</button>
         </div>

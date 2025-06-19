@@ -1,3 +1,5 @@
+// This components used in the movie selected, like it give chioces to user to see the showTime or Detail of the movie that they selected
+
 import React from "react";
 
 interface TabsProps {
