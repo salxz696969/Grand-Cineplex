@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 
 export default function MovieShowTimes() {
     return (
-        <div className="flex flex-col gap-4 w-full lg:border-l border-gray-700 pl-4">
+        <div className="flex flex-col gap-4 w-full lg:border-l border-gray-700 pl-4 py-4">
             <div className="flex flex-row justify-start items-center gap-2 mb-4">
                 <MapPin className="w-5 h-5 text-sky-500" />
                 <h1 className="text-xl font-bold text-white">Showing in Grand Cineplex CADT</h1>
