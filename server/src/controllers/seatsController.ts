@@ -1,88 +1,128 @@
 import { Request, Response } from "express";
-import { db } from "../db";
-import { seats } from "../db/schema/seats";
-import { theaters } from "../db/schema/theaters";
-import { eq } from "drizzle-orm";
-import { screenings } from "../db/schema/screenings";
-import { tickets } from "../db/schema/tickets";
-import { bookings } from "../db/schema/bookings";
+import Seat from "../db/models/Seat";
+import Theater from "../db/models/Theater";
+import Screening from "../db/models/Screening";
+import Ticket from "../db/models/Ticket";
+import Booking from "../db/models/Booking";
 
 export const getAllSeatsBasedOnShowTime = async (
-	req: Request,
-	res: Response
+  req: Request,
+  res: Response
 ) => {
-	try {
-		const showTimeId = parseInt(req.params.id);
-		const seatsFromAShowTime = await db
-			.select()
-			.from(seats)
-			.innerJoin(theaters, eq(seats.theaterId, theaters.id))
-			.innerJoin(screenings, eq(screenings.theaterId, theaters.id))
-			.where(eq(screenings.id, showTimeId));
-		const seatsFromTicketsDb = await db
-			.select({ seatId: tickets.seatId })
-			.from(tickets)
-			.innerJoin(bookings, eq(tickets.bookingId, bookings.id))
-			.innerJoin(screenings, eq(bookings.screeningId, screenings.id))
-			.where(eq(screenings.id, showTimeId));
-		const availableSeats = seatsFromAShowTime.filter(
-			(seat) =>
-				seatsFromTicketsDb
-					.map((ticket) => ticket.seatId)
-					.includes(seat.seats.id) === false
-		);
-		res.status(200).json(availableSeats);
-	} catch (error) {
-		res.json(error).status(404);
-	}
+  try {
+    const showTimeId = parseInt(req.params.id);
+
+    // Get all seats for the theater of this screening
+    const screening = await Screening.findByPk(showTimeId, {
+      include: [
+        {
+          association: "theater",
+          include: [
+            {
+              association: "seats",
+              attributes: ["id", "rowNumber", "seatNumber", "seatType"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!screening) {
+      return res.status(404).json({ message: "Screening not found" });
+    }
+
+    // Get booked seats for this screening
+    const bookedSeats = await Ticket.findAll({
+      include: [
+        {
+          association: "booking",
+          where: { screeningId: showTimeId },
+          attributes: ["id"],
+        },
+      ],
+      attributes: ["seatId"],
+    });
+
+    const bookedSeatIds = bookedSeats.map((ticket) => ticket.seatId);
+
+    // Filter out booked seats - using type assertion for the association
+    const theaterSeats = (screening as any).theater?.seats || [];
+    const availableSeats = theaterSeats.filter(
+      (seat: any) => !bookedSeatIds.includes(seat.id)
+    );
+
+    res.status(200).json(availableSeats);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 export const addSeat = async (req: Request, res: Response) => {
-	try {
-		const { seatNumber, theaterId, rowNumber } = req.body;
-		if (!seatNumber || !theaterId || !rowNumber) {
-			return res.status(400).json({ message: "Invalid input" });
-		}
-		const newSeat = await db
-			.insert(seats)
-			.values({ seatNumber, theaterId, rowNumber })
-			.returning();
-		res.status(201).json(newSeat);
-	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
-	}
+  try {
+    const { seatNumber, theaterId, rowNumber, seatType } = req.body;
+
+    if (!seatNumber || !theaterId || !rowNumber) {
+      return res.status(400).json({
+        message: "Seat number, theater ID, and row number are required",
+      });
+    }
+
+    const newSeat = await Seat.create({
+      seatNumber,
+      theaterId,
+      rowNumber,
+      seatType: seatType || "regular",
+    });
+
+    res.status(201).json(newSeat);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 export const updateSeat = async (req: Request, res: Response) => {
-	try {
-		const seatId = parseInt(req.params.id);
-		const { seatNumber, rowNumber, seatType } = req.body;
-		if (!seatNumber || !rowNumber) {
-			return res.status(400).json({ message: "Invalid input" });
-		}
-		const updatedSeat = await db
-			.update(seats)
-			.set({ seatNumber, rowNumber, seatType })
-			.where(eq(seats.id, seatId))
-			.returning();
-		res.status(200).json(updatedSeat);
-	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
-	}
+  try {
+    const seatId = parseInt(req.params.id);
+    const { seatNumber, rowNumber, seatType } = req.body;
+
+    if (!seatNumber || !rowNumber) {
+      return res
+        .status(400)
+        .json({ message: "Seat number and row number are required" });
+    }
+
+    const seat = await Seat.findByPk(seatId);
+
+    if (!seat) {
+      return res.status(404).json({ message: "Seat not found" });
+    }
+
+    await seat.update({
+      seatNumber,
+      rowNumber,
+      seatType,
+    });
+
+    res.status(200).json(seat);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 export const deleteSeat = async (req: Request, res: Response) => {
-	try {
-		const seatId = parseInt(req.params.id);
-		const deletedSeat = await db
-			.delete(seats)
-			.where(eq(seats.id, seatId))
-			.returning();
-		if (deletedSeat.length === 0) {
-			return res.status(404).json({ message: "Seat not found" });
-		}
-		res.status(200).json(deletedSeat);
-	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
-	}
+  try {
+    const seatId = parseInt(req.params.id);
+
+    const seat = await Seat.findByPk(seatId);
+
+    if (!seat) {
+      return res.status(404).json({ message: "Seat not found" });
+    }
+
+    await seat.destroy();
+
+    res.status(200).json({ message: "Seat deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };

@@ -1,101 +1,161 @@
 import { Request, Response } from "express";
-import { db } from "../db";
-import { screenings } from "../db/schema/screenings";
-import { eq, inArray } from "drizzle-orm";
+import Screening from "../db/models/Screening";
+import { Op } from "sequelize";
 
 export const getTodayShowTimes = async (req: Request, res: Response) => {
-	try {
-        const today = new Date();
-		const next5Days = [];
-		for (let i = 0; i < 6; i++) {
-			const date = new Date(today);
-			date.setDate(today.getDate() + i);
-			next5Days.push(date.toLocaleDateString().split("T")[0]);
-		}
-		console.log(next5Days);
-		const showTimeForToday = await db
-			.select()
-			.from(screenings)
-			.where(inArray(screenings.screeningDate, next5Days));
-		res.json(showTimeForToday).status(200);
-	} catch (error) {
-		res.json(error).status(404);
-	}
+  try {
+    const today = new Date();
+    const next5Days = [];
+    for (let i = 0; i < 6; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      next5Days.push(date.toISOString().split("T")[0]);
+    }
+
+    const showTimeForToday = await Screening.findAll({
+      where: {
+        screeningDate: {
+          [Op.in]: next5Days,
+        },
+      },
+      include: [
+        {
+          association: "movie",
+          attributes: ["id", "title", "duration", "genre"],
+        },
+        {
+          association: "theater",
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
+      ],
+    });
+
+    res.status(200).json(showTimeForToday);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 export const getAllShowTimes = async (req: Request, res: Response) => {
-	try {
-		const allShowTimes = await db.select().from(screenings);
-		res.json(allShowTimes).status(200);
-	} catch (error) {
-		res.json(error).status(404);
-	}
+  try {
+    const allShowTimes = await Screening.findAll({
+      include: [
+        {
+          association: "movie",
+          attributes: ["id", "title", "duration"],
+        },
+        {
+          association: "theater",
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
+      ],
+    });
+    res.status(200).json(allShowTimes);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 export const getShowTimesBasedOnMovieId = async (
-	req: Request,
-	res: Response
+  req: Request,
+  res: Response
 ) => {
-	try {
-		const movieId = parseInt(req.params.id);
-		const showTimesForMovie = await db
-			.select()
-			.from(screenings)
-			.where(eq(screenings.movieId, movieId));
-		res.json(showTimesForMovie).status(200);
-	} catch (error) {
-		res.json(error).status(404);
-	}
+  try {
+    const movieId = parseInt(req.params.id);
+    const showTimesForMovie = await Screening.findAll({
+      where: { movieId },
+      include: [
+        {
+          association: "theater",
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
+      ],
+    });
+    res.status(200).json(showTimesForMovie);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
 export const addShowTime = async (req: Request, res: Response) => {
-    try {
-        const { movieId, theaterId, screeningDate, screeningTime, price } = req.body;
-		const createdAt = new Date();
-		if (!movieId || !theaterId || !screeningDate || !screeningTime) {
-			return res.status(400).json({ message: "Invalid input" });
-		}
-		const newShowTime = await db
-			.insert(screenings)
-			.values({ movieId, theaterId, screeningDate, screeningTime, price, createdAt })
-			.returning();
-		res.status(201).json(newShowTime);
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", error });
+  try {
+    const { movieId, theaterId, screeningDate, screeningTime, price } =
+      req.body;
+
+    if (!movieId || !theaterId || !screeningDate || !screeningTime || !price) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-}
+
+    const newShowTime = await Screening.create({
+      movieId,
+      theaterId,
+      screeningDate,
+      screeningTime,
+      price,
+    });
+
+    res.status(201).json(newShowTime);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
 
 export const updateShowTime = async (req: Request, res: Response) => {
-    try {
-        const showTimeId = parseInt(req.params.id);
-        const { movieId, theaterId, screeningDate, screeningTime, price } = req.body;
-        const updatedAt = new Date();
-        if (!movieId || !theaterId || !screeningDate || !screeningTime) {
-            return res.status(400).json({ message: "Invalid input" });
-        }
-        const updatedShowTime = await db
-            .update(screenings)
-            .set({ movieId, theaterId, screeningDate, screeningTime, price, updatedAt })
-            .where(eq(screenings.id, showTimeId))
-            .returning();
-        res.status(200).json(updatedShowTime);
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", error });
+  try {
+    const showTimeId = parseInt(req.params.id);
+    const { movieId, theaterId, screeningDate, screeningTime, price } =
+      req.body;
+
+    if (!movieId || !theaterId || !screeningDate || !screeningTime || !price) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-}
+
+    const showTime = await Screening.findByPk(showTimeId);
+
+    if (!showTime) {
+      return res.status(404).json({ message: "Show time not found" });
+    }
+
+    await showTime.update({
+      movieId,
+      theaterId,
+      screeningDate,
+      screeningTime,
+      price,
+    });
+
+    res.status(200).json(showTime);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
 
 export const deleteShowTime = async (req: Request, res: Response) => {
-    try {
-        const showTimeId = parseInt(req.params.id);
-        const deletedShowTime = await db
-            .delete(screenings)
-            .where(eq(screenings.id, showTimeId))
-            .returning();
-        if (deletedShowTime.length === 0) {
-            return res.status(404).json({ message: "Show time not found" });
-        }
-        res.status(200).json(deletedShowTime[0]);
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", error });
+  try {
+    const showTimeId = parseInt(req.params.id);
+
+    const showTime = await Screening.findByPk(showTimeId);
+
+    if (!showTime) {
+      return res.status(404).json({ message: "Show time not found" });
     }
-}   
+
+    await showTime.destroy();
+
+    res.status(200).json({ message: "Show time deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
