@@ -1,27 +1,68 @@
 import React from 'react';
+import { Clock, Users, LaptopMinimal } from "lucide-react";
 
 interface TheatreCardProps {
   name: string;
-  showtimes: string[];
+  cinema_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
-export default function TheatreCard({ name, showtimes }: TheatreCardProps) {
-  return (
-    <div className="bg-gradient-to-tr from-[#1e293b] to-[#0f172a] border border-[#334155] rounded-2xl p-6 shadow-xl hover:shadow-black transition duration-300">
-      <h3 className="text-white text-xl font-semibold mb-4">
-        {name}
-      </h3>
+const TheatreCard: React.FC<TheatreCardProps> = ({
+  name,
+  cinema_id,
+  created_at,
+  updated_at
+}) => {
+  // For example purposes, some static data like seats and showtimes
+  const availableSeats = 45;
+  const totalSeats = 120;
+  const showtimes = ["8:00", "10:00", "12:00", "2:30", "5:00", "7:30"];
 
-      <div className="flex flex-wrap gap-3">
-        {showtimes.map((time, index) => (
-          <button
-            key={index}
-            className="bg-[#26477b] text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-inner hover:bg-[#3b82f6] hover:text-white hover:shadow-blue-400/50 transition duration-300"
-          >
-            {time}
-          </button>
-        ))}
+  return (
+    <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
+      {/* Theater Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <LaptopMinimal className="w-5 h-5 text-sky-500" />
+          <div>
+            <h2 className="text-lg font-bold text-white">{name}</h2>
+            <p className="text-sm text-gray-400">Cinema ID: {cinema_id}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Seats Info */}
+      <div className="flex items-center justify-between bg-gray-800/50 rounded-md p-3">
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-green-500" />
+          <span className="text-sm text-gray-300">Available Seats</span>
+        </div>
+        <div className="text-right">
+          <p className="text-lg font-bold text-green-500">{availableSeats}</p>
+          <p className="text-xs text-gray-400">of {totalSeats} total</p>
+        </div>
+      </div>
+
+      {/* Showtimes */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Clock className="w-4 h-4 text-sky-500" />
+          <h4 className="text-sm font-semibold text-gray-300">Showtimes</h4>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {showtimes.map((time, index) => (
+            <button
+              key={index}
+              className="rounded-md border border-gray-600 px-3 py-2 text-sm font-medium text-gray-300 hover:border-sky-500 hover:text-sky-400 hover:bg-sky-500/10 transition-all duration-200"
+            >
+              {time}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default TheatreCard;

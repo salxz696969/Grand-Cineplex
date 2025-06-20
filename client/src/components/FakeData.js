@@ -289,37 +289,73 @@ export const Info = [
 export const TheatersData = [
   {
     id: 1,
-    name: "Legend Premium AEON Mall Sen Sok",
+    name: "Campus Cineplex Central Hall",
     cinema_id: 1,
     created_at: "2025-06-01T09:00:00Z",
     updated_at: "2025-06-01T09:00:00Z"
   },
   {
     id: 2,
-    name: "Major Cineplex Sorya",
+    name: "UniFilm Theater Science Block",
     cinema_id: 2,
     created_at: "2025-06-02T10:15:00Z",
     updated_at: "2025-06-02T10:15:00Z"
   },
   {
     id: 3,
-    name: "Prime Cineplex Siem Reap",
+    name: "Student Screen Arts Auditorium",
     cinema_id: 3,
     created_at: "2025-06-03T11:30:00Z",
     updated_at: "2025-06-03T11:30:00Z"
   },
   {
     id: 4,
-    name: "Legend Cinema Olympia Mall",
-    cinema_id: 1,
+    name: "Library Lounge Cinema Room",
+    cinema_id: 4,
     created_at: "2025-06-04T12:45:00Z",
     updated_at: "2025-06-04T12:45:00Z"
   },
   {
     id: 5,
-    name: "Major Cineplex AEON 1",
-    cinema_id: 2,
+    name: "Tech Park Movie Hall",
+    cinema_id: 5,
     created_at: "2025-06-05T14:00:00Z",
     updated_at: "2025-06-05T14:00:00Z"
+  },
+  {
+    id: 6,
+    name: "Student Union Movie Theater",
+    cinema_id: 1,
+    created_at: "2025-06-06T15:15:00Z",
+    updated_at: "2025-06-06T15:15:00Z"
+  },
+  {
+    id: 7,
+    name: "Engineering Block Cinema",
+    cinema_id: 2,
+    created_at: "2025-06-07T16:30:00Z",
+    updated_at: "2025-06-07T16:30:00Z"
+  },
+  {
+    id: 8,
+    name: "Sports Complex Movie Hall",
+    cinema_id: 3,
+    created_at: "2025-06-08T17:45:00Z",
+    updated_at: "2025-06-08T17:45:00Z"
+  },
+  {
+    id: 9,
+    name: "Graduate Center Screening Room",
+    cinema_id: 4,
+    created_at: "2025-06-09T19:00:00Z",
+    updated_at: "2025-06-09T19:00:00Z"
+  },
+  {
+    id: 10,
+    name: "Music Hall Film Theater",
+    cinema_id: 5,
+    created_at: "2025-06-10T20:15:00Z",
+    updated_at: "2025-06-10T20:15:00Z"
   }
 ];
+
