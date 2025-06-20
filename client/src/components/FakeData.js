@@ -285,3 +285,41 @@ export const upcomingShowJune = [
 export const Info = [
   { image: pic15 }
 ];
+
+export const TheatersData = [
+  {
+    id: 1,
+    name: "Legend Premium AEON Mall Sen Sok",
+    cinema_id: 1,
+    created_at: "2025-06-01T09:00:00Z",
+    updated_at: "2025-06-01T09:00:00Z"
+  },
+  {
+    id: 2,
+    name: "Major Cineplex Sorya",
+    cinema_id: 2,
+    created_at: "2025-06-02T10:15:00Z",
+    updated_at: "2025-06-02T10:15:00Z"
+  },
+  {
+    id: 3,
+    name: "Prime Cineplex Siem Reap",
+    cinema_id: 3,
+    created_at: "2025-06-03T11:30:00Z",
+    updated_at: "2025-06-03T11:30:00Z"
+  },
+  {
+    id: 4,
+    name: "Legend Cinema Olympia Mall",
+    cinema_id: 1,
+    created_at: "2025-06-04T12:45:00Z",
+    updated_at: "2025-06-04T12:45:00Z"
+  },
+  {
+    id: 5,
+    name: "Major Cineplex AEON 1",
+    cinema_id: 2,
+    created_at: "2025-06-05T14:00:00Z",
+    updated_at: "2025-06-05T14:00:00Z"
+  }
+];

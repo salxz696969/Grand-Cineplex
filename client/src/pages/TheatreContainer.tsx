@@ -1,18 +1,22 @@
 import React from 'react';
-import Header from '../components/homecomponents/Header';
-import TheatreShowtime from '../components/theatres/TheatreShowtime';
+import { TheatersData } from '../components/FakeData';
+import TheatreCards from '../components/theatres/TheatreCard';
 
-const theatres = [1,2,3]; // placeholder
+export default function TheatreContainer() {
+  // Dummy showtimes (same for all)
+  const showtimes = ["10:00 AM", "12:30 PM", "3:00 PM", "5:30 PM", "8:00 PM"];
 
-export default function Theatres() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Header />
-      <div className="p-4">
-        <h2 className="text-lg font-semibold mt-6 mb-4">Theatres</h2>
-        <div className="space-y-4">
-          {theatres.map((t, i) => <TheatreShowtime key={i} />)}
-        </div>
+    <div className="mt-10">
+      <h2 className="text-xl font-bold mb-4 text-white">Available Theaters</h2>
+      <div className="flex flex-col gap-5">
+        {TheatersData.map((theater) => (
+          <TheatreCards
+            key={theater.id}
+            name={theater.name}
+            showtimes={showtimes}
+          />
+        ))}
       </div>
     </div>
   );

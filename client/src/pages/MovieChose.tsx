@@ -3,11 +3,12 @@ import { useParams } from "react-router-dom";
 import { currentShow, upcomingShowJune } from "../components/FakeData";
 import Header from "../components/homecomponents/Header";
 import Footer from "../components/Footer";
-
 import MovieHeader from "../components/movie/MovieHeader";
 import Tabs from "../components/movie/Tab";
 import ShowtimeTab from "../components/homecomponents/ShowtimeTab";
 import DetailTab from "../components/movie/DetailTab";
+import TheatresContainer from "./TheatreContainer";
+
 
 interface Movie {
   id: number;
@@ -97,7 +98,11 @@ export default function MovieChosen() {
           )}
           {activeTab === "detail" && <DetailTab overview={movie.description} />}
         </div>
+
+        <TheatresContainer/>
+          
       </div>
+
 
       <Footer />
     </div>
