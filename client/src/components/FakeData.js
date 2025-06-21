@@ -289,70 +289,70 @@ export const Info = [
 export const TheatersData = [
   {
     id: 1,
-    name: "Campus Cineplex Central Hall",
+    name: "CADT First Hall",
     cinema_id: 1,
     created_at: "2025-06-01T09:00:00Z",
     updated_at: "2025-06-01T09:00:00Z"
   },
   {
     id: 2,
-    name: "UniFilm Theater Science Block",
+    name: "CADT Second Hall",
     cinema_id: 2,
     created_at: "2025-06-02T10:15:00Z",
     updated_at: "2025-06-02T10:15:00Z"
   },
   {
     id: 3,
-    name: "Student Screen Arts Auditorium",
+    name: "CADT Third Hall",
     cinema_id: 3,
     created_at: "2025-06-03T11:30:00Z",
     updated_at: "2025-06-03T11:30:00Z"
   },
   {
     id: 4,
-    name: "Library Lounge Cinema Room",
+    name: "CADT Fourth Hall",
     cinema_id: 4,
     created_at: "2025-06-04T12:45:00Z",
     updated_at: "2025-06-04T12:45:00Z"
   },
   {
     id: 5,
-    name: "Tech Park Movie Hall",
+    name: "CADT Fifth Hall",
     cinema_id: 5,
     created_at: "2025-06-05T14:00:00Z",
     updated_at: "2025-06-05T14:00:00Z"
   },
   {
     id: 6,
-    name: "Student Union Movie Theater",
+    name: "CADT Six Hall",
     cinema_id: 1,
     created_at: "2025-06-06T15:15:00Z",
     updated_at: "2025-06-06T15:15:00Z"
   },
   {
     id: 7,
-    name: "Engineering Block Cinema",
+    name: "CADT Seven Hall",
     cinema_id: 2,
     created_at: "2025-06-07T16:30:00Z",
     updated_at: "2025-06-07T16:30:00Z"
   },
   {
     id: 8,
-    name: "Sports Complex Movie Hall",
+    name: "CADT Eight Hall",
     cinema_id: 3,
     created_at: "2025-06-08T17:45:00Z",
     updated_at: "2025-06-08T17:45:00Z"
   },
   {
     id: 9,
-    name: "Graduate Center Screening Room",
+    name: "CADT Nine Hall",
     cinema_id: 4,
     created_at: "2025-06-09T19:00:00Z",
     updated_at: "2025-06-09T19:00:00Z"
   },
   {
     id: 10,
-    name: "Music Hall Film Theater",
+    name: "CADT Ten Hall",
     cinema_id: 5,
     created_at: "2025-06-10T20:15:00Z",
     updated_at: "2025-06-10T20:15:00Z"

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, Users, LaptopMinimal } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 interface TheatreCardProps {
   name: string;
@@ -14,10 +15,12 @@ const TheatreCard: React.FC<TheatreCardProps> = ({
   created_at,
   updated_at
 }) => {
-  // For example purposes, some static data like seats and showtimes
-  const availableSeats = 45;
-  const totalSeats = 120;
+  
+  // Just use the fake data
+  const availableSeats = 40;
+  const totalSeats = 60;
   const showtimes = ["8:00", "10:00", "12:00", "2:30", "5:00", "7:30"];
+  const navigate= useNavigate();
 
   return (
     <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
@@ -32,7 +35,6 @@ const TheatreCard: React.FC<TheatreCardProps> = ({
         </div>
       </div>
 
-      {/* Seats Info */}
       <div className="flex items-center justify-between bg-gray-800/50 rounded-md p-3">
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-green-500" />
@@ -44,7 +46,7 @@ const TheatreCard: React.FC<TheatreCardProps> = ({
         </div>
       </div>
 
-      {/* Showtimes */}
+
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Clock className="w-4 h-4 text-sky-500" />
