@@ -91,6 +91,7 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }
     }
   }, [searchTerm, allMovies]);
 
+  
   if (isLoading || isSearching) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">

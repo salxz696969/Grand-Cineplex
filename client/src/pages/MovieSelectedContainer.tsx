@@ -5,6 +5,7 @@ import Header from "../components/homecomponents/Header";
 import Footer from "../components/Footer";
 import MovieSelectedCard from "../components/movie/MovieSelectedCard";
 import TheatreContainer from "../components/theatres/TheatreContainer";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 
 interface Movie {
@@ -37,16 +38,7 @@ export default function MovieChosen() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#171c20] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white text-sm">Loading movie details...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
 
   if (!movie) {
     return <p className="text-white p-4">Movie not found</p>;
@@ -62,7 +54,7 @@ export default function MovieChosen() {
               <MovieSelectedCard movie={movie} />
             </div> 
             <div className="flex-1">
-              <TheatreContainer />
+              <TheatreContainer movieId={movie.id} />
             </div>
           </div>
         </div>

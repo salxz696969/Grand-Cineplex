@@ -4,6 +4,7 @@ import InfoInform from "../components/homecomponents/InformationPic";
 import ScheduleHeader from "../components/homecomponents/ScheduleShow";
 import MovieContainer from "../components/movie/MovieContainer";
 import Footer from "../components/Footer";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,16 +20,7 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#171c20] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white text-sm">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-[#171c20] text-white">
