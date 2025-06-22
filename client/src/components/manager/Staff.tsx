@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Search, Filter, PlusCircle, User, Mail, Phone, Shield, Edit, Trash2, MoreHorizontal } from "lucide-react";
+import AddStaff from "./AddStaff";
 
 export interface StaffMember {
     id: string;
@@ -205,6 +206,7 @@ export default function Staff() {
     const [selectedRole, setSelectedRole] = useState<string>("all");
     const [selectedStatus, setSelectedStatus] = useState<string>("all");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
+    const [addingStaff, setAddingStaff] = useState(false);
 
     const filteredStaff = staff.filter(member => {
         const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -259,6 +261,21 @@ export default function Staff() {
 
     const departments = Array.from(new Set(staff.map(s => s.department)));
 
+    const handleBackToStaff = () => {
+        setAddingStaff(false);
+    };
+
+    const handleAddStaff = () => {
+        setAddingStaff(true);
+    };
+
+    // If adding staff, show the AddStaff component
+    if (addingStaff) {
+        return (
+            <AddStaff onBack={handleBackToStaff} />
+        );
+    }
+
     return (
         <div className="flex flex-col gap-6 p-4 w-full">
             {/* Header */}
@@ -267,7 +284,10 @@ export default function Staff() {
                     <h2 className="text-2xl font-bold tracking-tight text-white">Staff Management</h2>
                     <p className="text-slate-400">Manage your cinema staff members and roles.</p>
                 </div>
-                <button className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform hover:scale-105">
+                <button
+                    onClick={handleAddStaff}
+                    className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform hover:scale-105"
+                >
                     <PlusCircle className="w-4 h-4" />
                     Add Staff Member
                 </button>

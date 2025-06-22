@@ -6,6 +6,7 @@ import Movies from '../../components/manager/Movies';
 import Screenings from '../../components/manager/Screenings';
 import Staff from '../../components/manager/Staff';
 import Bookings from '../../components/manager/Bookings';
+import Theaters from '../../components/manager/Theaters';
 
 
 
@@ -30,6 +31,8 @@ export default function Main() {
                 return <Staff />;
             case 'bookings':
                 return <Bookings />;
+            case 'theaters':
+                return <Theaters />;
             default:
                 return <Dashboard />;
         }

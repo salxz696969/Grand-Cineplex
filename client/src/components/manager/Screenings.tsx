@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { PlusCircle, Search, Calendar, Clock, MapPin, Users, Filter, Film } from "lucide-react";
 import MovieScreeningCard from "./MovieScreeningCard";
+import AddScreening from "./AddScreening";
 
 
 export interface Screening {
@@ -158,6 +159,7 @@ export default function Screenings() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedTheater, setSelectedTheater] = useState<string>("all");
     const [selectedStatus, setSelectedStatus] = useState<string>("all");
+    const [addingScreening, setAddingScreening] = useState(false);
 
     // Use today's date for filtering
     const today = new Date().toISOString().split('T')[0];
@@ -187,6 +189,21 @@ export default function Screenings() {
         return acc;
     }, {} as Record<string, { movieTitle: string; movieImage: string; screenings: Screening[] }>);
 
+    const handleBackToScreenings = () => {
+        setAddingScreening(false);
+    };
+
+    const handleAddScreening = () => {
+        setAddingScreening(true);
+    };
+
+    // If adding a screening, show the AddScreening component
+    if (addingScreening) {
+        return (
+            <AddScreening onBack={handleBackToScreenings} />
+        );
+    }
+
     return (
         <div className="flex flex-col gap-6 p-4 w-full">
             {/* Header */}
@@ -195,7 +212,10 @@ export default function Screenings() {
                     <h2 className="text-2xl font-bold tracking-tight text-white">Screenings</h2>
                     <p className="text-slate-400">Manage movie screenings and showtimes.</p>
                 </div>
-                <button className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform hover:scale-105">
+                <button
+                    onClick={handleAddScreening}
+                    className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform hover:scale-105"
+                >
                     <PlusCircle className="w-4 h-4" />
                     Add Screening
                 </button>

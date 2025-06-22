@@ -1,4 +1,4 @@
-import { BarChart, Calendar, Film, HomeIcon, Ticket, User } from "lucide-react";
+import { BarChart, Calendar, Film, HomeIcon, Theater, Ticket, User } from "lucide-react";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -26,6 +26,12 @@ const content = [
         title: "Bookings",
         icon: <Ticket className="w-5 h-5" />,
         subHeading: "Manage your bookings."
+    },
+    {
+        id: "theaters",
+        title: "Theaters",
+        icon: <Theater className="w-5 h-5" />,
+        subHeading: "Manage your theaters."
     },
     {
         id: "staff",
