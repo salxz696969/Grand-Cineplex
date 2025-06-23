@@ -9,31 +9,41 @@ A brief reference for maintaining consistency, readability, and scalability thro
 - **Follow the given structure** (e.g., `components/`, `pages/`, `services/`, etc.).
 - Group related files together by feature or function.
 - **Keep components small and focused**. One component = one job.
+- **Backend:** Use an `app/` folder under `src/` to separate role-based modules (customer, cashier, manager) from shared code.
 
 ---
 
-## 🧩 Naming Conventions
+## 🧩 Abstraction & Independence
+
+- **Route Registration:**
+  - Register only base role prefixes (e.g., `/customer`, `/cashier`, `/manager`) in `app.ts`.
+  - Each role's `routes/index.ts` should handle its own subroutes (e.g., `/movies`, `/bookings`).
+  - This keeps the main app entry clean and each module independent and maintainable.
+
+---
+
+## 🧮 Naming Conventions
 
 ### General
 
 - Use **kebab-case** for folders: `movie-list`, `user-profile`
-- Use **PascalCase** for React components: `MovieCard.jsx`, `UserForm.jsx`
+- Use **PascalCase** for React components: `MovieCard.tsx`, `UserForm.tsx`
 - Use **camelCase** for variables and functions: `handleSubmit`, `fetchData`
 - Use **UPPER_SNAKE_CASE** for constants: `MAX_RETRIES`, `API_URL`
 
 ### Backend
 
-- **Schema Files**: Use singular form + `.ts` (e.g., `movies.ts`, `theaters.ts`)
-- **File naming style**: Prefer `user.controller.ts`, `user.service.ts`, `user.routes.ts` for clarity.
+- **Schema/Model Files:** Use singular form + `.ts` (e.g., `Movie.ts`, `Theater.ts`)
+- **File naming style:** Prefer `user.controller.ts`, `user.service.ts`, `user.routes.ts` for clarity.
   (`[entity].[layer].ts`)
-- **Middleware**: Name based on action, e.g., `authMiddleware.ts`, `errorHandler.ts`
+- **Middleware:** Name based on action, e.g., `authMiddleware.ts`, `errorHandler.ts`
 
-### Database (Drizzle)
+### Database (Sequelize & Drizzle)
 
-- **Table Names**: Use plural, snake_case: `movies`, `movie_screenings`
-- **Column Names**: Use snake_case: `created_at`, `updated_at`
-- **Foreign Keys**: Use `entity_id` format: `movie_id`, `theater_id`
-- **Enums**: Use singular form: `payment_type`, `booking_status`
+- **Table Names:** Use plural, snake_case: `movies`, `movie_screenings`
+- **Column Names:** Use snake_case: `created_at`, `updated_at`
+- **Foreign Keys:** Use `entity_id` format: `movie_id`, `theater_id`
+- **Enums:** Use singular form: `payment_type`, `booking_status`
 
 ---
 
@@ -45,7 +55,8 @@ A brief reference for maintaining consistency, readability, and scalability thro
 
 - Avoid deep relative imports (like `../../../utils`). Use aliases or structure well.
 
-- For Drizzle schemas, import from the index file:
+- For Sequelize models, import from the models index file if available.
+- For Drizzle schemas (legacy), import from the index file:
   ✅ Yes: `import { movies, theaters } from '../db'`
   🚫 No: `import { movies } from '../db/schema/movies'`
 
@@ -72,7 +83,15 @@ Example:
 ## 🌐 API Layer (Frontend)
 
 - Centralize API calls (e.g., in `api/[api].ts`) to avoid scattered logic.
+- **Prefer utility functions** for each endpoint (not classes), e.g.:
+  ```ts
+  // api/customer.ts
+  export async function getMovies() { ... }
+  export async function bookTicket(payload) { ... }
+  ```
+- Centralize the API base URL (e.g., `API_BASE_URL` from `.env`).
 - Use meaningful names like `getUserData()` or `submitBooking()`.
+- Handle errors in the API layer or propagate them consistently.
 
 ---
 
@@ -84,9 +103,16 @@ Example:
 
 ---
 
-## 🗄️ Database (Drizzle)
+## 📄 Database (Sequelize & Drizzle)
 
-- **Schema Organization**
+- **Sequelize (current):**
+
+  - Define each model in its own file under `db/models/`.
+  - Use TypeScript for type safety.
+  - Define associations in model files or a central index.
+  - Use migrations for schema changes.
+
+- **Drizzle (legacy, for reference):**
 
   - Keep each table in its own file under `db/schema/`
   - Use TypeScript for type safety
@@ -94,29 +120,15 @@ Example:
 
 - **Query Best Practices**
 
-  - Use prepared statements (Drizzle handles this)
+  - Use prepared statements (ORM handles this)
   - Keep queries simple and focused
   - Use transactions for multiple operations
   - Handle errors appropriately
 
 - **Type Safety**
-  - Use Drizzle's generated types
-  - Define custom types in `data/types.ts`
+  - Use ORM-generated types
+  - Define custom types in `shared/types.ts`
   - Use enums for fixed sets of values
-
-Example:
-
-```typescript
-// Good
-const movie = await db
-  .select()
-  .from(movies)
-  .where(eq(movies.id, movieId))
-  .limit(1);
-
-// Bad
-const movie = await db.execute(sql`SELECT * FROM movies WHERE id = ${movieId}`);
-```
 
 ---
 
@@ -138,4 +150,4 @@ console.log("[User Fetch]", userData); // DEBUG:
 - Always keep `.env` for secrets — never commit `.env` or `node_modules`.
 - Prefer `.tsx` for React files and `.ts` for logic/backend.
 - Write clean, predictable functions — avoid side effects.
-- Use Drizzle's type-safe query builder instead of raw SQL.
+- Use Sequelize for all new database work; Drizzle files are kept for reference only.
