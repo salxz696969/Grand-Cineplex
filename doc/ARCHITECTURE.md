@@ -82,7 +82,7 @@ Contains core application logic (business rules). This layer abstracts operation
 #### 📁 `middleware/`
 
 Reusable Express middleware for things like:
-
+s
 - Request logging
 - Error handling
 - Authentication/authorization
