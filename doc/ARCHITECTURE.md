@@ -16,12 +16,12 @@ This document provides a high-level overview of the architectural structure and 
 
 - **Express**
 - **PostgreSQL**
-- **Drizzle ORM** - Type-safe SQL query builder
+- **Sequelize ORM** – Type-safe SQL ORM (current)
 - **Firebase, JWT or session-based auth (TBD)**
 
 ---
 
-## 📐 Architectural Style
+## 📖 Architectural Style
 
 The app follows a **modular, layered architecture**, emphasizing separation of concerns and maintainability across both frontend and backend codebases.
 
@@ -38,7 +38,7 @@ This folder holds all reusable UI elements, categorized into:
 
 #### 📁 `pages/`
 
-Page-level components that represent full views in the app. Each page may fetch data and render relevant components. Example: `Login.jsx`, `MovieList.jsx`, `BookingPage.jsx`.
+Page-level components that represent full views in the app. Each page may fetch data and render relevant components. Example: `Login.tsx`, `MovieList.tsx`, `BookingPage.tsx`.
 
 #### 📁 `assets/`
 
@@ -54,30 +54,25 @@ Helper functions, constants, formatting tools, and hooks (`useDebounce`, `format
 
 ---
 
-### 🖥 Backend – Express (Server)
+### 🖥️ Backend – Express (Server)
 
 #### 📁 `db/`
 
-Database configuration and schema definitions using Drizzle ORM:
+Database configuration and schema definitions:
 
-- `schema/`: Table definitions and relationships
-- `index.ts`: Database connection and configuration
+- `models/`: Sequelize model definitions (current)
+- `index.ts`: Sequelize connection and configuration
+- `schema/`: Drizzle schema definitions (legacy, for reference)
 
-#### 📁 `routes/`
+#### 📁 `app/`
 
-Defines API endpoints and maps them to the appropriate controller functions. Keeps the URL structure organized. Example:
+Role-based modules for route and controller organization:
 
-```js
-router.get("/movies", movieController.getAllMovies);
-```
+- `customer/`: Customer-facing routes and controllers
+- `cashier/`: Cashier-facing routes and controllers
+- `manager/`: Manager/admin routes and controllers
 
-#### 📁 `controllers/`
-
-Responsible for handling incoming HTTP requests. Calls service functions to execute business logic and sends back appropriate responses. Think of it as the "interface" between the web and your app logic.
-
-#### 📁 `services/`
-
-Contains core application logic (business rules). This layer abstracts operations like filtering data, validating input, or applying transformations. It's what your controller "delegates" to.
+Each role has its own `routes/` (with an `index.ts` that combines subroutes) and `controllers/`.
 
 #### 📁 `middleware/`
 
@@ -88,17 +83,17 @@ Reusable Express middleware for things like:
 - Authentication/authorization
 - Input validation
 
-#### 📁 `data/`
+#### 📁 `controllers/`
 
-Contains data-related utilities and types:
+Contains core application logic (business rules). This layer abstracts operations like filtering data, validating input, or applying transformations. 
 
-- Type definitions
-- Data transformation functions
-- Constants and enums
+#### 📁 `shared/`
+
+Contains shared utilities, types, and helpers used across the backend.
 
 #### 📄 `app.ts`
 
-Sets up the Express app: loads middleware, connects to the database, sets up CORS, and mounts routes.
+Sets up the Express app: loads middleware, connects to the database, sets up CORS, and mounts routes. **Only base role prefixes are registered here** (e.g., `/customer`, `/cashier`, `/manager`). Each role's `routes/index.ts` handles its own subroutes, keeping the main app entry clean and modular.
 
 #### 📄 `server.ts`
 
@@ -106,20 +101,19 @@ Entry point that starts the server (e.g., `app.listen()`).
 
 ---
 
-## 🧱 Summary
+## 🧑‍💻 Summary Table
 
-| Layer / Folder | Purpose                                         |
-| -------------- | ----------------------------------------------- |
-| `components/`  | Reusable building blocks for UI                 |
-| `pages/`       | Views/screens rendered by routes                |
-| `db/`          | Database configuration and schema definitions   |
-| `routes/`      | Maps API endpoints to controller functions      |
-| `controllers/` | Handle HTTP logic and coordinate between layers |
-| `services/`    | Business logic and rules                        |
-| `data/`        | Data types, transformations, and utilities      |
-| `middleware/`  | Request preprocessing (auth, validation, etc.)  |
-| `layouts/`     | Page layout wrappers for UI consistency         |
-| `api/`         | Functions to talk to backend from frontend      |
+| Layer / Folder | Purpose                                        |
+| -------------- | ---------------------------------------------- |
+| `components/`  | Reusable building blocks for UI                |
+| `pages/`       | Views/screens rendered by routes               |
+| `db/`          | Database configuration and models (Sequelize)  |
+| `app/`         | Role-based route/controller modules            |
+| `middleware/`  | Request preprocessing (auth, validation, etc.) |
+| `controllers/` | Business logic and rules                       |
+| `shared/`      | Shared utilities, types, and helpers           |
+| `layouts/`     | Page layout wrappers for UI consistency        |
+| `api/`         | Functions to talk to backend from frontend     |
 
 ---
 
@@ -127,7 +121,7 @@ Entry point that starts the server (e.g., `app.listen()`).
 
 ```
 +---------------------+
-|  🖱️ User Interaction|
+|  🖥️ User Interaction|
 |     (React UI)      |
 +----------+----------+
            |
@@ -138,27 +132,22 @@ Entry point that starts the server (e.g., `app.listen()`).
            |
            v
 +----------+----------+
-|  🛣️ Express Route   |
+|  🛠️ Express Route   |
 +----------+----------+
            |
            v
 +----------+----------+
-| 🧭 Controller Logic |
+| 🧑‍💻 Controller Logic |
 +----------+----------+
            |
            v
 +----------+----------+
-| 🧠 Service Layer    |
+| 🗄️ Sequelize ORM    |
 +----------+----------+
            |
            v
 +----------+----------+
-| 🌊 Drizzle ORM      |
-+----------+----------+
-           |
-           v
-+----------+----------+
-| 🗄️ PostgreSQL DB    |
+| 📄 PostgreSQL DB    |
 +----------+----------+
            |
            v
@@ -179,7 +168,7 @@ Entry point that starts the server (e.g., `app.listen()`).
 
 - Maintainability and scalability
 - Separation of concerns
-- Type safety with Drizzle ORM
+- Type safety with Sequelize ORM (and Drizzle legacy)
 - Ease of testing and debugging
 
 ---
