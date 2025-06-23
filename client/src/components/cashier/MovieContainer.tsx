@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import MovieCard from "./MovieCard";
-import { currentShow, upcomingShow } from "../../utils/FakeData";
+import { currentShow, upcomingShowJune } from "../../utils/FakeData";
 
 export interface Movie {
   id: number;

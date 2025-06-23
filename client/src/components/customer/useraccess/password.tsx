@@ -1,3 +1,5 @@
+// This components used in signup and signin to provide user to fill the password
+
 import { useState, ChangeEvent } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 

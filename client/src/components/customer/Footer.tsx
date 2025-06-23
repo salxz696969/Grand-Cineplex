@@ -1,3 +1,5 @@
+// This is the footer for our website
+
 import React from "react";
 
 export default function Footer() {
@@ -8,7 +10,7 @@ export default function Footer() {
           
           {/* About Us */}
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4">About CineView</h3>
+            <h3 className="text-white text-lg font-semibold mb-4">About Cinema</h3>
             <p className="leading-relaxed break-words">
               Grand-Cineplex is your ultimate destination for blockbuster hits and hidden indie gems. Enjoy next-level sound, razor-sharp screens, and unbeatable comfort — because at Grand-Cineplex, every movie matters.
             </p>

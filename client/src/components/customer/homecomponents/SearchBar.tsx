@@ -1,3 +1,5 @@
+// This component is the searchbar which offer user the search their favorite movie
+
 import React from 'react';
 import { Search } from 'lucide-react';
 

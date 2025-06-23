@@ -1,14 +1,25 @@
 import React from "react";
-import Header from "../../components/Header";
-import Password from "../../components/Password";
+
+import Header from "../../components/customer/homecomponents/Header";
+import Password from "../../components/customer/useraccess/password";
 import { Link } from "react-router-dom";
-import { useState, FormEvent } from "react";
-import { ValidateEmail } from "../../utils/validation";
+import { useState, useEffect, FormEvent } from "react";
+import { ValidateEmail } from "../../components/customer/support";
+import LoadingSpinner from "../../components/customer/LoadingSpinner";
 
 export default function SignIn() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); // 0.5 second delay
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,8 +36,10 @@ export default function SignIn() {
 
     setError(null);
 
-    // Login API Call in this to login user
+    //  backend API login logic here
   };
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="w-screen h-screen bg-[#171c20] flex flex-col">
@@ -36,22 +49,27 @@ export default function SignIn() {
           <form onSubmit={handleLogin} className="w-full fill">
             <h4 className="text-2xl mb-7">Login</h4>
 
-            <input type="text" placeholder="Email" className="input-box" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input
+              type="text"
+              placeholder="Email"
+              className="input-box"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-            {/* invoke Password components when assign props to it */}
+            {/* Password input component */}
             <Password value={password} onChange={(e) => setPassword(e.target.value)} />
 
-            {/* Enable when it error on email, password */}
-            {error && (<p className="text-sm text-red-500 mb-3">{error}</p>)}
+            {/* Display error message if any */}
+            {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
 
-            <button type="submit" className="btn-primary h-10">Login</button>
+            <button type="submit" className="btn-primary h-10">
+              Login
+            </button>
 
             <p className="text-sm text-center mt-4">
               Not registered yet?{" "}
-              <Link
-                className="font-medium text-blue-500 underline"
-                to="/SignUp"
-              >
+              <Link className="font-medium text-blue-500 underline" to="/SignUp">
                 Create an Account
               </Link>
             </p>
