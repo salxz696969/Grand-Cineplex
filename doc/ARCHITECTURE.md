@@ -7,20 +7,21 @@ This document provides a high-level overview of the architectural structure and 
 ## 🔧 Tech Stack
 
 ### Frontend (Client)
-- **React** 
+
+- **React**
 - **Axios**
 - **Tailwind CSS**
 
 ### Backend (Server)
-- **Express**  
-- **PostgreSQL**  
-- **pg** 
+
+- **Express**
+- **PostgreSQL**
+- **Sequelize ORM** – Type-safe SQL ORM (current)
 - **Firebase, JWT or session-based auth (TBD)**
 
 ---
 
-
-## 📐 Architectural Style
+## 📖 Architectural Style
 
 The app follows a **modular, layered architecture**, emphasizing separation of concerns and maintainability across both frontend and backend codebases.
 
@@ -32,62 +33,67 @@ The app follows a **modular, layered architecture**, emphasizing separation of c
 
 This folder holds all reusable UI elements, categorized into:
 
-* `common/`: Global shared components like `Button`, `Input`, `Modal`, etc.
-* `pageX/`: Components specific to a given page (`Home`, `Dashboard`, etc.).
-
+- `common/`: Global shared components like `Button`, `Input`, `Modal`, etc.
+- `pageX/`: Components specific to a given page (`Home`, `Dashboard`, etc.).
 
 #### 📁 `pages/`
 
-Page-level components that represent full views in the app. Each page may fetch data and render relevant components. Example: `Login.jsx`, `MovieList.jsx`, `BookingPage.jsx`.
+Page-level components that represent full views in the app. Each page may fetch data and render relevant components. Example: `Login.tsx`, `MovieList.tsx`, `BookingPage.tsx`.
 
 #### 📁 `assets/`
 
 Static files like images, icons, logos, or SVGs.
 
-#### 📁 `api/` 
+#### 📁 `api/`
 
 Holds functions to interact with the backend. Encapsulates API logic and can define services like `getMovies()`, `bookSeat(id)` etc.
 
-#### 📁 `utils/` *(planned)*
+#### 📁 `utils/` _(planned)_
 
 Helper functions, constants, formatting tools, and hooks (`useDebounce`, `formatDate`, etc.).
 
 ---
 
-### 🖥 Backend – Express (Server)
+### 🖥️ Backend – Express (Server)
 
-#### 📁 `routes/`
+#### 📁 `db/`
 
-Defines API endpoints and maps them to the appropriate controller functions. Keeps the URL structure organized. Example:
+Database configuration and schema definitions:
 
-```js
-router.get("/movies", movieController.getAllMovies)
-```
+- `models/`: Sequelize model definitions (current)
+- `index.ts`: Sequelize connection and configuration
+- `schema/`: Drizzle schema definitions (legacy, for reference)
 
-#### 📁 `controllers/`
+#### 📁 `app/`
 
-Responsible for handling incoming HTTP requests. Calls service functions to execute business logic and sends back appropriate responses. Think of it as the "interface" between the web and your app logic.
+Role-based modules for route and controller organization:
 
-#### 📁 `services/`
+- `customer/`: Customer-facing routes and controllers
+- `cashier/`: Cashier-facing routes and controllers
+- `manager/`: Manager/admin routes and controllers
 
-Contains core application logic (business rules). This layer abstracts operations like filtering data, validating input, or applying transformations. It’s what your controller “delegates” to.
-
-#### 📁 `models/`
-
-Represents your database tables/entities. If you're using an ORM like Sequelize or Prisma, this is where you define your schemas, relationships, and database access methods.
+Each role has its own `routes/` (with an `index.ts` that combines subroutes) and `controllers/`.
 
 #### 📁 `middleware/`
 
 Reusable Express middleware for things like:
 
-* Request logging
-* Error handling
-* Authentication/authorization
-* Input validation
+- Request logging
+- Error handling
+- Authentication/authorization
+- Input validation
+
+#### 📁 `controllers/`
+
+Contains core application logic (business rules). This layer abstracts operations like filtering data, validating input, or applying transformations. 
+
+#### 📁 `shared/`
+
+Contains shared utilities, types, and helpers used across the backend.
 
 #### 📄 `app.ts`
 
-Sets up the Express app: loads middleware, connects to the database, sets up CORS, and mounts routes.
+Sets up the Express app: loads middleware, connects to the database, sets up CORS, and mounts routes. **Only base role prefixes are registered here** (e.g., `/customer`, `/cashier`, `/manager`). Each role's `routes/index.ts` handles its own subroutes, keeping the main app entry clean and modular.
 
 #### 📄 `server.ts`
 
@@ -95,29 +101,27 @@ Entry point that starts the server (e.g., `app.listen()`).
 
 ---
 
+## 🧑‍💻 Summary Table
 
-## 🧱 Summary
-
-| Layer / Folder | Purpose                                           |
-| -------------- | ------------------------------------------------- |
-| `components/`  | Reusable building blocks for UI                   |
-| `pages/`       | Views/screens rendered by routes                  |
-| `routes/`      | Maps API endpoints to controller functions        |
-| `controllers/` | Handle HTTP logic and coordinate between layers   |
-| `services/`    | Business logic and rules                          |
-| `models/`      | Database schema and data interaction              |
-| `middleware/`  | Request preprocessing (auth, validation, etc.)    |
-| `layouts/`     | Page layout wrappers for UI consistency           |
-| `api/`         | Functions to talk to backend from frontend        |
+| Layer / Folder | Purpose                                        |
+| -------------- | ---------------------------------------------- |
+| `components/`  | Reusable building blocks for UI                |
+| `pages/`       | Views/screens rendered by routes               |
+| `db/`          | Database configuration and models (Sequelize)  |
+| `app/`         | Role-based route/controller modules            |
+| `middleware/`  | Request preprocessing (auth, validation, etc.) |
+| `controllers/` | Business logic and rules                       |
+| `shared/`      | Shared utilities, types, and helpers           |
+| `layouts/`     | Page layout wrappers for UI consistency        |
+| `api/`         | Functions to talk to backend from frontend     |
 
 ---
-
 
 ## 🔄 Data Flow Overview
 
 ```
 +---------------------+
-|  🖱️ User Interaction|
+|  🖥️ User Interaction|
 |     (React UI)      |
 +----------+----------+
            |
@@ -128,22 +132,22 @@ Entry point that starts the server (e.g., `app.listen()`).
            |
            v
 +----------+----------+
-|  🛣️ Express Route   |
+|  🛠️ Express Route   |
 +----------+----------+
            |
            v
 +----------+----------+
-| 🧭 Controller Logic |
+| 🧑‍💻 Controller Logic |
 +----------+----------+
            |
            v
 +----------+----------+
-| 🧠 Service Layer    |
+| 🗄️ Sequelize ORM    |
 +----------+----------+
            |
            v
 +----------+----------+
-| 🗄️ PostgreSQL DB    |
+| 📄 PostgreSQL DB    |
 +----------+----------+
            |
            v
@@ -157,18 +161,16 @@ Entry point that starts the server (e.g., `app.listen()`).
 |    (Re-render UI)    |
 +----------+-----------+
 ```
+
 ---
 
 ## ✅ Goals
 
 - Maintainability and scalability
 - Separation of concerns
+- Type safety with Sequelize ORM (and Drizzle legacy)
 - Ease of testing and debugging
 
 ---
 
-
-
 > 📌 Note: As the project evolves, this document will be updated to reflect more specific architectural decisions.
-
-

@@ -18,6 +18,6 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "server/src"
+    "src/server/src"
   ]
 }
