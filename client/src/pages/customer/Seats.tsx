@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from '../components/Header';
-import SeatGrid from '../components/SeatGrid';
+import Header from '../../components/Header';
+import SeatGrid from '../../components/SeatGrid';
 
 export default function Seats() {
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
-import Header from '../components/Header';
-import InfoRow from '../components/InfoRow';
+import Header from '../../components/Header';
+import InfoRow from '../../components/InfoRow';
 
 export default function Info() {
   return (

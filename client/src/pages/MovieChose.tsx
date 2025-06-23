@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { currentShow, upcomingShow } from "../components/FakeData"; // <-- import upcomingShow too
+import { currentShow, upcomingShow } from "../utils/FakeData"; // <-- import upcomingShow too
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
