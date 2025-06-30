@@ -4,7 +4,7 @@
 
 ---
 
-## 🚧 Status: _In Development_
+## 🚧 Status: Frontend Ready. _Backend currently in development!_
 
 ---
 

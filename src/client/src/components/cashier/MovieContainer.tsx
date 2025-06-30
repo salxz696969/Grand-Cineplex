@@ -19,12 +19,13 @@ export interface Movie {
 interface MovieContainerProps {
   searchTerm: string;
   activeTab: "now" | "upcoming";
+  movies: Movie[];
 }
 
-export default function MovieContainer({ searchTerm, activeTab }: MovieContainerProps) {
-  const [allMovies, setAllMovies] = useState<Movie[]>([]);
+export default function MovieContainer({ searchTerm, activeTab, movies }: MovieContainerProps) {
+  const [allMovies, setAllMovies] = useState<Movie[]>([movies[0], movies[1], movies[2]]); // Initialize with some default movies
   const [movieList, setMovieList] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
 
   const [isSearching, setIsSearching] = useState(false);
@@ -33,31 +34,87 @@ export default function MovieContainer({ searchTerm, activeTab }: MovieContainer
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const noResultTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    const loadMovies = async () => {
-      try {
-        setIsLoading(true);
-        setIsError(null);
+  // useEffect(() => {
+  //   const loadMovies = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       setIsError(null);
 
-        // Load movies based on activeTab
-        if (activeTab === "now") {
-          setAllMovies(currentShow);
-          setMovieList(currentShow);
-        } else {
-          setAllMovies(upcomingShow);
-          setMovieList(upcomingShow);
-        }
-      } catch (error: any) {
-        setIsError(error.message || "Failed to load movies");
-        setAllMovies([]);
-        setMovieList([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       // Load movies based on activeTab
+  //       if (activeTab === "now") {
+  //         setAllMovies(
+  //           currentShow.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "", // Add director if available in data
+  //             cast: "",     // Add cast if available in data
+  //             language: movie.language,
+  //           }))
+  //         );
+  //         setMovieList(
+  //           currentShow.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "",
+  //             cast: "",
+  //             language: movie.language,
+  //           }))
+  //         );
+  //       } else {
+  //         setAllMovies(
+  //           upcomingShowJune.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "",
+  //             cast: "",
+  //             language: movie.language,
+  //           }))
+  //         );
+  //         setMovieList(
+  //           upcomingShowJune.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "",
+  //             cast: "",
+  //             language: movie.language,
+  //           }))
+  //         );
+  //       }
+  //     } catch (error: any) {
+  //       setIsError(error.message || "Failed to load movies");
+  //       setAllMovies([]);
+  //       setMovieList([]);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    loadMovies();
-  }, [activeTab]);
+  //   loadMovies();
+  // }, [activeTab]);
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);

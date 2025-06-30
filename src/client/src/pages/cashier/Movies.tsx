@@ -1,10 +1,24 @@
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 import Header from "../../components/cashier/Header";
 import ScreeningDay from "../../components/cashier/ScreeningDay";
 import SearchBar from "../../components/cashier/SearchBar";
 import MovieContainer from "../../components/cashier/MovieContainer";
+import axios from 'axios';
 
 export default function Movies() {
+    const [movies, setMovies]=useState([]);
+    useEffect(() => {
+        const fetchMovies = async () => {
+            try {
+                const movies= await axios.get('http://localhost:6000/cashier/movies');
+                console.log("Movies fetched:", movies.data);
+                setMovies(movies.data);
+            } catch (error) {
+                console.error("Error fetching movies:", error);
+            }
+        };
+        fetchMovies();
+    }, []);
     return (
         <div>
             <div className="relative">
@@ -16,7 +30,7 @@ export default function Movies() {
                         <ScreeningDay days={[]} selectedIndex={0} onSelect={() => { }} />
                         <SearchBar searchTerm={""} setSearchTerm={() => { }} />
                     </div>
-                    <MovieContainer searchTerm={""} activeTab={"now"} />
+                    {/* <MovieContainer searchTerm={""} activeTab={"now"} movies={movies} /> */}
                 </div>
             </div>
         </div>

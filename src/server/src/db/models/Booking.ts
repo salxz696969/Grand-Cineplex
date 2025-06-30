@@ -1,5 +1,4 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
-
 // Define booking status enum
 export enum BookingStatus {
   PENDING = "pending",
@@ -40,7 +39,7 @@ class Booking extends Model {
 
   // Static methods
   static async findWithDetails(bookingId: number) {
-    return this.findByPk(bookingId, {
+    return this.findByPk(bookingId, { 
       include: [
         {
           association: "customer",
