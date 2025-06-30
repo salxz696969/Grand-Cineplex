@@ -337,15 +337,15 @@ CREATE TRIGGER trigger_update_payments_updated_at
 -- ========================================
 -- SET session_replication_role = 'replica';
 
-DROP TABLE IF EXISTS payments CASCADE;
-DROP TABLE IF EXISTS tickets CASCADE;
-DROP TABLE IF EXISTS bookings CASCADE;
-DROP TABLE IF EXISTS screenings CASCADE;
-DROP TABLE IF EXISTS seats CASCADE;
-DROP TABLE IF EXISTS staff CASCADE;
-DROP TABLE IF EXISTS customers CASCADE;
-DROP TABLE IF EXISTS theaters CASCADE;
-DROP TABLE IF EXISTS movies CASCADE;
+-- DROP TABLE IF EXISTS payments CASCADE;
+-- DROP TABLE IF EXISTS tickets CASCADE;
+-- DROP TABLE IF EXISTS bookings CASCADE;
+-- DROP TABLE IF EXISTS screenings CASCADE;
+-- DROP TABLE IF EXISTS seats CASCADE;
+-- DROP TABLE IF EXISTS staff CASCADE;
+-- DROP TABLE IF EXISTS customers CASCADE;
+-- DROP TABLE IF EXISTS theaters CASCADE;
+-- DROP TABLE IF EXISTS movies CASCADE;
 
 -- SET session_replication_role = 'origin';
 
@@ -530,7 +530,3 @@ INSERT INTO payments (booking_id, amount, method, status) VALUES
     (18, 520.00, 'digital_wallet', 'pending'),
     (19, 460.00, 'card', 'completed'),
     (20, 400.00, 'cash', 'completed');
-
-
-
-    UPDATE screenings SET screening_date = '2025-10-23' WHERE id IN (29);

@@ -4,14 +4,16 @@ import {
   deleteMovie,
   getAllMovies,
   getMovieBasedOnId,
+  getMoviesAndItsScreenings,
+  getMoviesFor7Days,
   updateMovie,
 } from "../controllers/moviesController";
 import verifyToken from "../../../middleware/verifyToken";
 
 const route = express.Router();
 
-route.get("/", getAllMovies);
-route.get("/:id", getMovieBasedOnId);
+route.get("/", getMoviesFor7Days);
+route.get("/details", getMoviesAndItsScreenings);
 route.post("/movies", verifyToken, addMovie);
 route.patch("/movies/:id", verifyToken, updateMovie);
 route.delete("/movies/:id", verifyToken, deleteMovie);
