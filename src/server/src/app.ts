@@ -5,8 +5,15 @@ import managerRoute from "./app/manager/routes/index";
 import cors from "cors";
 
 const app = express();
-app.use(cors())
+app.use(cors(
+    {
+        origin: "http://localhost:5173", // Adjust this to your frontend URL
+        methods: ["GET", "POST", "PATCH", "DELETE"],
+        credentials: true, // Allow cookies to be sent with requests
+    }
+))
 
+app.options("*", cors());
 // Middleware
 app.use(express.json());
 
@@ -18,5 +25,9 @@ app.use("/cashier", cashierRoute);
 
 // Manager routes
 app.use("/manager", managerRoute);
+
+app.get("/", (req, res) => {
+  res.json({kdit:"kdit"})
+});
 
 export default app;

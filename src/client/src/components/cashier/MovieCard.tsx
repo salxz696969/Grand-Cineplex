@@ -6,15 +6,15 @@ interface MovieCardProps {
     title: string;
     releaseDate: string;
     duration: string;
-    image: string;
+    posterUrl: string;
 }
 
-export default function MovieCard({ id, title, releaseDate, duration, image }: MovieCardProps) {
+export default function MovieCard({ id, title, releaseDate, duration, posterUrl }: MovieCardProps) {
     return (
-        <Link to={`/movie/${id}`}>
+        <Link to={`/cashier/detail/movie/${id}`}>
             <div className="overflow-hidden shadow flex flex-col group hover:text-sky-800 transition-colors duration-300">
                 <div className="aspect-[9/16] w-full bg-center bg-cover  ease-in-out overflow-hidden ">
-                    <img src={image} alt={`${title} poster`} className="w-full h-full object-cover rounded-2xl group-hover:scale-105 cursor-pointer transition-transform duration-300 ease-in-out" />
+                    <img src={posterUrl} alt={`${title} poster`} className="w-full h-full object-cover rounded-2xl group-hover:scale-105 cursor-pointer transition-transform duration-300 ease-in-out" />
                 </div>
                 <div className="pt-4">
                     <div className="text-sm text-white font-semibold group-hover:text-sky-800 transition-colors duration-300">{title}</div>

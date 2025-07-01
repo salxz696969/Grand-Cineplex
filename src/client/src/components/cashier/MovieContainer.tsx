@@ -7,7 +7,7 @@ export interface Movie {
   title: string;
   releaseDate: string;
   duration: string;
-  image: string;
+  posterUrl: string;
   genre: string;
   overview: string;
   rating: number;
@@ -23,7 +23,7 @@ interface MovieContainerProps {
 }
 
 export default function MovieContainer({ searchTerm, activeTab, movies }: MovieContainerProps) {
-  const [allMovies, setAllMovies] = useState<Movie[]>([movies[0], movies[1], movies[2]]); // Initialize with some default movies
+  // const [allMovies, setAllMovies] = useState<Movie[]>([movies[0], movies[1], movies[2]]); // Initialize with some default movies
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
@@ -126,11 +126,11 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
 
     if (trimmedTerm === "") {
       setIsSearching(false);
-      setMovieList(allMovies);
+      setMovieList(movies);
       return;
     }
 
-    const filtered = allMovies.filter((movie) =>
+    const filtered = movies.filter((movie) =>
       movie.title.toLowerCase().includes(trimmedTerm)
     );
 
@@ -146,7 +146,7 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
         setShowNoResults(true);
       }, 3000);
     }
-  }, [searchTerm, allMovies]);
+  }, [searchTerm, movies]);
 
   if (isLoading) return <p className="text-white">Loading movies...</p>;
   if (isError) return <p className="text-red-500">Error: {isError}</p>;
@@ -164,7 +164,7 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
             title={movie.title}
             releaseDate={movie.releaseDate}
             duration={movie.duration}
-            image={movie.image}
+            posterUrl={movie.posterUrl}
           />
         ))
       )}
