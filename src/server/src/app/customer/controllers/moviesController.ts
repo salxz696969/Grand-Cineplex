@@ -29,122 +29,63 @@ export const getMovieBasedOnId = async (req: Request, res: Response) => {
   }
 };
 
-export const getComingSoonMovies = async (req: Request, res: Response) => {
+export const getNowShowingMovies = async (req: Request, res: Response) => {
   try {
     const today = new Date();
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const sixMonthsLater = new Date(
-      today.getFullYear(),
-      today.getMonth() + 6,
-      1
-    );
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(today.getDate() - 20);
 
-    const moviesComingInNext6Months = await Movie.findAll({
-      include: [
-        {
-          model: Screening,
-          as: "screenings",
-          where: {
-            screeningDate: {
-              [Op.gte]: startOfMonth,
-              [Op.lt]: sixMonthsLater,
-            },
-          },
-          required: true,
+    const movies = await Movie.findAll({
+      where: {
+        release_date: {
+          [Op.gte]: twentyDaysAgo,
+          [Op.lte]: today,
         },
-      ],
-      order: [["releaseDate", "ASC"]],
+      },
+      order: [["release_date", "DESC"]],
     });
 
-    res.status(200).json(moviesComingInNext6Months);
+    res.status(200).json(movies);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-export const addMovie = async (req: Request, res: Response) => {
+export const getUpcomingMovies = async (req: Request, res: Response) => {
   try {
-    const {
-      title,
-      description,
-      releaseDate,
-      duration,
-      genre,
-      rating,
-      posterUrl,
-    } = req.body;
+    const today = new Date();
 
-    if (!title || !duration) {
-      return res
-        .status(400)
-        .json({ message: "Title and duration are required" });
-    }
-
-    const newMovie = await Movie.create({
-      title,
-      description,
-      releaseDate,
-      duration,
-      genre,
-      rating,
-      posterUrl,
+    const movies = await Movie.findAll({
+      where: {
+        release_date: {
+          [Op.gt]: today,
+        },
+      },
+      order: [["release_date", "ASC"]],
     });
 
-    res.status(201).json(newMovie);
+    res.status(200).json(movies);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-export const updateMovie = async (req: Request, res: Response) => {
+export const getTopRatedMovies = async (req: Request, res: Response) => {
   try {
-    const movieId = parseInt(req.params.id);
-    const {
-      title,
-      description,
-      releaseDate,
-      duration,
-      genre,
-      rating,
-      posterUrl,
-    } = req.body;
-
-    const movie = await Movie.findByPk(movieId);
-
-    if (!movie) {
-      return res.status(404).json({ message: "Movie not found" });
-    }
-
-    await movie.update({
-      title,
-      description,
-      releaseDate,
-      duration,
-      genre,
-      rating,
-      posterUrl,
+    const topMovies = await Movie.findAll({
+      where: {
+        rating: {
+          [Op.not]: null,
+        },
+      },
+      order: [["rating", "DESC"]],
+      limit: 5,
+      attributes: ["id", "poster_url"],
     });
 
-    res.status(200).json(movie);
+    res.status(200).json(topMovies);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-export const deleteMovie = async (req: Request, res: Response) => {
-  try {
-    const movieId = parseInt(req.params.id);
-
-    const movie = await Movie.findByPk(movieId);
-
-    if (!movie) {
-      return res.status(404).json({ message: "Movie not found" });
-    }
-
-    await movie.destroy();
-
-    res.status(200).json({ message: "Movie deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-};

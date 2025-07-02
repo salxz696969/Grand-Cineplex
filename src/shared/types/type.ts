@@ -28,8 +28,9 @@ export interface Movie {
   description?: string;
   duration: number;
   genre?: string;
-  rating?: string;
+  rating?: number;
   poster_url?: string;
+  trailer_url?: string;
   release_date?: string;
   created_at: string;
   updated_at: string;

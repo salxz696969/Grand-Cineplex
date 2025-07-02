@@ -1,8 +1,3 @@
-// This component objective is that give user option to select tabs for the show of movie
-// which is the current show or the upcoming show 
-
-
-
 
 import React, { useState } from "react";
 import SearchBar from "./SearchBar";

@@ -1,20 +1,20 @@
 import express from "express";
+import cors from "cors";
 import customerRoute from "./app/customer/routes/index";
 import cashierRoute from "./app/cashier/routes/index";
 import managerRoute from "./app/manager/routes/index";
 
 const app = express();
 
-// Middleware
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
 app.use(express.json());
 
-// Customer routes
 app.use("/customer", customerRoute);
-
-// Cashier routes
 app.use("/cashier", cashierRoute);
-
-// Manager routes
 app.use("/manager", managerRoute);
 
 export default app;

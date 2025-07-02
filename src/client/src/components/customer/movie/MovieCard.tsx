@@ -7,12 +7,12 @@ import { Link } from "react-router-dom";
 interface MovieCardProps {
   id: number;
   title: string;
-  releaseDate: string;
+  release_date: string;
   duration: string;
   image: string;
 }
 
-export default function MovieCard({ id, title, releaseDate, duration, image }: MovieCardProps) {
+export default function MovieCard({ id, title, release_date, duration, image }: MovieCardProps) {
   return (
     <Link to={`/movie/${id}`}>
       <div className="overflow-hidden shadow flex flex-col">
@@ -23,7 +23,7 @@ export default function MovieCard({ id, title, releaseDate, duration, image }: M
         <div className="pl-2">
           <div className="text-sm text-white font-semibold">{title}</div>
           <div className="text-xs text-neutral-400 mb-3">
-            {releaseDate} &bull; {duration}
+            {release_date} &bull; {duration}
           </div>
         </div>
       </div>

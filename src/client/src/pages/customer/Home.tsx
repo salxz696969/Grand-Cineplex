@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../components/customer/homecomponents/Header";
-import InfoInform from "../../components/customer/homecomponents/InformationPic";
 import ScheduleHeader from "../../components/customer/homecomponents/ScheduleShow";
 import MovieContainer from "../../components/customer/movie/MovieContainer";
 import Footer from "../../components/customer/Footer";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
+import TopRatedMovies from "../../components/customer/homecomponents/TopRatedMovies";
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +26,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#171c20] text-white">
       <Header />
       <div className="px-[20px] sm:px-[60px] md:px-[100px] lg:px-[180px]">
-        <InfoInform />
+        <TopRatedMovies/>
         <ScheduleHeader
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

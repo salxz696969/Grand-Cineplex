@@ -94,7 +94,7 @@ export const initScreening = (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "movies",
+          model: "movie",
           key: "id",
         },
       },

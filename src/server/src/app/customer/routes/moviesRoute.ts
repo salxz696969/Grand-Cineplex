@@ -1,19 +1,22 @@
 import express from "express";
 import {
-  addMovie,
-  deleteMovie,
   getAllMovies,
   getMovieBasedOnId,
-  updateMovie,
+  getUpcomingMovies,
+  getNowShowingMovies,
+  getTopRatedMovies
 } from "../controllers/moviesController";
 import verifyToken from "../../../middleware/verifyToken";
 
 const route = express.Router();
 
 route.get("/", getAllMovies);
+route.get("/now-showing", getNowShowingMovies);
+route.get("/upcoming", getUpcomingMovies);
+route.get("/top-rated", getTopRatedMovies);
 route.get("/:id", getMovieBasedOnId);
-route.post("/movies", verifyToken, addMovie);
-route.patch("/movies/:id", verifyToken, updateMovie);
-route.delete("/movies/:id", verifyToken, deleteMovie);
+
+
+
 
 export default route;

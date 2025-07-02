@@ -6,9 +6,10 @@ class Movie extends Model {
   declare description: string | null;
   declare duration: number;
   declare genre: string | null;
-  declare rating: string | null;
-  declare posterUrl: string | null;
-  declare releaseDate: Date | null;
+  declare rating: number | null;
+  declare poster_url: string | null;
+  declare trailer_url: string | null;
+  declare release_date: Date | null;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -23,11 +24,11 @@ class Movie extends Model {
   static async findUpcoming() {
     return this.findAll({
       where: {
-        releaseDate: {
+        release_date: {
           [Op.gte]: new Date(),
         },
       },
-      order: [["releaseDate", "ASC"]],
+      order: [["release_date", "ASC"]],
     });
   }
 
@@ -66,21 +67,25 @@ export const initMovie = (sequelize: Sequelize) => {
         allowNull: true,
       },
       rating: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.FLOAT,
         allowNull: true,
       },
-      posterUrl: {
+      poster_url: {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      releaseDate: {
+      trailer_url: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      release_date: {
         type: DataTypes.DATEONLY,
         allowNull: true,
       },
     },
     {
       sequelize,
-      tableName: "movies",
+      tableName: "movie",
       timestamps: true,
       underscored: true,
     }
