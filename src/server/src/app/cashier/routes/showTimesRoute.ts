@@ -3,6 +3,7 @@ import {
   addShowTime,
   deleteShowTime,
   getAllShowTimes,
+  getShowTimesBasedOnId,
   getShowTimesBasedOnMovieId,
   getTodayShowTimes,
   updateShowTime,
@@ -18,4 +19,5 @@ route.get("/coming-soon", getComingSoonMovies);
 route.post("/", addShowTime);
 route.patch("/:id", updateShowTime);
 route.delete("/:id", deleteShowTime);
+route.get("/:id", getShowTimesBasedOnId);
 export default route;

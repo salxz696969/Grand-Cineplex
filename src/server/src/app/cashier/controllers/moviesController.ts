@@ -58,6 +58,36 @@ export const getMovieBasedOnId = async (req: Request, res: Response) => {
   }
 };
 
+export const getMovieAndScreeningBasedOnId = async (req: Request, res: Response) => {
+  try {
+    const movieId = parseInt(req.params.id);
+    const movie = await Movie.findByPk(movieId);
+
+    if (!movie) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+    // Import Theater model
+    // import Theater from "../../../db/models/Theater"; // Make sure this import exists at the top
+
+    const screenings = await Screening.findAll({
+      where: { movieId },
+      include: [
+        {
+          model: require("../../../db/models/Theater").default,
+          as: "theater",
+          attributes: ["name"],
+        },
+      ],
+      order: [["screeningDate", "ASC"]],
+    });
+
+    res.status(200).json({ movie, screenings });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
 export const getMoviesAndItsScreenings = async (
   req: Request,
   res: Response

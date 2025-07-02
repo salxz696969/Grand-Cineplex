@@ -10,7 +10,7 @@ const CashierRoutes = () => {
     <Routes>
       <Route path="/" element={<Movies />} />
       <Route path="/detail/movie/:id" element={<MovieDetail />} />
-      <Route path="/seats" element={<SeatSelection />} />
+      <Route path="/seats/:id" element={<SeatSelection />} />
       <Route path="/payment" element={<Payment />} />
     </Routes>
   );

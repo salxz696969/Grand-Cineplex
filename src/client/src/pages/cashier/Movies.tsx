@@ -4,6 +4,7 @@ import ScreeningDay from "../../components/cashier/ScreeningDay";
 import SearchBar from "../../components/cashier/SearchBar";
 import MovieContainer from "../../components/cashier/MovieContainer";
 import axios from "axios";
+import { getMoviesFor7Days } from "../../api/cashier";
 
 type CalendarDay = {
 	number: number;
@@ -40,15 +41,13 @@ export default function Movies() {
 	const [movies, setMovies] = useState<any[]>([]);
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [showedMovies, setShowedMovies] = useState<any[]>([]);
-
 	useEffect(() => {
+        console.log("Movies component rendered");
 		const fetchMovies = async () => {
 			try {
-				const response = await axios.get(
-					"http://localhost:6969/cashier/movies"
-				);
-				console.log("Movies fetched:", response.data);
-				setMovies(response.data);
+				const response = await getMoviesFor7Days();
+				console.log("Movies fetched:", response);
+				setMovies(response);
 			} catch (error) {
 				console.error("Error fetching movies:", error);
 			}
