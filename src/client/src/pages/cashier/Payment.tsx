@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import sequelize from "./../../../../server/src/db/index";
 import { getMoviesAndItsScreenings, submitBooking } from "../../api/cashier";
+import { Link } from "react-router-dom";
 
 interface PaymentMethod {
 	id: string;
@@ -41,10 +42,10 @@ type BookingData = {
 	totalPrice: number;
 };
 
-type SelectedSeats={
-    seatId: string;
-    idNumber: number;
-}
+type SelectedSeats = {
+	seatId: string;
+	idNumber: number;
+};
 
 interface Screening {
 	id: number;
@@ -83,7 +84,7 @@ export function Payment() {
 		const getDataFromLocalStorage = () => {
 			const data = localStorage.getItem("selectedSeats");
 			if (data) {
-                console.log("Data from local storage:", JSON.parse(data));
+				console.log("Data from local storage:", JSON.parse(data));
 				const parsedData = JSON.parse(data) as BookingData;
 				setSeats(parsedData.seats);
 				setScreeningId(Number(parsedData.screeningId));
@@ -107,7 +108,6 @@ export function Payment() {
 		fetchScreeningDetails();
 	}, [screeningId]);
 
-
 	// Mock booking data
 	const bookingSummary: BookingSummary = {
 		movieTitle: screeningDetails?.movie?.title ?? "",
@@ -119,7 +119,6 @@ export function Payment() {
 		customerName: "John Doe",
 		customerPhone: "+1 (555) 123-4567",
 	};
-
 
 	const paymentMethods: PaymentMethod[] = [
 		{
@@ -161,13 +160,14 @@ export function Payment() {
 				amount: price,
 				method: selectedPaymentMethod,
 				status: "pending",
-			})
-            console.log("Booking request:", request);
-        } catch (error) {
-            console.error("Payment processing failed:", error);
-        }finally{
-            setIsProcessing(false);
-        }
+			});
+			console.log("Booking request:", request);
+		} catch (error) {
+			console.error("Payment processing failed:", error);
+		} finally {
+			setIsProcessing(false);
+			setIsCompleted(true);
+		}
 	};
 
 	if (isCompleted) {
@@ -257,12 +257,16 @@ export function Payment() {
 						</div>
 
 						<div className="flex gap-4 justify-center">
-							<button className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-								Print Tickets
-							</button>
-							<button className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-								New Booking
-							</button>
+							<Link to={"/cashier"}>
+								<button className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+									Print Tickets
+								</button>
+							</Link>
+							<Link to={"/cashier"}>
+								<button className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+									New Booking
+								</button>
+							</Link>
 						</div>
 					</div>
 				</div>
@@ -402,7 +406,9 @@ export function Payment() {
 										</div>
 										<span>Seat {seat}</span>
 									</div>
-									<span className="font-medium">${screeningDetails?.price}</span>
+									<span className="font-medium">
+										${screeningDetails?.price}
+									</span>
 								</div>
 							))}
 							<div className="border-t border-gray-600 pt-4 mt-4">
