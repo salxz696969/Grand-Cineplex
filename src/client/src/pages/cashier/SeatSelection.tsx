@@ -11,7 +11,7 @@ interface Seat {
 	type: "regular" | "premium" | "vip";
 	price: number;
 	isBooked: boolean;
-    idNumber: number; // Added to store the id from the API
+	idNumber: number; // Added to store the id from the API
 }
 
 type SeatFromApi = {
@@ -24,12 +24,13 @@ type SeatFromApi = {
 type DataFromApi = {
 	price: number;
 	availableSeats: SeatFromApi[];
+	bookedSeatsInfo: SeatFromApi[];
 };
 
-type SelectedSeats={
-    seatId: string;
-    idNumber: number;
-}
+type SelectedSeats = {
+	seatId: string;
+	idNumber: number;
+};
 
 export function SeatSelection() {
 	const [selectedSeats, setSelectedSeats] = useState<SelectedSeats[]>([]);
@@ -63,21 +64,36 @@ export function SeatSelection() {
 		"Y",
 		"Z",
 	]);
-	// const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 	const seatsPerRow = 10;
 
 	useEffect(() => {
 		try {
-			const generateSeats = (seatsFromApi: DataFromApi): Seat[] => {
-				return seatsFromApi.availableSeats.map((seat) => ({
-					id: `${seat.rowNumber}${seat.seatNumber}`,
-					row: seat.rowNumber,
-					number: seat.seatNumber,
-					type: seat.seatType,
-					price: Number(seatsFromApi.price),
-					isBooked: false,
-                    idNumber: seat.id,
-				}));
+			const generateSeats = (
+				seatsFromApi: DataFromApi,
+				seatType: string
+			): Seat[] => {
+				if (seatType === "availableSeats") {
+					return seatsFromApi.availableSeats.map((seat) => ({
+						id: `${seat.rowNumber}${seat.seatNumber}`,
+						row: seat.rowNumber,
+						number: seat.seatNumber,
+						type: seat.seatType,
+						price: seatsFromApi.price,
+						isBooked: false,
+						idNumber: seat.id, // Assigning a unique id number
+					}));
+				} else if (seatType === "bookedSeats") {
+					return seatsFromApi.bookedSeatsInfo.map((seat) => ({
+						id: `${seat.rowNumber}${seat.seatNumber}`,
+						row: seat.rowNumber,
+						number: seat.seatNumber,
+						type: seat.seatType,
+						price: seatsFromApi.price,
+						isBooked: true,
+						idNumber: seat.id, // Assigning a unique id number
+					}));
+				}
+				return [];
 			};
 			const fetchSeats = async () => {
 				const response = await getSeatsBasedOnScreeningId(
@@ -85,9 +101,25 @@ export function SeatSelection() {
 				);
 				const tempRow = rows;
 				// console.log("Response from API:", response);
-				setRows(tempRow.slice(0, response.availableSeats.length / seatsPerRow));
-				setSeats(generateSeats(response));
-                console.log(generateSeats(response));
+				setRows(
+					tempRow.slice(
+						0,
+						response.availableSeats.length / seatsPerRow
+					)
+				);
+				setSeats(
+					[
+						...generateSeats(response, "availableSeats"),
+						...generateSeats(response, "bookedSeats"),
+					].sort((a, b) => {
+						// First sort by row (A-Z)
+						if (a.row !== b.row) {
+							return a.row.localeCompare(b.row);
+						}
+						// If row is the same, sort by number (1-10)
+						return a.number - b.number;
+					})
+				);
 			};
 			fetchSeats();
 		} catch (error) {
@@ -169,17 +201,17 @@ export function SeatSelection() {
 		}, 0);
 	};
 
-    const saveToLocalStorage = () => {
-        const selectedSeat= selectedSeats.map((seatId) => seatId)
-        console.log("Selected seats:", selectedSeat);
-        const dataToSave = {
-            screeningId: id,
-            seats: selectedSeat,
-            totalPrice: getTotalPrice(),
-        };
-        console.log("Data to save:", dataToSave);
-        localStorage.setItem("selectedSeats", JSON.stringify(dataToSave));
-    }
+	const saveToLocalStorage = () => {
+		const selectedSeat = selectedSeats.map((seatId) => seatId);
+		console.log("Selected seats:", selectedSeat);
+		const dataToSave = {
+			screeningId: id,
+			seats: selectedSeat,
+			totalPrice: getTotalPrice(),
+		};
+		console.log("Data to save:", dataToSave);
+		localStorage.setItem("selectedSeats", JSON.stringify(dataToSave));
+	};
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-4 lg:p-8">
@@ -233,8 +265,9 @@ export function SeatSelection() {
 								{seats
 									.filter((seat) => seat.row === row)
 									.map((seat) => {
-                                        const isSelected =
-                                            selectedSeats.some((s) => s.seatId === seat.id);
+										const isSelected = selectedSeats.some(
+											(s) => s.seatId === seat.id
+										);
 
 										return (
 											<button
@@ -244,7 +277,10 @@ export function SeatSelection() {
 													isSelected
 												)}`}
 												onClick={() =>
-													toggleSeat(seat.id, seat.idNumber)
+													toggleSeat(
+														seat.id,
+														seat.idNumber
+													)
 												}
 												disabled={seat.isBooked}
 												title={`${seat.row}${seat.number} - $${seat.price}`}
@@ -288,19 +324,24 @@ export function SeatSelection() {
 					{selectedSeats.length > 0 ? (
 						<div className="space-y-3">
 							<div className="flex flex-wrap gap-2">
-								{selectedSeats.sort((a, b) => a.seatId.localeCompare(b.seatId)).map((selectedSeat) => {
-									const seat = seats.find(
-										(s) => s.id === selectedSeat.seatId
-									);
-									return (
-										<div
-											key={selectedSeat.seatId}
-											className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm"
-										>
-											{selectedSeat.seatId} - ${seat?.price}
-										</div>
-									);
-								})}
+								{selectedSeats
+									.sort((a, b) =>
+										a.seatId.localeCompare(b.seatId)
+									)
+									.map((selectedSeat) => {
+										const seat = seats.find(
+											(s) => s.id === selectedSeat.seatId
+										);
+										return (
+											<div
+												key={selectedSeat.seatId}
+												className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm"
+											>
+												{selectedSeat.seatId} - $
+												{seat?.price}
+											</div>
+										);
+									})}
 							</div>
 							<div className="flex items-center justify-between pt-3 border-t border-gray-700">
 								<span className="text-gray-300">
@@ -311,8 +352,10 @@ export function SeatSelection() {
 								</span>
 							</div>
 							<Link to={`/cashier/payment`}>
-								<button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform"
-                                onClick={() => saveToLocalStorage()}>
+								<button
+									className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform"
+									onClick={() => saveToLocalStorage()}
+								>
 									Continue to Payment
 								</button>
 							</Link>

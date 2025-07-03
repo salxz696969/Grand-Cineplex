@@ -32,7 +32,6 @@ export default function MovieInTheatreCard({
   onTimeSelect
 }: MovieInTheatreCardProps) {
   const occupancyRate = Math.round(((totalSeats - availableSeats) / totalSeats) * 100);
-  console.log(showtimes)
 
   return (
     <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
