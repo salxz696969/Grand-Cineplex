@@ -11,6 +11,7 @@ interface Seat {
 	type: "regular" | "premium" | "vip";
 	price: number;
 	isBooked: boolean;
+    idNumber: number; // Added to store the id from the API
 }
 
 type SeatFromApi = {
@@ -25,8 +26,13 @@ type DataFromApi = {
 	availableSeats: SeatFromApi[];
 };
 
+type SelectedSeats={
+    seatId: string;
+    idNumber: number;
+}
+
 export function SeatSelection() {
-	const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+	const [selectedSeats, setSelectedSeats] = useState<SelectedSeats[]>([]);
 	const [seats, setSeats] = useState<Seat[]>([]);
 	const id = useParams().id;
 	const [rows, setRows] = useState<string[]>([
@@ -69,7 +75,8 @@ export function SeatSelection() {
 					number: seat.seatNumber,
 					type: seat.seatType,
 					price: Number(seatsFromApi.price),
-					isBooked: false, // Assuming no seats are booked initially
+					isBooked: false,
+                    idNumber: seat.id,
 				}));
 			};
 			const fetchSeats = async () => {
@@ -80,6 +87,7 @@ export function SeatSelection() {
 				// console.log("Response from API:", response);
 				setRows(tempRow.slice(0, response.availableSeats.length / seatsPerRow));
 				setSeats(generateSeats(response));
+                console.log(generateSeats(response));
 			};
 			fetchSeats();
 		} catch (error) {
@@ -123,15 +131,16 @@ export function SeatSelection() {
 
 	// const seats = generateSeats();
 
-	const toggleSeat = (seatId: string) => {
+	const toggleSeat = (seatId: string, idNumber: number) => {
 		const seat = seats.find((s) => s.id === seatId);
 		if (seat?.isBooked) return;
 
 		setSelectedSeats((prev) =>
-			prev.includes(seatId)
-				? prev.filter((id) => id !== seatId)
-				: [...prev, seatId]
+			prev.some((s) => s.seatId === seatId)
+				? prev.filter((s) => s.seatId !== seatId)
+				: [...prev, { seatId, idNumber }]
 		);
+		console.log("Selected seats:", selectedSeats);
 	};
 
 	const getSeatStyle = (seat: Seat, isSelected: boolean) => {
@@ -154,8 +163,8 @@ export function SeatSelection() {
 	};
 
 	const getTotalPrice = () => {
-		return selectedSeats.reduce((total, seatId) => {
-			const seat = seats.find((s) => s.id === seatId);
+		return selectedSeats.reduce((total, selectedSeat) => {
+			const seat = seats.find((s) => s.id === selectedSeat.seatId);
 			return total + (seat?.price || 0);
 		}, 0);
 	};
@@ -224,8 +233,8 @@ export function SeatSelection() {
 								{seats
 									.filter((seat) => seat.row === row)
 									.map((seat) => {
-										const isSelected =
-											selectedSeats.includes(seat.id);
+                                        const isSelected =
+                                            selectedSeats.some((s) => s.seatId === seat.id);
 
 										return (
 											<button
@@ -235,7 +244,7 @@ export function SeatSelection() {
 													isSelected
 												)}`}
 												onClick={() =>
-													toggleSeat(seat.id)
+													toggleSeat(seat.id, seat.idNumber)
 												}
 												disabled={seat.isBooked}
 												title={`${seat.row}${seat.number} - $${seat.price}`}
@@ -279,16 +288,16 @@ export function SeatSelection() {
 					{selectedSeats.length > 0 ? (
 						<div className="space-y-3">
 							<div className="flex flex-wrap gap-2">
-								{selectedSeats.sort().map((seatId) => {
+								{selectedSeats.sort((a, b) => a.seatId.localeCompare(b.seatId)).map((selectedSeat) => {
 									const seat = seats.find(
-										(s) => s.id === seatId
+										(s) => s.id === selectedSeat.seatId
 									);
 									return (
 										<div
-											key={seatId}
+											key={selectedSeat.seatId}
 											className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm"
 										>
-											{seatId} - ${seat?.price}
+											{selectedSeat.seatId} - ${seat?.price}
 										</div>
 									);
 								})}

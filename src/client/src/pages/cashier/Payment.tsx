@@ -15,7 +15,7 @@ import {
 	MapPin,
 } from "lucide-react";
 import sequelize from "./../../../../server/src/db/index";
-import { getMoviesAndItsScreenings } from "../../api/cashier";
+import { getMoviesAndItsScreenings, submitBooking } from "../../api/cashier";
 
 interface PaymentMethod {
 	id: string;
@@ -37,9 +37,14 @@ interface BookingSummary {
 
 type BookingData = {
 	screeningId: string;
-	seats: string[];
+	seats: SelectedSeats[];
 	totalPrice: number;
 };
+
+type SelectedSeats={
+    seatId: string;
+    idNumber: number;
+}
 
 interface Screening {
 	id: number;
@@ -67,7 +72,7 @@ export function Payment() {
 		useState<string>("");
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isCompleted, setIsCompleted] = useState(false);
-	const [seats, setSeats] = useState<string[]>([]);
+	const [seats, setSeats] = useState<SelectedSeats[]>([]);
 	const [screeningId, setScreeningId] = useState<number>(0);
 	const [price, setPrice] = useState<number>(0);
 	const [screeningDetails, setScreeningDetails] = useState<Screening | null>(
@@ -78,6 +83,7 @@ export function Payment() {
 		const getDataFromLocalStorage = () => {
 			const data = localStorage.getItem("selectedSeats");
 			if (data) {
+                console.log("Data from local storage:", JSON.parse(data));
 				const parsedData = JSON.parse(data) as BookingData;
 				setSeats(parsedData.seats);
 				setScreeningId(Number(parsedData.screeningId));
@@ -101,17 +107,19 @@ export function Payment() {
 		fetchScreeningDetails();
 	}, [screeningId]);
 
+
 	// Mock booking data
 	const bookingSummary: BookingSummary = {
 		movieTitle: screeningDetails?.movie?.title ?? "",
 		theater: screeningDetails?.theater?.name ?? "",
 		date: screeningDetails?.screeningDate ?? "",
 		time: screeningDetails?.screeningTime ?? "",
-		seats: seats,
+		seats: seats.map((seat) => seat.seatId),
 		totalAmount: price,
 		customerName: "John Doe",
 		customerPhone: "+1 (555) 123-4567",
 	};
+
 
 	const paymentMethods: PaymentMethod[] = [
 		{
@@ -146,10 +154,20 @@ export function Payment() {
 		setIsProcessing(true);
 
 		// Simulate payment processing
-		setTimeout(() => {
-			setIsProcessing(false);
-			setIsCompleted(true);
-		}, 2000);
+		try {
+			const request = await submitBooking({
+				screeningId: Number(screeningId),
+				seats: seats.map((seat) => seat.idNumber),
+				amount: price,
+				method: selectedPaymentMethod,
+				status: "pending",
+			})
+            console.log("Booking request:", request);
+        } catch (error) {
+            console.error("Payment processing failed:", error);
+        }finally{
+            setIsProcessing(false);
+        }
 	};
 
 	if (isCompleted) {
