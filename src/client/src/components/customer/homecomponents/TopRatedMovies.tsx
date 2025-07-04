@@ -60,7 +60,7 @@ export default function TopRatedMovies() {
   // }
 
   return (
-    <div className="w-full h-[320px] sm:h-[360px] md:h-[420px] lg:h-[480px] overflow-hidden mt-10 rounded-2xl relative bg-black">
+    <div className="w-full h-[320px] sm:h-[360px] md:h-[420px] lg:h-[480px] overflow-hidden mt-10 rounded-2xl relative bg-[#111518]">
       <h2 className="flex items-center justify-center h-full text-3xl font-bold">Top Rate Movie</h2>
       <div ref={containerRef} className="flex h-full items-center"
         style={{
@@ -70,7 +70,7 @@ export default function TopRatedMovies() {
         {movies.map((_, i) => (
           <div
             key={i}
-            className="flex justify-center items-center h-full w-full bg-black"
+            className="flex justify-center items-center h-full w-full bg-[#111518]"
             style={{ width: `${100 / (movies.length + 1)}%` }}
           >
             <div className="w-full h-full bg-gray-900 rounded-lg"></div>
@@ -78,7 +78,7 @@ export default function TopRatedMovies() {
         ))}
 
         <div
-          className="flex justify-center items-center h-full w-full bg-black"
+          className="flex justify-center items-center h-full w-full bg-[#111518]"
           style={{ width: `${100 / (movies.length + 1)}%` }}
         >
           <div className="w-full h-full bg-gray-900 rounded-lg"></div>

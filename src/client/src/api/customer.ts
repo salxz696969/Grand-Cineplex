@@ -30,12 +30,20 @@ export async function fetchNowShowingMovies(): Promise<Movie[]> {
 }
 
 // Fetch upcoming movie
-export async function fetchUpcomingMovies(): Promise<Movie[]> {
-  try{
-      const response = await fetch(`${baseUrl}/upcoming`);
-      if (!response.ok) throw new Error("Failed to fetch upcoming movies");
-      return await response.json();
-  }catch(err){
+export async function fetchUpcomingMovies(month?: number, year?: number): Promise<Movie[]> {
+  try {
+    let url = `${baseUrl}/upcoming`;
+
+    // Append query params if month and year are provided
+    if (month && year) {
+      url += `?month=${month}&year=${year}`;
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch upcoming movies");
+
+    return await response.json();
+  } catch (err) {
     console.log(err);
     throw err;
   }
@@ -51,3 +59,18 @@ export async function fetchTopRatedMovies(): Promise<Movie[]> {
     throw err;
   }
 }
+
+export async function fetchMovieById(id: number): Promise<Movie> {
+  try{
+      const response = await fetch(`${baseUrl}/${id}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch movie with id ${id}`);
+      }
+    const movie: Movie = await response.json();
+    return movie;
+  }catch(err){
+    console.error(err);
+    throw err;
+  }
+}
+

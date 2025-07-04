@@ -6,7 +6,7 @@ import SignUp from "../pages/customer/SignUp";
 import SignIn from "../pages/customer/SignIn";
 import SeatContainer from "../pages/customer/SeatContainer";
 import PaymentContainer from "../pages/customer/PaymentContainer";
-import MovieChosen from "../pages/customer/MovieChose";
+import MovieSelectedContainer from "../pages/customer/MovieSelectedContainer";
 
 const CustomerRoutes = () => {
   return (
@@ -17,7 +17,7 @@ const CustomerRoutes = () => {
           <Route path="/payment" element={<PaymentContainer />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/SignIn" element={<SignIn />} />
-          <Route path="/movie/:id" element={<MovieChosen/>} />
+          <Route path="/movie/:id" element={<MovieSelectedContainer/>} />
       </Routes>
   );
 };

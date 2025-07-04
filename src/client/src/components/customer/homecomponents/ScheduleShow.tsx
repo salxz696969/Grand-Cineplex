@@ -13,6 +13,7 @@ interface ScheduleHeaderProps {
   setSearchTerm: (value: string) => void;
   activeTab: "now" | "upcoming";
   setActiveTab: React.Dispatch<React.SetStateAction<"now" | "upcoming">>;
+  onUpcomingMonthChange: (month: number, year: number) => void;
 }
 
 export default function ScheduleHeader({
@@ -20,6 +21,7 @@ export default function ScheduleHeader({
   setSearchTerm,
   activeTab,
   setActiveTab,
+  onUpcomingMonthChange,
 }: ScheduleHeaderProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
@@ -100,14 +102,24 @@ export default function ScheduleHeader({
               </div>
             ))
             // It filters to show upcoming show tabs
-            : getUpcomingMonths().map((month, idx) => (
-                <div key={idx} onClick={() => setSelectedIndex(idx)}
-                  className={`cursor-pointer flex flex-col items-center rounded border-2 ${
-                    idx === selectedIndex ? "border-red-500" : "border-gray-700"}
-                    px-2 py-2 w-16 sm:w-20 md:w-24 lg:w-28 xl:w-32 min-w-[64px]`}>
-                  <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-semibold text-center leading-tight">{month}</p>
-                </div>
-              ))}
+            : getUpcomingMonths().map((monthName, idx) => {
+                const date = new Date();
+                date.setMonth(date.getMonth() + idx);
+                const month = date.getMonth() + 1; // 1-based
+                const year = date.getFullYear();
+
+                return (
+                  <div key={idx} onClick={() => {
+                    setSelectedIndex(idx);
+                    onUpcomingMonthChange(month, year);
+                  }}
+                    className={`cursor-pointer flex flex-col items-center rounded border-2 ${
+                      idx === selectedIndex ? "border-red-500" : "border-gray-700"}
+                      px-2 py-2 w-16 sm:w-20 md:w-24 lg:w-28 xl:w-32 min-w-[64px]`}>
+                    <p className="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[14px] xl:text-[16px] font-semibold text-center leading-tight">{monthName}</p>
+                  </div>
+                );
+              })}
         </div>
       </div>
       {/* Right Side: Search Bar */}
@@ -117,3 +129,4 @@ export default function ScheduleHeader({
     </div>
   );
 }
+

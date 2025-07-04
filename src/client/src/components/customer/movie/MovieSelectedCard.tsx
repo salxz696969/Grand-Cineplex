@@ -1,18 +1,9 @@
 import React from "react";
-import { Clock, Calendar, Star, Film, Globe, Play } from "lucide-react";
+import { Clock, Calendar, Star, Film, Play } from "lucide-react";
+import { Movie } from "../../../../../shared/types/type";
 
 interface MovieSelectedProps {
-  movie: {
-    title: string;
-    release_date: string;
-    duration: string;
-    poster_url: string;
-    genre: string;
-    description: string;
-    rating: number;
-    language: string;
-    trailer_url: string;
-  };
+  movie: Movie;
 }
 
 export default function MovieSelectedCard({ movie }: MovieSelectedProps) {
@@ -41,7 +32,6 @@ export default function MovieSelectedCard({ movie }: MovieSelectedProps) {
           <h1 className="text-xl font-bold">{movie.title}</h1>
 
           <div className="flex flex-col lg:flex-col gap-2">
-
             <div className="flex items-center gap-2 text-yellow-400">
               <Star className="w-4 h-4" />
               <p className="text-sm">{movie.rating}</p>
@@ -61,13 +51,7 @@ export default function MovieSelectedCard({ movie }: MovieSelectedProps) {
               <Calendar className="w-4 h-4" />
               <p className="text-sm">{movie.release_date}</p>
             </div>
-
-            <div className="flex items-center gap-2 text-green-400">
-              <Globe className="w-4 h-4" />
-              <p className="text-sm">{movie.language}</p>
-            </div>
           </div>
-          
         </div>
       </div>
     </div>

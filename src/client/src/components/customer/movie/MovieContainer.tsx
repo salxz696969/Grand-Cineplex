@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import MovieCard from "./MovieCard";
-import {fetchNowShowingMovies, fetchUpcomingMovies } from "../../../api/customer";
+import { fetchNowShowingMovies, fetchUpcomingMovies } from "../../../api/customer";
 import { Movie } from "../../../../../shared/types/type";
-
 
 interface MovieContainerProps {
   searchTerm: string;
   activeTab: "now" | "upcoming";
+  selectedMonth: number | null;
+  selectedYear: number | null;
 }
 
-const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }) => {
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab, selectedMonth, selectedYear }) => {
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,37 +26,35 @@ const MovieContainer: React.FC<MovieContainerProps> = ({ searchTerm, activeTab }
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const noResultTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-useEffect(() => {
-  const loadMovies = async () => {
-    try {
-      setIsLoading(true);
-      setIsError(null);
+  useEffect(() => {
+    const loadMovies = async () => {
+      try {
+        setIsLoading(true);
+        setIsError(null);
 
-      let movies: Movie[] = [];
+        let movies: Movie[] = [];
 
-      if (activeTab === "now") {
-        movies = await fetchNowShowingMovies();
-      } else {
-        movies = await fetchUpcomingMovies();
+        if (activeTab === "now") {
+          movies = await fetchNowShowingMovies();
+        } else if (selectedMonth && selectedYear) {
+          movies = await fetchUpcomingMovies(selectedMonth, selectedYear);
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        setAllMovies(movies);
+        setMovieList(movies);
+      } catch (error: any) {
+        setIsError(error.message || "Failed to load movies");
+        setAllMovies([]);
+        setMovieList([]);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      setAllMovies(movies);
-      setMovieList(movies);
-    } catch (error: any) {
-      setIsError(error.message || "Failed to load movies");
-      setAllMovies([]);
-      setMovieList([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  loadMovies();
-}, [activeTab]);
-
-
+    loadMovies();
+  }, [activeTab, selectedMonth, selectedYear]);
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
@@ -97,7 +101,41 @@ useEffect(() => {
     );
   }
 
-  if (isError) return <p className="text-red-500">Error: {isError}</p>;
+  if (isError) return <p className="text-red-500 flex items-center justify-center">Error: {isError}</p>;
+
+  // Custom no upcoming movies message
+  if (
+    activeTab === "upcoming" &&
+    movieList.length === 0 &&
+    !isSearching &&
+    !isLoading
+  ) {
+    const monthName = selectedMonth ? monthNames[selectedMonth - 1] : "";
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[300px] p-6 border border-gray-700 rounded-lg bg-gray-900 text-gray-300 text-center">
+        <svg
+          className="w-25 h-20  mb-4 text-gray-600"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9.75 17L15 12 9.75 7v10z"
+          ></path>
+        </svg>
+        <h3 className="text-xl font-semibold mb-2">No Upcoming Movies Yet</h3>
+        <p className="text-gray-400">
+          There are currently no upcoming movies scheduled for{" "}
+          <strong>{monthName} {selectedYear}</strong>. Please check back later.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-5 custom-cols">
@@ -120,3 +158,4 @@ useEffect(() => {
 };
 
 export default MovieContainer;
+
