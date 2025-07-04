@@ -78,7 +78,7 @@ export function SeatSelection() {
 						row: seat.rowNumber,
 						number: seat.seatNumber,
 						type: seat.seatType,
-						price: seatsFromApi.price,
+						price: Number(seatsFromApi.price),
 						isBooked: false,
 						idNumber: seat.id, // Assigning a unique id number
 					}));
@@ -88,7 +88,7 @@ export function SeatSelection() {
 						row: seat.rowNumber,
 						number: seat.seatNumber,
 						type: seat.seatType,
-						price: seatsFromApi.price,
+						price: Number(seatsFromApi.price),
 						isBooked: true,
 						idNumber: seat.id, // Assigning a unique id number
 					}));
@@ -172,8 +172,9 @@ export function SeatSelection() {
 				? prev.filter((s) => s.seatId !== seatId)
 				: [...prev, { seatId, idNumber }]
 		);
-		console.log("Selected seats:", selectedSeats);
 	};
+
+	console.log("Selected seats:", selectedSeats);
 
 	const getSeatStyle = (seat: Seat, isSelected: boolean) => {
 		if (seat.isBooked) {
@@ -195,10 +196,11 @@ export function SeatSelection() {
 	};
 
 	const getTotalPrice = () => {
-		return selectedSeats.reduce((total, selectedSeat) => {
+		const total = selectedSeats.reduce((total, selectedSeat) => {
 			const seat = seats.find((s) => s.id === selectedSeat.seatId);
-			return total + (seat?.price || 0);
+			return total + (typeof seat?.price === "number" ? seat.price : 0);
 		}, 0);
+		return isNaN(total) ? 0 : total;
 	};
 
 	const saveToLocalStorage = () => {

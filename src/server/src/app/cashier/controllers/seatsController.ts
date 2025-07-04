@@ -37,16 +37,17 @@ export const getAllSeatsBasedOnShowTime = async (
 		}
 
 		// Get booked seats for this screening
-		const bookedSeats = await Ticket.findAll({
-			include: [
-				{
-					association: "booking",
-					where: { screeningId: showTimeId },
-					attributes: ["id"],
-				},
-			],
-			attributes: ["seatId"],
-		});
+    // Find tickets where seatId matches and booking's screeningId matches showTimeId
+    const bookedSeats = await Ticket.findAll({
+      include: [
+      {
+        association: "booking",
+        attributes: ["id", "screeningId"],
+        where: { screeningId: showTimeId },
+      },
+      ],
+      attributes: ["seatId", "bookingId"],
+    });
 
     // Get detailed info of booked seats
     const bookedSeatsInfo = await Seat.findAll({

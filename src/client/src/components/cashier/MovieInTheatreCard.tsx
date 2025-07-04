@@ -90,7 +90,7 @@ export default function MovieInTheatreCard({
         </div>
         
           <div className="flex flex-wrap gap-2">
-            {showtimes.map((time, index) => (
+            {showtimes.sort((a, b) => a.time.localeCompare(b.time)).map((time, index) => (
               <Link to={`/cashier/seats/${time.screeningId}`} key={index}>
                 <button
                   key={index}
