@@ -18,6 +18,7 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src/server/src"
+    "src/server/src",
+    "src/client/src"
   ]
 }

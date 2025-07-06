@@ -14,6 +14,8 @@ export interface Movie {
   director: string;
   cast: string;
   language: string;
+  trailerUrl?: string; // Optional field for trailer URL
+  description?: string; // Optional field for movie description
 }
 
 interface MovieContainerProps {

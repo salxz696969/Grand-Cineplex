@@ -1,15 +1,47 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import MovieCard from "./MovieCard";
 import { Movie } from "../cashier/MovieContainer";
 import { currentShow } from "../../utils/FakeData";
 import { PlusCircle, Search } from "lucide-react";
 import AddMovie from "./AddMovie";
+import { getAllMovies, getRecentlyAddedMovies } from "../../api/manager";
+import { updateMovie } from './../../../../server/src/app/customer/controllers/moviesController';
+
+type MovieData = {
+    id: number;
+	title: string;
+	description: string;
+	posterUrl: string;
+	trailerUrl: string;
+	duration: string;
+	genre: string;
+	rating: number;
+	releaseDate: string;
+	director: string;
+	cast: string;
+	language: string;
+};
 
 export default function Movies() {
-    const [movies, setMovies] = useState<Movie[]>(currentShow);
+    const [movies, setMovies] = useState<MovieData[]>([]);
+    const [allMovies, setAllMovies] = useState<MovieData[]>([]);
     const [activeTab, setActiveTab] = useState<string>("recent");
     const [addingMovie, setAddingMovie] = useState(false);
+
+    useEffect(()=>{
+        const fetchMovies = async () => {
+            try {
+                const response=await getRecentlyAddedMovies()
+                setMovies(response);
+                const allResponse = await getAllMovies(); // Assuming this fetches all movies
+                setAllMovies(allResponse);
+            } catch (error) {
+                console.error("Error fetching movies:", error);
+            }
+        }
+        fetchMovies();
+    }, [])
 
     const handleBackToMovies = () => {
         setAddingMovie(false);
@@ -53,9 +85,21 @@ export default function Movies() {
                 <input type="text" placeholder="Search movies" className="w-full max-w-md  rounded-full border border-slate-700 bg-slate-800 px-5 py-2 text-white " />
             </div>
             <div className="grid w-full gap-5 custom-cols mt-4 ">
-                {movies.map((movie) => (
-                    <MovieCard key={movie.id} movie={movie} />
-                ))}
+                {activeTab === "recent" ? (
+                    movies.map((movie) => (
+                        <MovieCard key={movie.id} movie={movie} />
+                    ))
+                ) : (
+                    allMovies.length > 0 ? (
+                        allMovies.map((movie) => (
+                            <MovieCard key={movie.id} movie={movie} />
+                        ))
+                    ) : (
+                        <div className="col-span-full text-center text-slate-400">
+                            No movies available.
+                        </div>
+                    )
+                )}
             </div>
         </div>
     );

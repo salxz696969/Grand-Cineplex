@@ -26,8 +26,6 @@ app.use("/cashier", cashierRoute);
 // Manager routes
 app.use("/manager", managerRoute);
 
-app.get("/", (req, res) => {
-  res.json({kdit:"kdit"})
-});
+
 
 export default app;

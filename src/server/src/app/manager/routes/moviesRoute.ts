@@ -4,6 +4,7 @@ import {
   deleteMovie,
   getAllMovies,
   getMovieBasedOnId,
+  getRecentlyAddedMovies,
   updateMovie,
 } from "../controllers/moviesController";
 import verifyToken from "../../../middleware/verifyToken";
@@ -11,9 +12,10 @@ import verifyToken from "../../../middleware/verifyToken";
 const route = express.Router();
 
 route.get("/", getAllMovies);
-route.get("/:id", getMovieBasedOnId);
-route.post("/movies", verifyToken, addMovie);
-route.patch("/movies/:id", verifyToken, updateMovie);
+// route.get("/:id", getMovieBasedOnId);
+route.post("/", addMovie);
+route.patch("/", updateMovie);
 route.delete("/movies/:id", verifyToken, deleteMovie);
+route.get("/recently-added", getRecentlyAddedMovies); // Assuming you want to use the same route for recently added movies
 
 export default route;

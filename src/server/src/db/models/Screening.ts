@@ -1,5 +1,5 @@
 import { Model, DataTypes, Op, Sequelize } from "sequelize";
-
+import Movie from "./Movie";
 class Screening extends Model {
   declare id: number;
   declare movieId: number;
@@ -126,6 +126,7 @@ export const initScreening = (sequelize: Sequelize) => {
       underscored: true,
     }
   );
+  Screening.belongsTo(Movie, { as: "movie", foreignKey: "movieId" });
 };
 
 export default Screening;

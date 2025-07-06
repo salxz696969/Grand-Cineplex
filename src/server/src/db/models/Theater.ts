@@ -1,10 +1,17 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
 
+export enum TheaterStatus {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  MAINTENANCE = "maintenance",
+}
+
 class Theater extends Model {
   declare id: number;
   declare name: string;
   declare createdAt: Date;
   declare updatedAt: Date;
+  declare status: TheaterStatus;
 
   // Static methods
   static async findWithSeats() {
@@ -53,6 +60,14 @@ export const initTheater = (sequelize: Sequelize) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      status:{
+        type: DataTypes.ENUM(
+          TheaterStatus.ACTIVE,
+          TheaterStatus.INACTIVE,
+          TheaterStatus.MAINTENANCE
+        ),
+        defaultValue: TheaterStatus.ACTIVE,
+      }
     },
     {
       sequelize,
