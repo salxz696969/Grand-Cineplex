@@ -2,6 +2,7 @@ import express from "express";
 import {
   addBookingByStaff,
   deleteBookingByStaff,
+  getAllBookings,
   getAllBookingsForUser,
   getBookingBasedOnId,
   updateBookingByStaff,
@@ -10,8 +11,8 @@ import verifyToken from "../../../middleware/verifyToken";
 
 const route = express.Router();
 
-route.get("/", verifyToken, getAllBookingsForUser);
-route.get("/:id", verifyToken, getBookingBasedOnId);
+route.get("/", getAllBookings);
+// route.get("/:id", verifyToken, getBookingBasedOnId);
 route.post("/staff", verifyToken, addBookingByStaff);
 route.patch("/staff/:id", verifyToken, updateBookingByStaff);
 route.patch("/staff/:id", verifyToken, deleteBookingByStaff);

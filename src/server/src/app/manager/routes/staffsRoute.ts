@@ -4,12 +4,14 @@ import {
   getStaffInfo,
   updateStaffInfo,
   deleteStaff,
+  getAllStaff,
 } from "../controllers/staffsController";
 
 const router = Router();
 
 // Add a new staff member
 router.post("/", addStaff);
+router.get("/", getAllStaff)
 
 // Get staff info by ID
 router.get("/:id", getStaffInfo);

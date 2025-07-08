@@ -211,15 +211,15 @@ export const initBooking = (sequelize: Sequelize) => {
 		}
 	);
 	// In Booking.ts
-	Booking.belongsTo(Customer, { as: "customer", foreignKey: "customerId" });
-	Booking.belongsTo(Staff, {
-		as: "createdByStaff",
-		foreignKey: "createdByStaffId",
-	});
-	Booking.belongsTo(Screening, {
-		as: "screening",
-		foreignKey: "screeningId",
-	});
+	// Booking.belongsTo(Customer, { as: "customer", foreignKey: "customerId" });
+	// Booking.belongsTo(Staff, {
+	// 	as: "createdByStaff",
+	// 	foreignKey: "createdByStaffId",
+	// });
+	// Booking.belongsTo(Screening, {
+	// 	as: "screening",
+	// 	foreignKey: "screeningId",
+	// });
 };
 
 export default Booking;

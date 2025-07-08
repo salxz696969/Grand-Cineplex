@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Filter, PlusCircle, MapPin } from "lucide-react";
 import SeatManagementPopup from "./SeatManagement";
 import TheaterCard from "./TheaterCard";
 import AddTheater from "./AddTheater";
+import { getTheaters } from "../../api/manager";
 
 export interface Theater {
-    id: string;
+    id: number;
     name: string;
     capacity: number;
     rows: number;
     seatsPerRow: number;
     status: "active" | "maintenance" | "inactive";
-    location: string;
-    description: string;
+    location?: string;
+    description?: string;
 }
 
 export interface Seat {
@@ -24,59 +25,72 @@ export interface Seat {
     isBooked: boolean;
 }
 
-const dummyTheaters: Theater[] = [
-    {
-        id: "TH001",
-        name: "Theater A",
-        capacity: 120,
-        rows: 8,
-        seatsPerRow: 15,
-        status: "active",
-        location: "Ground Floor",
-        description: "Main theater with premium sound system"
-    },
-    {
-        id: "TH002",
-        name: "Theater B",
-        capacity: 80,
-        rows: 6,
-        seatsPerRow: 14,
-        status: "active",
-        location: "First Floor",
-        description: "Intimate theater for smaller audiences"
-    },
-    {
-        id: "TH003",
-        name: "Theater C",
-        capacity: 100,
-        rows: 7,
-        seatsPerRow: 15,
-        status: "maintenance",
-        location: "Ground Floor",
-        description: "Currently under maintenance"
-    },
-    {
-        id: "TH004",
-        name: "VIP Theater",
-        capacity: 40,
-        rows: 4,
-        seatsPerRow: 10,
-        status: "active",
-        location: "Second Floor",
-        description: "Premium VIP experience with recliner seats"
-    }
-];
+// const dummyTheaters: Theater[] = [
+//     {
+//         id: "TH001",
+//         name: "Theater A",
+//         capacity: 120,
+//         rows: 8,
+//         seatsPerRow: 15,
+//         status: "active",
+//         location: "Ground Floor",
+//         description: "Main theater with premium sound system"
+//     },
+//     {
+//         id: "TH002",
+//         name: "Theater B",
+//         capacity: 80,
+//         rows: 6,
+//         seatsPerRow: 14,
+//         status: "active",
+//         location: "First Floor",
+//         description: "Intimate theater for smaller audiences"
+//     },
+//     {
+//         id: "TH003",
+//         name: "Theater C",
+//         capacity: 100,
+//         rows: 7,
+//         seatsPerRow: 15,
+//         status: "maintenance",
+//         location: "Ground Floor",
+//         description: "Currently under maintenance"
+//     },
+//     {
+//         id: "TH004",
+//         name: "VIP Theater",
+//         capacity: 40,
+//         rows: 4,
+//         seatsPerRow: 10,
+//         status: "active",
+//         location: "Second Floor",
+//         description: "Premium VIP experience with recliner seats"
+//     }
+// ];
 
 export default function Theaters() {
-    const [theaters, setTheaters] = useState<Theater[]>(dummyTheaters);
+    const [theaters, setTheaters] = useState<Theater[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedStatus, setSelectedStatus] = useState<string>("all");
     const [editingTheater, setEditingTheater] = useState<Theater | null>(null);
     const [addingTheater, setAddingTheater] = useState(false);
 
+    useEffect(() => {
+        // Fetch theaters from API
+        const fetchTheaters = async () => {
+            try {
+                const data=await getTheaters()
+                setTheaters(data);
+            } catch (error) {
+                console.error("Error fetching theaters:", error);
+            }
+        }
+        fetchTheaters();
+    }, []);
+
     const filteredTheaters = theaters.filter(theater => {
         const matchesSearch = theater.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            theater.location.toLowerCase().includes(searchTerm.toLowerCase());
+            theater.location?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = selectedStatus === "all" || theater.status === selectedStatus;
 
         return matchesSearch && matchesStatus;

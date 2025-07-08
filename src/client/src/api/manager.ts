@@ -17,6 +17,7 @@ type MovieData ={
 
 const API_BASE_URL =
 	import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+import { get } from 'http';
 
 export const getHomePageInfo = async () => {
 	try {
@@ -66,6 +67,66 @@ export const updateMovie = async (movieData: MovieData) => {
         return response.data;
     } catch (error) {
         console.error("Error updating movie:", error);
+        throw error;
+    }
+}
+
+export const getTodayShowTimes= async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/manager/showtimes`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching today's showtimes:", error);
+        throw error;
+    }
+}
+
+export const getAllStaff = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/manager/staff`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching staff data:", error);
+        throw error;
+    }
+}
+
+export const addStaff = async (staffData: any) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/manager/staff`, staffData);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding staff:", error);
+        throw error;
+    }
+}
+
+export const getTheaters = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/manager/theaters`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching theaters:", error);
+        throw error;
+    }
+}
+
+export const addTheater = async (theaterData: any) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/manager/theaters`, theaterData);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding theater:", error);
+        throw error;
+    }
+}
+
+export const getBookings = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/manager/bookings`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
         throw error;
     }
 }

@@ -12,6 +12,7 @@ class Theater extends Model {
   declare createdAt: Date;
   declare updatedAt: Date;
   declare status: TheaterStatus;
+  declare cinemaId: number;
 
   // Static methods
   static async findWithSeats() {
@@ -67,10 +68,18 @@ export const initTheater = (sequelize: Sequelize) => {
           TheaterStatus.MAINTENANCE
         ),
         defaultValue: TheaterStatus.ACTIVE,
-      }
+      },
+      cinemaId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "cinemas",
+          key: "id",
+        },
+      },
     },
     {
-      sequelize,
+      sequelize,  
       tableName: "theaters",
       timestamps: true,
       underscored: true,

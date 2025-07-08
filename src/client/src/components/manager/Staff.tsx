@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Filter, PlusCircle, User, Mail, Phone, Shield, Edit, Trash2, MoreHorizontal } from "lucide-react";
 import AddStaff from "./AddStaff";
+import { getAllStaff } from "../../api/manager";
+import { get } from "http";
 
 export interface StaffMember {
-    id: string;
+    id: number;
     name: string;
     email: string;
     phone: string;
@@ -14,88 +16,88 @@ export interface StaffMember {
     avatar?: string;
 }
 
-const dummyStaff: StaffMember[] = [
-    {
-        id: "ST001",
-        name: "Sarah Johnson",
-        email: "sarah.johnson@cinema.com",
-        phone: "+1 (555) 123-4567",
-        role: "manager",
-        department: "Management",
-        hireDate: "2023-01-15",
-        status: "active"
-    },
-    {
-        id: "ST002",
-        name: "Mike Chen",
-        email: "mike.chen@cinema.com",
-        phone: "+1 (555) 234-5678",
-        role: "cashier",
-        department: "Customer Service",
-        hireDate: "2023-03-20",
-        status: "active"
-    },
-    {
-        id: "ST003",
-        name: "Lisa Wang",
-        email: "lisa.wang@cinema.com",
-        phone: "+1 (555) 345-6789",
-        role: "cashier",
-        department: "Customer Service",
-        hireDate: "2023-02-10",
-        status: "active"
-    },
-    {
-        id: "ST004",
-        name: "David Rodriguez",
-        email: "david.rodriguez@cinema.com",
-        phone: "+1 (555) 456-7890",
-        role: "usher",
-        department: "Operations",
-        hireDate: "2023-04-05",
-        status: "active"
-    },
-    {
-        id: "ST005",
-        name: "Emma Davis",
-        email: "emma.davis@cinema.com",
-        phone: "+1 (555) 567-8901",
-        role: "cleaner",
-        department: "Maintenance",
-        hireDate: "2023-01-30",
-        status: "active"
-    },
-    {
-        id: "ST006",
-        name: "James Wilson",
-        email: "james.wilson@cinema.com",
-        phone: "+1 (555) 678-9012",
-        role: "technician",
-        department: "Technical",
-        hireDate: "2022-11-15",
-        status: "on-leave"
-    },
-    {
-        id: "ST007",
-        name: "Maria Garcia",
-        email: "maria.garcia@cinema.com",
-        phone: "+1 (555) 789-0123",
-        role: "cashier",
-        department: "Customer Service",
-        hireDate: "2023-05-12",
-        status: "inactive"
-    },
-    {
-        id: "ST008",
-        name: "Alex Thompson",
-        email: "alex.thompson@cinema.com",
-        phone: "+1 (555) 890-1234",
-        role: "usher",
-        department: "Operations",
-        hireDate: "2023-06-01",
-        status: "active"
-    }
-];
+// const dummyStaff: StaffMember[] = [
+//     {
+//         id: "ST001",
+//         name: "Sarah Johnson",
+//         email: "sarah.johnson@cinema.com",
+//         phone: "+1 (555) 123-4567",
+//         role: "manager",
+//         department: "Management",
+//         hireDate: "2023-01-15",
+//         status: "active"
+//     },
+//     {
+//         id: "ST002",
+//         name: "Mike Chen",
+//         email: "mike.chen@cinema.com",
+//         phone: "+1 (555) 234-5678",
+//         role: "cashier",
+//         department: "Customer Service",
+//         hireDate: "2023-03-20",
+//         status: "active"
+//     },
+//     {
+//         id: "ST003",
+//         name: "Lisa Wang",
+//         email: "lisa.wang@cinema.com",
+//         phone: "+1 (555) 345-6789",
+//         role: "cashier",
+//         department: "Customer Service",
+//         hireDate: "2023-02-10",
+//         status: "active"
+//     },
+//     {
+//         id: "ST004",
+//         name: "David Rodriguez",
+//         email: "david.rodriguez@cinema.com",
+//         phone: "+1 (555) 456-7890",
+//         role: "usher",
+//         department: "Operations",
+//         hireDate: "2023-04-05",
+//         status: "active"
+//     },
+//     {
+//         id: "ST005",
+//         name: "Emma Davis",
+//         email: "emma.davis@cinema.com",
+//         phone: "+1 (555) 567-8901",
+//         role: "cleaner",
+//         department: "Maintenance",
+//         hireDate: "2023-01-30",
+//         status: "active"
+//     },
+//     {
+//         id: "ST006",
+//         name: "James Wilson",
+//         email: "james.wilson@cinema.com",
+//         phone: "+1 (555) 678-9012",
+//         role: "technician",
+//         department: "Technical",
+//         hireDate: "2022-11-15",
+//         status: "on-leave"
+//     },
+//     {
+//         id: "ST007",
+//         name: "Maria Garcia",
+//         email: "maria.garcia@cinema.com",
+//         phone: "+1 (555) 789-0123",
+//         role: "cashier",
+//         department: "Customer Service",
+//         hireDate: "2023-05-12",
+//         status: "inactive"
+//     },
+//     {
+//         id: "ST008",
+//         name: "Alex Thompson",
+//         email: "alex.thompson@cinema.com",
+//         phone: "+1 (555) 890-1234",
+//         role: "usher",
+//         department: "Operations",
+//         hireDate: "2023-06-01",
+//         status: "active"
+//     }
+// ];
 
 function StaffCard({ member }: { member: StaffMember }) {
     const getRoleColor = (role: string) => {
@@ -201,12 +203,24 @@ function StaffCard({ member }: { member: StaffMember }) {
 }
 
 export default function Staff() {
-    const [staff, setStaff] = useState<StaffMember[]>(dummyStaff);
+    const [staff, setStaff] = useState<StaffMember[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedRole, setSelectedRole] = useState<string>("all");
     const [selectedStatus, setSelectedStatus] = useState<string>("all");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
     const [addingStaff, setAddingStaff] = useState(false);
+
+    useEffect(()=>{
+        const getStaff=async()=>{
+            try {
+                const response = await getAllStaff()
+                setStaff(response)
+            } catch (error) {
+                console.error("error getting staff: ", error)
+            }
+        }
+        getStaff()
+    }, [])
 
     const filteredStaff = staff.filter(member => {
         const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

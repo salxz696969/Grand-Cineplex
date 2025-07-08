@@ -126,7 +126,7 @@ export const initScreening = (sequelize: Sequelize) => {
       underscored: true,
     }
   );
-  Screening.belongsTo(Movie, { as: "movie", foreignKey: "movieId" });
+  // Screening.belongsTo(Movie, { as: "movie", foreignKey: "movieId" });
 };
 
 export default Screening;
