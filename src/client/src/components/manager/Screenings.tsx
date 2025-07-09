@@ -6,7 +6,7 @@ import {
 	Clock,
 	MapPin,
 	Users,
-	Filter,
+	Filter, 
 	Film,
 } from "lucide-react";
 import MovieScreeningCard from "./MovieScreeningCard";

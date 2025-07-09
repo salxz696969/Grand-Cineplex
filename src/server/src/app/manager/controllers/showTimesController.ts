@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import Screening from "../../../db/models/Screening";
+import Booking from "../../../db/models/Booking";
+import Ticket from "../../../db/models/Ticket";
+import Seat from "../../../db/models/Seat";
 import { Op, Sequelize } from "sequelize";
 
 export const get7DaysShowTimes = async (req: Request, res: Response) => {
@@ -103,19 +106,19 @@ export const getTodayShowTimes = async (req: Request, res: Response) => {
 				status = "completed";
 			}
 
-      return {
-        id: data.id,
-        movieTitle: data.movie?.title,
-        movieImage: data.movie?.posterUrl,
-        theater: data.theater?.name,
-        date: screeningDate,
-        time: screeningTime.slice(0, 5),
-        duration: String(data.movie?.duration) + " min",
-        availableSeats: Number(data.theater?.seatCount) || 100,
-        totalSeats: Number(data.theater?.seatCount) || 50,
-        price: Number(data.price),
-        status,
-      };
+			return {
+				id: data.id,
+				movieTitle: data.movie?.title,
+				movieImage: data.movie?.posterUrl,
+				theater: data.theater?.name,
+				date: screeningDate,
+				time: screeningTime.slice(0, 5),
+				duration: String(data.movie?.duration) + " min",
+				availableSeats: Number(data.theater?.seatCount) || 100,
+				totalSeats: Number(data.theater?.seatCount) || 50,
+				price: Number(data.price),
+				status,
+			};
 		});
 		res.json(formatData);
 	} catch (error) {
@@ -125,6 +128,7 @@ export const getTodayShowTimes = async (req: Request, res: Response) => {
 
 export const getAllShowTimes = async (req: Request, res: Response) => {
 	try {
+		// Get all screenings with movie and theater info
 		const allShowTimes = await Screening.findAll({
 			include: [
 				{
@@ -143,10 +147,10 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 						include: [
 							[
 								Sequelize.literal(`(
-								SELECT COUNT(*)
-								FROM seats AS seat
-								WHERE seat.theater_id = theater.id
-							)`),
+                  SELECT COUNT(*)
+                  FROM seats AS seat
+                  WHERE seat.theater_id = theater.id
+                )`),
 								"seatCount",
 							],
 						],
@@ -159,19 +163,54 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 				["screeningTime", "ASC"],
 			],
 		});
-		const formatData = allShowTimes.map((data: any) => {
-			const screeningDate = data.screeningDate;
-			const screeningTime = data.screeningTime;
+
+		// For each screening, get booked seats
+		const result = [];
+		for (const screening of allShowTimes) {
+			// Find all bookings for this screening, including tickets and seats
+			const bookings = await Booking.findAll({
+				where: { screeningId: screening.id },
+				include: [
+					{
+						association: "tickets",
+						include: [
+							{
+								association: "seat",
+								attributes: [
+									"id",
+								],
+							},
+						],
+					},
+				],
+			});
+
+			// Collect all booked seats for this screening
+			const bookedSeats = (bookings as any[])
+				.flatMap((booking) =>
+					(booking.tickets || []).map((ticket: any) => ticket.seat)
+				)
+				.filter(Boolean);
+
+			// Extract seatCount from theater
+			const seatCount =
+				((screening as any).theater?.dataValues &&
+					(screening as any).theater.dataValues.seatCount) ||
+				(screening as any).theater?.seatCount ||
+				0;
+
+			// Status calculation
+			const screeningDate = screening.screeningDate;
+			const screeningTime = screening.screeningTime;
 			const now = new Date();
 			const screeningDateTime = new Date(
 				`${screeningDate}T${screeningTime}`
 			);
 			let status: "upcoming" | "ongoing" | "completed" = "upcoming";
-			const durationMinutes = data.movie?.duration || 0;
+			const durationMinutes = (screening as any).movie?.duration || 0;
 			const endDateTime = new Date(
 				screeningDateTime.getTime() + durationMinutes * 60000
 			);
-
 			if (now < screeningDateTime) {
 				status = "upcoming";
 			} else if (now >= screeningDateTime && now <= endDateTime) {
@@ -180,21 +219,22 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 				status = "completed";
 			}
 
-      return {
-        id: data.id,
-        movieTitle: data.movie?.title,
-        movieImage: data.movie?.posterUrl,
-        theater: data.theater?.name,
-        date: screeningDate,
-        time: screeningTime.slice(0, 5),
-        duration: String(data.movie?.duration) + " min",
-        availableSeats: Number(data.theater?.seatCount) || 100,
-        totalSeats: Number(data.theater?.seatCount) || 50,
-        price: Number(data.price),
-        status,
-      };
-		});
-		res.json(formatData);
+			result.push({
+				id: screening.id,
+				movieTitle: (screening as any).movie?.title,
+				movieImage: (screening as any).movie?.posterUrl,
+				theater: (screening as any).theater?.name,
+				date: screeningDate,
+				time: screeningTime.slice(0, 5),
+				duration: String((screening as any).movie?.duration) + " min",
+				availableSeats: Number(seatCount) - bookedSeats.length,
+				totalSeats: Number(seatCount),
+				price: Number(screening.price),
+				status,
+			});
+		}
+
+		res.json(result).status(200);
 	} catch (error) {
 		res.status(500).json({ message: "Internal server error", error });
 	}

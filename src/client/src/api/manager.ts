@@ -130,3 +130,13 @@ export const getBookings = async () => {
         throw error;
     }
 }
+
+export const addScreening= async (screeningData: any) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/manager/showtimes`, screeningData);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding screening:", error);
+        throw error;
+    }
+}
