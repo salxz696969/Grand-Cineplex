@@ -16,7 +16,7 @@ interface SeatCardProps {
   onToggle: (id: string) => void;
 }
 
-const SeatCard = ({ seat, isSelected, onToggle }: SeatCardProps) => {
+export function SeatCard({ seat, isSelected, onToggle }: SeatCardProps) {
   const getSeatStyle = () => {
     if (seat.isBooked) return "bg-red-600 cursor-not-allowed opacity-60";
     if (isSelected)
@@ -41,6 +41,4 @@ const SeatCard = ({ seat, isSelected, onToggle }: SeatCardProps) => {
       <Sofa />
     </button>
   );
-};
-
-export default SeatCard;
+}

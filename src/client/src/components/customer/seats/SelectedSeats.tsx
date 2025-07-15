@@ -1,9 +1,12 @@
 import React from "react";
 import { Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+ 
 
 interface Seat {
   id: string;
+  row: string;
+  number: number;
   price: number;
 }
 
@@ -11,13 +14,25 @@ interface SelectedSeatsProps {
   selectedSeats: string[];
   seats: Seat[];
   totalPrice: number;
+  screeningId?: string | null;
 }
 
-const SelectedSeats = ({ selectedSeats, seats, totalPrice }: SelectedSeatsProps) => {
+const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: SelectedSeatsProps) => {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigate("/payment"); // assuming this route renders PaymentContainer
+    if (!screeningId) {
+      alert("Screening information is missing.");
+      return;
+    }
+    if (selectedSeats.length === 0) {
+      alert("Please select at least one seat.");
+      return;
+    }
+
+    const seatParam = selectedSeats.join(",");
+    navigate(`/payment?screeningId=${screeningId}&seats=${seatParam}`);
+    // navigate(`/payment/${bookingId}`);
   };
 
   return (
@@ -33,12 +48,13 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice }: SelectedSeatsProps)
               .sort()
               .map((id) => {
                 const seat = seats.find((s) => s.id === id);
+                const seatLabel = seat ? `${seat.row}${seat.number}` : id;
                 return (
                   <span
                     key={id}
                     className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm"
                   >
-                    {id} - ${seat?.price}
+                    {seatLabel} - ${seat?.price}
                   </span>
                 );
               })}

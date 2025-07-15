@@ -11,12 +11,12 @@ export enum BookingStatus {
 
 class Booking extends Model {
   declare id: number;
-  declare customerId: number | null;
-  declare screeningId: number;
+  declare customer_id: number | null;
+  declare screening_id: number;
   declare status: BookingStatus;
-  declare createdByStaffId: number | null;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  declare created_by_staff_id: number | null;
+  declare created_at: Date;
+  declare updated_at: Date;
 
   // Custom instance methods
   isConfirmed(): boolean {
@@ -39,8 +39,8 @@ class Booking extends Model {
   }
 
   // Static methods
-  static async findWithDetails(bookingId: number) {
-    return this.findByPk(bookingId, {
+  static async findWithDetails(booking_id: number) {
+    return this.findByPk(booking_id, {
       include: [
         {
           association: "customer",
@@ -68,22 +68,22 @@ class Booking extends Model {
           include: [
             {
               association: "seat",
-              attributes: ["rowNumber", "seatNumber", "seatType"],
+              attributes: ["row_number", "seat_number", "seat_type"],
             },
           ],
         },
         {
           association: "payments",
-          attributes: ["id", "amount", "method", "status", "createdAt"],
+          attributes: ["id", "amount", "method", "status", "created_at"],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
   }
 
-  static async findByCustomer(customerId: number) {
+  static async findByCustomer(customer_id: number) {
     return this.findAll({
-      where: { customerId },
+      where: { customer_id },
       include: [
         {
           association: "screening",
@@ -103,18 +103,18 @@ class Booking extends Model {
           include: [
             {
               association: "seat",
-              attributes: ["rowNumber", "seatNumber"],
+              attributes: ["row_number", "seat_number"],
             },
           ],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
   }
 
-  static async findByScreening(screeningId: number) {
+  static async findByScreening(screening_id: number) {
     return this.findAll({
-      where: { screeningId },
+      where: { screening_id },
       include: [
         {
           association: "customer",
@@ -125,12 +125,12 @@ class Booking extends Model {
           include: [
             {
               association: "seat",
-              attributes: ["rowNumber", "seatNumber"],
+              attributes: ["row_number", "seat_number"],
             },
           ],
         },
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["created_at", "ASC"]],
     });
   }
 
@@ -152,7 +152,7 @@ class Booking extends Model {
           ],
         },
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["created_at", "ASC"]],
     });
   }
 }
@@ -165,7 +165,7 @@ export const initBooking = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      customerId: {
+      customer_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
@@ -173,7 +173,7 @@ export const initBooking = (sequelize: Sequelize) => {
           key: "id",
         },
       },
-      screeningId: {
+      screening_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -186,7 +186,7 @@ export const initBooking = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: BookingStatus.PENDING,
       },
-      createdByStaffId: {
+      created_by_staff_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {

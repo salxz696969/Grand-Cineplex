@@ -9,29 +9,30 @@ export enum SeatType {
 
 class Seat extends Model {
   declare id: number;
-  declare theaterId: number;
-  declare rowNumber: string;
-  declare seatNumber: number;
-  declare seatType: SeatType;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  declare theater_id: number;
+  declare row_number: string;
+  declare seat_number: number;
+  declare seat_type: SeatType;
+  declare price: number;
+  declare created_at: Date;
+  declare updated_at: Date;
 
   // Custom instance methods
   getSeatLabel(): string {
-    return `${this.rowNumber}${this.seatNumber}`;
+    return `${this.row_number}${this.seat_number}`;
   }
 
   isPremium(): boolean {
-    return this.seatType === SeatType.PREMIUM || this.seatType === SeatType.VIP;
+    return this.seat_type === SeatType.PREMIUM || this.seat_type === SeatType.VIP;
   }
 
   // Static methods
-  static async findByTheater(theaterId: number) {
+  static async findByTheater(theater_id: number) {
     return this.findAll({
-      where: { theaterId },
+      where: { theater_id },
       order: [
-        ["rowNumber", "ASC"],
-        ["seatNumber", "ASC"],
+        ["row_number", "ASC"],
+        ["seat_number", "ASC"],
       ],
     });
   }
@@ -45,11 +46,11 @@ class Seat extends Model {
         },
       ],
       where: {
-        "$tickets.booking.screeningId$": screeningId,
+        "$tickets.booking.screening_id$": screeningId,
       },
       order: [
-        ["rowNumber", "ASC"],
-        ["seatNumber", "ASC"],
+        ["row_number", "ASC"],
+        ["seat_number", "ASC"],
       ],
     });
   }
@@ -63,7 +64,7 @@ export const initSeat = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      theaterId: {
+      theater_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -71,18 +72,23 @@ export const initSeat = (sequelize: Sequelize) => {
           key: "id",
         },
       },
-      rowNumber: {
+      row_number: {
         type: DataTypes.STRING(5),
         allowNull: false,
       },
-      seatNumber: {
+      seat_number: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      seatType: {
+      seat_type: {
         type: DataTypes.ENUM(...Object.values(SeatType)),
         allowNull: false,
         defaultValue: SeatType.REGULAR,
+      },
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
     },
     {

@@ -18,13 +18,13 @@ export enum PaymentStatus {
 
 class Payment extends Model {
   declare id: number;
-  declare bookingId: number;
+  declare booking_id: number;
   declare amount: number;
   declare method: PaymentType;
   declare status: PaymentStatus;
-  declare transactionReference: string | null;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  declare transaction_reference: string | null;
+  declare created_at: Date;
+  declare updated_at: Date;
 
   // Custom instance methods
   isCompleted(): boolean {
@@ -48,10 +48,10 @@ class Payment extends Model {
   }
 
   // Static methods
-  static async findByBooking(bookingId: number) {
+  static async findByBooking(booking_id: number) {
     return this.findAll({
-      where: { bookingId },
-      order: [["createdAt", "DESC"]],
+      where: { booking_id },
+      order: [["created_at", "DESC"]],
     });
   }
 
@@ -78,7 +78,7 @@ class Payment extends Model {
           ],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
   }
 
@@ -96,7 +96,7 @@ class Payment extends Model {
           ],
         },
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["created_at", "ASC"]],
     });
   }
 
@@ -104,7 +104,7 @@ class Payment extends Model {
     const whereClause: any = { status: PaymentStatus.COMPLETED };
 
     if (startDate && endDate) {
-      whereClause.createdAt = {
+      whereClause.created_at = {
         [Op.between]: [startDate, endDate],
       };
     }
@@ -122,7 +122,7 @@ export const initPayment = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      bookingId: {
+      booking_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -143,7 +143,7 @@ export const initPayment = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: PaymentStatus.PENDING,
       },
-      transactionReference: {
+      transaction_reference: {
         type: DataTypes.STRING(100),
         allowNull: true,
       },

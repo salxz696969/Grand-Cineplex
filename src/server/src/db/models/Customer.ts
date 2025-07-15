@@ -6,15 +6,15 @@ class Customer extends Model {
   declare email: string;
   declare phone: string | null;
   declare password: string;
-  declare dateOfBirth: Date | null;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  declare date_of_birth: Date | null;
+  declare created_at: Date;
+  declare updated_at: Date;
 
   // Custom instance methods
   getAge(): number | null {
-    if (!this.dateOfBirth) return null;
+    if (!this.date_of_birth) return null;
     const today = new Date();
-    const birthDate = new Date(this.dateOfBirth);
+    const birthDate = new Date(this.date_of_birth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
 
@@ -35,8 +35,8 @@ class Customer extends Model {
     });
   }
 
-  static async findWithBookings(customerId: number) {
-    return this.findByPk(customerId, {
+  static async findWithBookings(customer_id: number) {
+    return this.findByPk(customer_id, {
       include: [
         {
           association: "bookings",
@@ -59,12 +59,12 @@ class Customer extends Model {
               include: [
                 {
                   association: "seat",
-                  attributes: ["rowNumber", "seatNumber", "seatType"],
+                  attributes: ["row_number", "seat_number", "seat_type"],
                 },
               ],
             },
           ],
-          order: [["createdAt", "DESC"]],
+          order: [["created_at", "DESC"]],
         },
       ],
     });
@@ -99,7 +99,7 @@ export const initCustomer = (sequelize: Sequelize) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      dateOfBirth: {
+      date_of_birth: {
         type: DataTypes.DATEONLY,
         allowNull: true,
       },

@@ -1,4 +1,3 @@
-
 export type PaymentType = "cash" | "card" | "digital_wallet" | "bank_transfer";
 
 export type BookingStatus = "pending" | "reserved" | "confirmed" | "cancelled" | "refunded";
@@ -6,7 +5,6 @@ export type BookingStatus = "pending" | "reserved" | "confirmed" | "cancelled" |
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
 
 export type SeatType = "regular" | "premium" | "vip";
-
 
 export interface Cinema {
   id: number;
@@ -46,20 +44,18 @@ export interface Theater {
 
 export interface Seat {
   id: number;
-  theater_id: number;
+  theater_id?: number;
   row_number: string;
   seat_number: number;
   seat_type: SeatType;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface Screening {
   id: number;
   movie_id: number;
   theater_id: number;
-  screening_date: string; // format: YYYY-MM-DD
-  screening_time: string; // format: HH:mm:ss
+  screening_date: string; // YYYY-MM-DD
+  screening_time: string; // HH:mm:ss
   price: number;
   created_at: string;
   updated_at: string;
@@ -100,4 +96,53 @@ export interface Payment {
   status: PaymentStatus;
   created_at: string;
   updated_at: string;
+}
+
+export interface MovieWithScreenings extends Movie {
+  screenings: Screening[];
+}
+
+// Extended Seat from API to include isBooked and price info
+export interface ApiSeat {
+  id: number;
+  row_number: string;
+  seat_number: number;
+  seat_type: SeatType;
+  price: number;
+  isBooked: boolean;
+}
+
+
+
+export interface BookingSummary {
+  movieTitle: string;
+  theaterName: string;  // changed from theater to theaterName
+  date: string;
+  time: string;
+  seats: {
+    seat_number: string;
+    price: number;
+  }[];
+
+  totalAmount: number;
+  customerName: string;
+  customerPhone: string;
+
+  screeningId?: number;
+}
+
+
+
+export interface ScreeningSeatData {
+  movieTitle: string;
+  theaterName: string;
+  screeningDate: string;
+  screeningTime: string;
+  price: number;
+  seats: ApiSeat[];
+}
+
+
+interface ScreeningWithTheaterName extends Screening {
+  theaterName: string; 
 }

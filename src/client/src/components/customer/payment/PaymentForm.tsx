@@ -8,13 +8,21 @@ const paymentMethods = [
   { id: "qr", name: "QR", icon: <QrCode className="w-5 h-5" /> },
 ];
 
+interface PaymentFormProps {
+  selectedPaymentMethod: string;
+  setSelectedPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
+  handlePayment: () => Promise<void> | void;
+  isProcessing: boolean;
+  totalAmount: number;
+}
+
 export default function PaymentForm({
   selectedPaymentMethod,
   setSelectedPaymentMethod,
   handlePayment,
   isProcessing,
   totalAmount,
-}) {
+}: PaymentFormProps) {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold mb-6">Payment</h2>
@@ -30,6 +38,7 @@ export default function PaymentForm({
                   : "border-gray-600 bg-gray-700/50 hover:border-gray-500"
               }`}
               onClick={() => setSelectedPaymentMethod(method.id)}
+              type="button"
             >
               <div className="text-center">
                 <div
@@ -48,6 +57,7 @@ export default function PaymentForm({
         </div>
       </div>
 
+      {/* Payment details inputs conditional by payment method */}
       {selectedPaymentMethod === "card" && (
         <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 space-y-3">
           <h3 className="text-lg font-semibold mb-4">Card Details</h3>
@@ -70,7 +80,10 @@ export default function PaymentForm({
         <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 space-y-2">
           <h3 className="text-lg font-semibold mb-4">Digital Payment</h3>
           {["Apple Pay", "Google Pay", "PayPal"].map((name) => (
-            <div key={name} className="flex gap-4 border border-gray-700 rounded-lg p-4 items-center">
+            <div
+              key={name}
+              className="flex gap-4 border border-gray-700 rounded-lg p-4 items-center"
+            >
               <div className="bg-sky-800 rounded-lg p-1">
                 <CreditCard className="w-10 h-10" />
               </div>
@@ -88,6 +101,7 @@ export default function PaymentForm({
             ? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white transform hover:scale-105"
             : "bg-gray-700 text-gray-400 cursor-not-allowed"
         }`}
+        type="button"
       >
         {isProcessing ? (
           <div className="flex items-center justify-center gap-2">
@@ -95,7 +109,7 @@ export default function PaymentForm({
             Processing...
           </div>
         ) : (
-          `Complete Payment - $${totalAmount}`
+          `Complete Payment - $${totalAmount.toFixed(2)}`
         )}
       </button>
     </div>

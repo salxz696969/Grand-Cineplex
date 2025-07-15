@@ -1,18 +1,14 @@
-import express from "express";
-import {
-  addBookingByStaff,
-  deleteBookingByStaff,
-  getAllBookingsForUser,
-  getBookingBasedOnId,
-  updateBookingByStaff,
-} from "../controllers/bookingsController";
-import verifyToken from "../../../middleware/verifyToken";
+import express, { Request, Response, NextFunction } from "express";
+import { getBookingBasedOnId, createBooking } from "../controllers/bookingsController";
+
+// No auth required, optional auth middleware placeholder
+const optionalAuth = (req: Request, res: Response, next: NextFunction) => {
+  next();
+};
 
 const route = express.Router();
 
-route.get("/", verifyToken, getAllBookingsForUser);
-route.get("/:id", verifyToken, getBookingBasedOnId);
-route.post("/staff", verifyToken, addBookingByStaff);
-route.patch("/staff/:id", verifyToken, updateBookingByStaff);
-route.patch("/staff/:id", verifyToken, deleteBookingByStaff);
+route.get("/:id", optionalAuth, getBookingBasedOnId);
+route.post("/", optionalAuth, createBooking);
+
 export default route;

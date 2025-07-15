@@ -1,7 +1,5 @@
-// This components used in signup and signin to provide user to fill the password
-
 import { useState, ChangeEvent } from "react";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEye, FaRegEyeSlash, FaLock } from "react-icons/fa";
 
 interface PasswordProps {
   value: string;
@@ -16,11 +14,11 @@ const Password: React.FC<PasswordProps> = ({ value, onChange }) => {
   };
 
   return (
-    <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded mb-4">
+    <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded">
+      <FaLock className="text-gray-400 mr-3" />
       <input
         type={isShowPassword ? "text" : "password"}
-        placeholder="Password"
-        className="w-full text-sm bg-transparent py-3 mr-3 rounded outline-none"
+        className="w-full text-sm bg-transparent py-3 mr-3 rounded outline-none text-white"
         value={value}
         onChange={onChange}
       />

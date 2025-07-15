@@ -54,74 +54,252 @@ export const getNowShowingMovies = async (req: Request, res: Response) => {
 
 
 
-export const getUpcomingMovies = async (req: Request, res: Response) => {
+
+export const getMoviesFor7Days = async (req: Request, res: Response) => {
   try {
-    const { month, year } = req.query;
-
-    let movies;
-
-    // If month and year are provided, filter by that month
-    if (month && year) {
-      const monthNum = parseInt(month as string);
-      const yearNum = parseInt(year as string);
-
-      if (isNaN(monthNum) || isNaN(yearNum)) {
-        return res.status(400).json({ message: "Invalid month or year format" });
-      }
-
-      // Minus it one because to make it match with js, since js count from zero
-      const startDate = new Date(yearNum, monthNum - 1, 1);
-      const endDate = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
-
-      // It filter the start day in target month to the end of the day
-      movies = await Movie.findAll({
-        where: {
-          release_date: {
-            [Op.between]: [startDate, endDate],
-          },
-        },
-        order: [["release_date", "ASC"]],
-      });
-    } else { 
-      // Find all movies where the release_date is greater than right now
-      
-      const today = new Date();
-
-      movies = await Movie.findAll({
-        where: {
-          release_date: {
-            [Op.gt]: today,
-          },
-        },
-        order: [["release_date", "ASC"]],
-      });
+    const dateParam = req.query.date as string;
+    if (!dateParam) {
+      return res.status(400).json({ message: "Missing date parameter" });
     }
 
-    res.status(200).json(movies);
+    // Parse date and normalize time to midnight
+    const selectedDate = new Date(dateParam);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    // Next day for less-than comparison
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    // Find movies that have screenings on the selected date
+    const movies = await Movie.findAll({
+      include: [
+        {
+          model: Screening,
+          as: "screenings",
+          where: {
+            screening_date: {
+              [Op.gte]: selectedDate,
+              [Op.lt]: nextDay,
+            },
+          },
+          required: true,
+        },
+      ],
+      order: [["release_date", "ASC"]],
+    });
+
+    res.json(movies);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 
-
-
-// export const getTopRatedMovies = async (req: Request, res: Response) => {
+// Use when user select on movie
+// export const getMovieAndScreeningBasedOnId = async (req: Request, res: Response) => {
 //   try {
-//     const topMovies = await Movie.findAll({
-//       where: {
-//         rating: {
-//           [Op.not]: null,
+//     const movieId = parseInt(req.params.id);
+//     const movie = await Movie.findByPk(movieId);
+
+//     if (!movie) {
+//       return res.status(404).json({ message: "Movie not found" });
+//     }
+
+//     // Import Theater model
+//     // import Theater from "../../../db/models/Theater"; // Make sure this import exists at the top
+
+//     const screenings = await Screening.findAll({
+//       where: { movieId },
+//       include: [
+//         {
+//           model: require("../../../db/models/Theater").default,
+//           as: "theater",
+//           attributes: ["name"],
 //         },
-//       },
-//       order: [["rating", "DESC"]],
-//       limit: 5,
-//       attributes: ["id", "poster_url"],
+//       ],
+//       order: [["screeningDate", "ASC"]],
 //     });
 
-//     res.status(200).json(topMovies);
+//     res.status(200).json({ movie, screenings });
 //   } catch (error) {
 //     res.status(500).json({ message: "Internal server error", error });
 //   }
 // };
 
+// Use in home page of current show tab
+
+// export const getMoviesAndItsScreenings = async (
+//   req: Request,
+//   res: Response
+// ) => {
+//   try {
+//     // Accept id and day from query parameters
+//     const movieIdParam = req.query.id as string | undefined;
+//     const dayParam = req.query.day as string | undefined;
+//     if (!movieIdParam) {
+//       return res.status(400).json({ message: "Missing movie id parameter." });
+//     }
+
+//     const movieId = parseInt(movieIdParam, 10);
+//     if (isNaN(movieId)) {
+//       return res.status(400).json({ message: "Invalid movie id parameter." });
+//     }
+
+//     // Strictly validate day parameter to be between 0 and 6
+//     let dayOffset = 0;
+//     if (dayParam !== undefined) {
+//       if (!/^\d+$/.test(dayParam)) {
+//         return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+//       }
+//       dayOffset = parseInt(dayParam, 10);
+//       if (isNaN(dayOffset) || dayOffset < 0 || dayOffset > 6) {
+//         return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+//       }
+//     }
+
+//     // Calculate the start and end of the requested day
+//     const startDate = new Date();
+//     startDate.setHours(0, 0, 0, 0);
+//     startDate.setDate(startDate.getDate() + dayOffset);
+
+//     const endDate = new Date(startDate);
+//     endDate.setDate(endDate.getDate() + 1);
+
+//     // Use findOne to return a single movie with its screenings
+//     const movieWithScreenings = await Movie.findOne({
+//       where: { id: movieId },
+//       include: [
+//         {
+//           model: Screening,
+//           as: "screenings",
+//           where: {
+//             screening_date: {
+//               [Op.gte]: startDate,
+//               [Op.lt]: endDate,
+//             },
+//           },
+//           required: true,
+//         },
+//       ],
+//       order: [["release_date", "ASC"]],
+//     });
+
+//     if (!movieWithScreenings) {
+//       return res.status(404).json({ message: "Movie or screenings not found for the specified day." });
+//     }
+
+//     res.status(200).json(movieWithScreenings);
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal server error", error });
+//   }
+// };
+
+
+
+export const getComingSoonMovies = async (req: Request, res: Response) => {
+  try {
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+      return res.status(400).json({ message: "Month and year are required" });
+    }
+
+    const selectedMonth = parseInt(month as string);
+    const selectedYear = parseInt(year as string);
+
+    // Get the first day of the selected month
+    const startOfMonth = new Date(selectedYear, selectedMonth - 1, 1); // month is 0-based
+    // Get the first day of the next month
+    const startOfNextMonth = new Date(selectedYear, selectedMonth, 1);
+
+    const movies = await Movie.findAll({
+      include: [
+        {
+          model: Screening,
+          as: "screenings",
+          where: {
+            screening_date: {
+              [Op.gte]: startOfMonth,
+              [Op.lt]: startOfNextMonth,
+            },
+          },
+          required: true,
+        },
+      ],
+      order: [["release_date", "ASC"]],
+    });
+
+    res.status(200).json(movies);
+  } catch (error) {
+    console.error("Error fetching upcoming movies:", error);
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+
+export const getMoviesAndItsScreenings = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const movieIdParam = req.query.id as string | undefined;
+    const dayParam = req.query.day as string | undefined;
+
+    if (!movieIdParam) {
+      return res.status(400).json({ message: "Missing movie id parameter." });
+    }
+
+    const movieId = parseInt(movieIdParam, 10);
+    if (isNaN(movieId)) {
+      return res.status(400).json({ message: "Invalid movie id parameter." });
+    }
+
+    // Default dayOffset = 0 (today)
+    let dayOffset = 0;
+    if (dayParam !== undefined) {
+      if (!/^\d+$/.test(dayParam)) {
+        return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+      }
+      dayOffset = parseInt(dayParam, 10);
+      if (isNaN(dayOffset) || dayOffset < 0 || dayOffset > 6) {
+        return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+      }
+    }
+
+    // Date range for filtering screenings
+    const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+    startDate.setDate(startDate.getDate() + dayOffset);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    // Get the movie and include any screenings (even if 0 screenings)
+    const movieWithScreenings = await Movie.findOne({
+      where: { id: movieId },
+      include: [
+        {
+          model: Screening,
+          as: "screenings",
+          where: {
+            screening_date: {
+              [Op.gte]: startDate,
+              [Op.lt]: endDate,
+            },
+          },
+          required: false, // ✅ allow returning movies even if they have no screenings
+        },
+      ],
+      order: [["release_date", "ASC"]],
+    });
+
+    if (!movieWithScreenings) {
+      return res.status(404).json({ message: "Movie not found." });
+    }
+
+    return res.status(200).json(movieWithScreenings);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};

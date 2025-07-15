@@ -159,3 +159,29 @@ export const deleteShowTime = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
+
+export const getShowTimesBasedOnId= async (req: Request, res: Response) => {
+  try {
+    const showTimeId = parseInt(req.params.id);
+    const showTime = await Screening.findByPk(showTimeId, {
+      include: [
+        {
+          association: "movie",
+          attributes: ["id", "title", "duration", "genre"],
+        },
+        {
+          association: "theater",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+
+    if (!showTime) {
+      return res.status(404).json({ message: "Show time not found" });
+    }
+
+    res.status(200).json(showTime);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+}

@@ -10,8 +10,8 @@ class Movie extends Model {
   declare poster_url: string | null;
   declare trailer_url: string | null;
   declare release_date: Date | null;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  declare created_at: Date;
+  declare updated_at: Date;
 
   // Custom instance methods
   getFormattedDuration(): string {

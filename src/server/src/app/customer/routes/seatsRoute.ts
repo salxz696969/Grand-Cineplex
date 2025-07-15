@@ -1,15 +1,15 @@
 import express from "express";
 import {
-  addSeat,
-  deleteSeat,
+  bookSeats,
+  selectSeat,
   getAllSeatsBasedOnShowTime,
-  updateSeat,
 } from "../controllers/seatsController";
 
 const route = express.Router();
 
-route.get("/available-seats/:id", getAllSeatsBasedOnShowTime);
-route.post("/", addSeat);
-route.patch("/:id", updateSeat);
-route.delete("/:id", deleteSeat);
+route.get("/screening/:id", getAllSeatsBasedOnShowTime);
+route.post("/selected", selectSeat);
+route.post("/booked", bookSeats);
+
+
 export default route;
