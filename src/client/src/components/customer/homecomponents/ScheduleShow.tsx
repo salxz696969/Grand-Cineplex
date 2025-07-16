@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import SearchBar from "./SearchBar";
 
@@ -14,7 +13,7 @@ interface ScheduleHeaderProps {
   activeTab: "now" | "upcoming";
   setActiveTab: React.Dispatch<React.SetStateAction<"now" | "upcoming">>;
   onUpcomingMonthChange: (month: number, year: number) => void;
-  onNowShowingDayChange: (date: Date) => void;  // <-- Added this prop
+  onNowShowingDayChange: (date: Date) => void;
 }
 
 export default function ScheduleHeader({
@@ -23,7 +22,7 @@ export default function ScheduleHeader({
   activeTab,
   setActiveTab,
   onUpcomingMonthChange,
-  onNowShowingDayChange, // <-- Added here
+  onNowShowingDayChange,
 }: ScheduleHeaderProps) {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
@@ -71,41 +70,33 @@ export default function ScheduleHeader({
 
   return (
     <div className="mt-8 mb-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4">
-      {/* Left side */}
+
+      {/* Schedule side */}
       <div className="w-full lg:w-[70%]">
         <div className="flex gap-6 text-xl font-bold mb-4 flex-wrap">
-          <button
-            onClick={() => handleTabChange("now")}
-            className={`transition-colors ${
-              activeTab === "now" ? "text-white border-b-2 border-white" : "text-gray-400"
-            }`}
-          >
+          <button onClick={() => handleTabChange("now")} className={`transition-colors ${
+              activeTab === "now" ? "text-white border-b-2 border-white" : "text-gray-400"}`}>
             Now Showing
           </button>
 
           <span className="text-gray-500">|</span>
 
-          <button
-            onClick={() => handleTabChange("upcoming")}
-            className={`transition-colors ${
-              activeTab === "upcoming" ? "text-white border-b-2 border-white" : "text-gray-400"
-            }`}
-          >
+          <button onClick={() => handleTabChange("upcoming")} className={`transition-colors ${
+              activeTab === "upcoming" ? "text-white border-b-2 border-white" : "text-gray-400"}`}>
             Upcoming
           </button>
         </div>
 
         <div className="flex flex-wrap gap-3 justify-start">
+          {/* Current Screenings */}
           {activeTab === "now"
             ? getNext6Days().map((c, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => {
+                <div key={idx} onClick={() => {
                     setSelectedIndex(idx);
                     const today = new Date();
                     const selectedDate = new Date(today);
                     selectedDate.setDate(today.getDate() + idx);
-                    onNowShowingDayChange(selectedDate); // Pass selected date up
+                    onNowShowingDayChange(selectedDate);
                   }}
                   className={`cursor-pointer flex flex-col items-center rounded border-2 ${
                     idx === selectedIndex ? "border-red-500" : "border-gray-700"
@@ -116,16 +107,15 @@ export default function ScheduleHeader({
                   <p className="text-gray-400 text-[8px] sm:text-[9px] md:text-xs">{c.month}</p>
                 </div>
               ))
+              // Upcoming Screenings
             : getUpcomingMonths().map((monthName, idx) => {
                 const date = new Date();
                 date.setMonth(date.getMonth() + idx);
-                const month = date.getMonth() + 1; // 1-based
+                const month = date.getMonth() + 1;
                 const year = date.getFullYear();
 
                 return (
-                  <div
-                    key={idx}
-                    onClick={() => {
+                  <div key={idx} onClick={() => {
                       setSelectedIndex(idx);
                       onUpcomingMonthChange(month, year);
                     }}
@@ -141,10 +131,12 @@ export default function ScheduleHeader({
               })}
         </div>
       </div>
-      {/* Right Side: Search Bar */}
+
+      {/* Sidebar side */}
       <div className="w-full lg:w-[30%] flex justify-center lg:justify-end">
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
+      
     </div>
   );
 }

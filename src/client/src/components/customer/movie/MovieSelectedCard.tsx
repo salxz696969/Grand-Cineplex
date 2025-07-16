@@ -2,19 +2,16 @@ import React from "react";
 import { Clock, Calendar, Star, Film, Play } from "lucide-react";
 import { FiFileText } from "react-icons/fi";
 import { MdTheaters } from "react-icons/md";
+import { formatDuration } from "../../../utils/Function";
 import { Movie } from "../../../../../shared/types/type";
+
 
 interface MovieSelectedProps {
   movie: Movie;
   isUpcoming?: boolean;
 }
 
-function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h > 0 ? `${h}h ` : ""}${m > 0 ? `${m}m` : ""}`.trim();
-}
-
+// Reduce description to show only limited words
 function truncateDescription(text: string | undefined, maxWords = 100): string {
   if (!text) return ""; 
 
@@ -27,30 +24,26 @@ function truncateDescription(text: string | undefined, maxWords = 100): string {
 
 
 export default function MovieSelectedCard({ movie, isUpcoming = false }: MovieSelectedProps) {
+
   const handlePlayClick = () => {
     window.open(movie.trailer_url, "_blank");
   };
 
   return (
     <div className={`${isUpcoming ? "w-full flex justify-center" : "h-full"}`}>
+
+      {/* Upcoming movies */}
       {isUpcoming ? (
         <div className="max-w-screen-xl w-full flex flex-col lg:flex-row gap-6 items-start border border-gray-700 rounded-lg p-6 text-white">
-          {/* Poster Top / Left */}
+          
           <div className="relative w-full lg:w-[300px] flex-shrink-0">
-            <img
-              src={movie.poster_url}
-              alt={movie.title}
-              className="w-full h-90 object-cover rounded-md shadow"
-            />
-            <button
-              onClick={handlePlayClick}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-700 hover:bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition"
-            >
+            <img src={movie.poster_url} alt={movie.title} className="w-full h-90 object-cover rounded-md shadow"/>
+            <button onClick={handlePlayClick} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+             bg-red-700 hover:bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition">
               <Play size={20} />
             </button>
           </div>
 
-          {/* Info Below / Right */}
           <div className="flex flex-col gap-3 flex-1 lg:mt-7">
             <h1 className="text-3xl font-bold mb-3">{movie.title}</h1>
 
@@ -99,24 +92,20 @@ export default function MovieSelectedCard({ movie, isUpcoming = false }: MovieSe
 
           </div>
         </div>
-      ) : (
-        // Original layout for current screenings
+      ) : (       
+        // Current show movies
         <div className="flex flex-row lg:flex-col gap-4 items-center lg:items-start justify-start lg:justify-start border-b border-gray-700 lg:border-b-0 lg:border-gray-700 lg:pr-4 pb-4 pt-4 lg:pb-0">
+          
           <div className="relative">
-            <img
-              src={movie.poster_url}
-              alt={movie.title}
-              className="lg:w-full w-[150px] lg:h-auto object-cover rounded-md flex-shrink-0"
-            />
-            <button
-              onClick={handlePlayClick}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition"
-            >
+            <img src={movie.poster_url} alt={movie.title} className="lg:w-full w-[150px] lg:h-auto object-cover rounded-md flex-shrink-0"/>
+            <button onClick={handlePlayClick} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+             bg-red-600 hover:bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition">
               <Play size={18} />
             </button>
           </div>
 
           <div className="flex-1 lg:flex-none w-full flex flex-col gap-4 text-white">
+
             <h1 className="text-xl font-bold">{movie.title}</h1>
 
             <div className="flex flex-col gap-2">
@@ -137,7 +126,9 @@ export default function MovieSelectedCard({ movie, isUpcoming = false }: MovieSe
                 <p className="text-sm">{movie.release_date}</p>
               </div>
             </div>
+
           </div>
+
         </div>
       )}
     </div>

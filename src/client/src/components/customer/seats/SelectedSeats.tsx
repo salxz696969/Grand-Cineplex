@@ -1,14 +1,8 @@
 import React from "react";
 import { Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Seat } from "../../../../../shared/types/type";
  
-
-interface Seat {
-  id: string;
-  row: string;
-  number: number;
-  price: number;
-}
 
 interface SelectedSeatsProps {
   selectedSeats: string[];
@@ -32,7 +26,6 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
 
     const seatParam = selectedSeats.join(",");
     navigate(`/payment?screeningId=${screeningId}&seats=${seatParam}`);
-    // navigate(`/payment/${bookingId}`);
   };
 
   return (
@@ -50,10 +43,7 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
                 const seat = seats.find((s) => s.id === id);
                 const seatLabel = seat ? `${seat.row}${seat.number}` : id;
                 return (
-                  <span
-                    key={id}
-                    className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm"
-                  >
+                  <span key={id} className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm">
                     {seatLabel} - ${seat?.price}
                   </span>
                 );
@@ -63,10 +53,7 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
             <span className="text-gray-300">Total ({selectedSeats.length} seats):</span>
             <span className="text-2xl font-bold text-green-400">${totalPrice.toFixed(2)}</span>
           </div>
-          <button
-            onClick={handleContinue}
-            className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all"
-          >
+          <button onClick={handleContinue} className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all">
             Continue to Payment
           </button>
         </>

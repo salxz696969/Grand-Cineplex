@@ -7,7 +7,7 @@ import {
   getTodayShowTimes,
   updateShowTime,
 } from "../controllers/showTimesController";
-// import { getComingSoonMovies } from "../controllers/moviesController";
+
 
 const route = express.Router();
 

@@ -7,7 +7,6 @@ import hall6 from '../assets/hall6.jpg';
 import poster from '../assets/poster.jpg';
 import poster2 from '../assets/poster2.jpg';
 import poster3 from '../assets/poster3.jpg';
-import HallForm from '../assets/form.jpg';
 
 
 export const featuredHalls = [

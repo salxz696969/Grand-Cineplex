@@ -11,7 +11,6 @@ export default function PrintTickets({ bookingSummary, onClose }: PrintTicketsPr
   const generatedRef = useRef(false);
 
   useEffect(() => {
-    // Only generate PDF once and only if document is visible
     if (!generatedRef.current && !document.hidden) {
       generatePDF();
       generatedRef.current = true;
@@ -29,12 +28,10 @@ export default function PrintTickets({ bookingSummary, onClose }: PrintTicketsPr
     const margin = 40;
     let y = margin;
 
-    // Ticket border
     doc.setDrawColor("#1e40af");
     doc.setLineWidth(2);
     doc.rect(margin, y, pageWidth - margin * 2, 280, "S");
 
-    // Title
     doc.setFontSize(24);
     doc.setTextColor("#1e40af");
     doc.setFont("helvetica", "bold");
@@ -126,10 +123,7 @@ export default function PrintTickets({ bookingSummary, onClose }: PrintTicketsPr
         <strong>Total Paid:</strong> ${bookingSummary.totalAmount.toFixed(2)}
       </div>
 
-      <button
-        onClick={onClose}
-        className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-      >
+      <button onClick={onClose} className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
         Close
       </button>
     </div>

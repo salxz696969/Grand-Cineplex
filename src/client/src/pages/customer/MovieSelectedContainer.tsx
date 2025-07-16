@@ -21,10 +21,7 @@ function isScreeningWithin6Days(screeningDateStr: string): boolean {
   return diffDays >= 0 && diffDays <= 5;
 }
 
-function joinScreeningsWithTheaters(
-  screenings: Screening[],
-  theaters: Theater[]
-): (Screening & { theaterName: string })[] {
+function joinScreeningsWithTheaters( screenings: Screening[], theaters: Theater[]):(Screening & {theaterName: string })[]{
   const theaterMap = theaters.reduce<Record<number, string>>((acc, t) => {
     acc[t.id] = t.name;
     return acc;

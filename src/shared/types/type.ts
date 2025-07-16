@@ -1,10 +1,10 @@
+// Enums / Union types
 export type PaymentType = "cash" | "card" | "digital_wallet" | "bank_transfer";
-
 export type BookingStatus = "pending" | "reserved" | "confirmed" | "cancelled" | "refunded";
-
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
-
 export type SeatType = "regular" | "premium" | "vip";
+
+// Core Entities
 
 export interface Cinema {
   id: number;
@@ -42,12 +42,21 @@ export interface Theater {
   updated_at: string;
 }
 
+// export interface Seat {
+//   id: number;
+//   theater_id?: number;
+//   row_number: string;
+//   seat_number: number;
+//   seat_type: SeatType;
+// }
+
 export interface Seat {
-  id: number;
-  theater_id?: number;
-  row_number: string;
-  seat_number: number;
-  seat_type: SeatType;
+  id: string;
+  row: string;
+  number: number;
+  type: "regular" | "premium" | "vip";
+  price: number;
+  isBooked: boolean;
 }
 
 export interface Screening {
@@ -73,7 +82,7 @@ export interface Customer {
 
 export interface Booking {
   id: number;
-  customer_id?: number;
+  customer_id: number; // Now always required (no guests)
   screening_id: number;
   status: BookingStatus;
   created_by_staff_id?: number;
@@ -98,11 +107,12 @@ export interface Payment {
   updated_at: string;
 }
 
+// Extensions
+
 export interface MovieWithScreenings extends Movie {
   screenings: Screening[];
 }
 
-// Extended Seat from API to include isBooked and price info
 export interface ApiSeat {
   id: number;
   row_number: string;
@@ -112,26 +122,20 @@ export interface ApiSeat {
   isBooked: boolean;
 }
 
-
-
 export interface BookingSummary {
   movieTitle: string;
-  theaterName: string;  // changed from theater to theaterName
+  theaterName: string;
   date: string;
   time: string;
   seats: {
     seat_number: string;
     price: number;
   }[];
-
   totalAmount: number;
   customerName: string;
   customerPhone: string;
-
   screeningId?: number;
 }
-
-
 
 export interface ScreeningSeatData {
   movieTitle: string;
@@ -142,7 +146,6 @@ export interface ScreeningSeatData {
   seats: ApiSeat[];
 }
 
-
-interface ScreeningWithTheaterName extends Screening {
-  theaterName: string; 
+export interface ScreeningWithTheaterName extends Screening {
+  theaterName: string;
 }

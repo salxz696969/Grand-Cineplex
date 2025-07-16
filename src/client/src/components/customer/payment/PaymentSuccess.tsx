@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, Receipt, User } from "lucide-react";
 import PrintTickets from "./PrintTickets";
+import { BookingSummary } from "../../../../../shared/types/type";
 
-export default function PaymentSuccess({ bookingSummary }) {
+
+export default function PaymentSuccess({ bookingSummary }: { bookingSummary: BookingSummary }) {
   const navigate = useNavigate();
   const [printing, setPrinting] = useState(false);
 
@@ -38,7 +40,7 @@ export default function PaymentSuccess({ bookingSummary }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Theater:</span>
-                  <span>{bookingSummary.theater || bookingSummary.theaterName}</span>
+                  <span>{bookingSummary.theaterName || bookingSummary.theaterName}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Date & Time:</span>
@@ -82,16 +84,10 @@ export default function PaymentSuccess({ bookingSummary }) {
           </div>
 
           <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => setPrinting(true)}
-              className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-            >
+            <button onClick={() => setPrinting(true)} className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
               Print Tickets
             </button>
-            <button
-              onClick={() => navigate("/")}
-              className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-            >
+            <button onClick={() => navigate("/")} className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
               New Booking
             </button>
           </div>

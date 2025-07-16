@@ -1,5 +1,3 @@
-import React from "react";
-
 const LoadingSpinner = () => (
   <div className="min-h-screen bg-[#171c20] flex items-center justify-center">
     <div className="flex flex-col items-center gap-3">

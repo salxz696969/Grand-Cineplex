@@ -22,7 +22,7 @@ export default function Home() {
     } else {
       setSelectedMonth(null);
       setSelectedYear(null);
-      setSelectedNowShowingDay(now); // <-- important: reset the date when switching back
+      setSelectedNowShowingDay(now);
     }
   }, [activeTab]);
 
@@ -40,23 +40,15 @@ export default function Home() {
       <Header />
       <div className="px-[20px] sm:px-[60px] md:px-[100px] lg:px-[180px]">
         <Featured/>
-        <ScheduleHeader
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+        <ScheduleHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} activeTab={activeTab} setActiveTab={setActiveTab}
           onUpcomingMonthChange={(month, year) => {
             setSelectedMonth(month);
             setSelectedYear(year);
           }}
           onNowShowingDayChange={(date) => setSelectedNowShowingDay(date)}
         />
-        <MovieContainer
-          searchTerm={searchTerm}
-          activeTab={activeTab}
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          selectedNowShowingDay={selectedNowShowingDay}
+        <MovieContainer searchTerm={searchTerm} activeTab={activeTab} 
+          selectedMonth={selectedMonth} selectedYear={selectedYear} selectedNowShowingDay={selectedNowShowingDay}
         />
       </div>
       <Footer />

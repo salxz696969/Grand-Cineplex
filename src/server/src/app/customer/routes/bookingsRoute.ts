@@ -1,14 +1,11 @@
 import express, { Request, Response, NextFunction } from "express";
 import { getBookingBasedOnId, createBooking } from "../controllers/bookingsController";
-
-// No auth required, optional auth middleware placeholder
-const optionalAuth = (req: Request, res: Response, next: NextFunction) => {
-  next();
-};
+import authMiddleware from "../../../middleware/authMiddleware";
 
 const route = express.Router();
 
-route.get("/:id", optionalAuth, getBookingBasedOnId);
-route.post("/", optionalAuth, createBooking);
+
+route.get("/:id", authMiddleware, getBookingBasedOnId);
+route.post("/", authMiddleware, createBooking);
 
 export default route;

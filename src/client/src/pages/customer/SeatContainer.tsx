@@ -8,15 +8,8 @@ import TimeoutPopup from "../../components/customer/TimeoutPopup";
 import { fetchSeatsByScreening } from "../../api/customer";
 import { ApiSeat } from "../../../../shared/types/type";
 import { LegendBox } from "../../components/customer/seats/Legendbox";
-
-interface Seat {
-  id: string;
-  row: string;
-  number: number;
-  type: "regular" | "premium" | "vip";
-  price: number;
-  isBooked: boolean;
-}
+import { Seat } from "../../../../shared/types/type";
+import { formatTime12h } from "../../utils/Function";
 
 function toSeatType(type: string): "regular" | "premium" | "vip" {
   switch (type.toLowerCase()) {
@@ -29,15 +22,9 @@ function toSeatType(type: string): "regular" | "premium" | "vip" {
   }
 }
 
-function formatTime12h(time24: string): string {
-  const [hourStr, minuteStr] = time24.split(":");
-  let hour = parseInt(hourStr, 10);
-  const ampm = hour >= 12 ? "PM" : "AM";
-  hour = hour % 12 || 12;
-  return `${hour}:${minuteStr} ${ampm}`;
-}
 
 export default function SeatContainer() {
+
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,10 +115,7 @@ export default function SeatContainer() {
 
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
-          >
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" /> Back to Movies
           </button>
           <div className="flex items-center gap-4 flex-wrap">
@@ -174,30 +158,17 @@ export default function SeatContainer() {
               const secondHalf = rowSeats.slice(6, 12);
 
               return (
-                <div
-                  key={row}
-                  className="flex flex-col sm:flex-row items-center gap-3 justify-center w-full max-w-4xl"
-                >
+                <div key={row} className="flex flex-col sm:flex-row items-center gap-3 justify-center w-full max-w-4xl">
                   <span className="w-8 text-center font-semibold text-gray-400 shrink-0">{row}</span>
                   <div className="flex flex-col sm:flex-row gap-1">
                     <div className="flex gap-1 justify-center">
                       {firstHalf.map((seat) => (
-                        <SeatCard
-                          key={seat.id}
-                          seat={seat}
-                          isSelected={selectedSeats.includes(seat.id)}
-                          onToggle={toggleSeat}
-                        />
+                        <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat}/>
                       ))}
                     </div>
                     <div className="flex gap-1 justify-center sm:ml-2 mt-1 sm:mt-0">
                       {secondHalf.map((seat) => (
-                        <SeatCard
-                          key={seat.id}
-                          seat={seat}
-                          isSelected={selectedSeats.includes(seat.id)}
-                          onToggle={toggleSeat}
-                        />
+                        <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat}/>
                       ))}
                     </div>
                   </div>
@@ -213,11 +184,7 @@ export default function SeatContainer() {
           <LegendBox colorFrom="#dc2626" colorTo="#dc2626" label="Booked" opacity />
         </div>
 
-        <SelectedSeats
-          selectedSeats={selectedSeats}
-          seats={seats}
-          totalPrice={getTotalPrice()}
-          screeningId={screeningId}
+        <SelectedSeats selectedSeats={selectedSeats} seats={seats} totalPrice={getTotalPrice()} screeningId={screeningId}
         />
       </div>
     </div>

@@ -3,6 +3,7 @@ import { Clock, Users, LaptopMinimal } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { Screening, ApiSeat } from '../../../../../shared/types/type';
 import { fetchSeatsByScreening } from '../../../api/customer';
+import { formatTime12h } from '../../../utils/Function';
 
 interface Props {
   name: string;
@@ -11,18 +12,13 @@ interface Props {
   screenings: Screening[];
 }
 
-export default function TheatreCard({
-  name,
-  cinema_id,
-  movieId,
-  screenings
-}: Props) {
+export default function TheatreCard({ name, cinema_id, movieId, screenings}: Props) {
   const navigate = useNavigate();
 
   const [availableSeats, setAvailableSeats] = useState<number>(0);
   const [totalSeats, setTotalSeats] = useState<number>(0);
 
-  // Fetch seat data for the first screening (or any logic you prefer)
+
   useEffect(() => {
     const fetchSeatInfo = async () => {
       if (screenings.length === 0) return;
@@ -42,14 +38,6 @@ export default function TheatreCard({
     fetchSeatInfo();
   }, [screenings]);
 
-  function formatTime12h(time24: string): string {
-    const [hourStr, minuteStr] = time24.split(':');
-    let hour = parseInt(hourStr, 10);
-    const minute = minuteStr;
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${ampm}`;
-  }
 
   function isPastShowtime(screeningDate: string, screeningTime: string): boolean {
     const now = new Date();
@@ -61,6 +49,7 @@ export default function TheatreCard({
 
   return (
     <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
+      
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <LaptopMinimal className="w-5 h-5 text-sky-500" />
@@ -96,9 +85,7 @@ export default function TheatreCard({
             .map((screening) => {
               const isPast = isPastShowtime(screening.screening_date, screening.screening_time);
               return (
-                <button
-                  key={screening.id}
-                  onClick={() => {
+                <button key={screening.id} onClick={() => {
                     if (!isPast) navigate(`/seats/${screening.id}`);
                   }}
                   disabled={isPast}

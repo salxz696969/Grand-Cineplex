@@ -1,17 +1,22 @@
-import { Movie, MovieWithScreenings, ApiSeat, BookingSummary,ScreeningSeatData, Theater } from "../../../shared/types/type";
+import {
+  Movie,
+  MovieWithScreenings,
+  BookingSummary,
+  ScreeningSeatData,
+  Theater,
+} from "../../../shared/types/type";
 
 const movieBaseUrl = "http://localhost:3000/customer/movies";
 const seatBaseUrl = "http://localhost:3000/customer/seats";
 const bookingUrl = "http://localhost:3000/customer/bookings";
 const theaterBaseUrl = "http://localhost:3000/customer/theaters";
 
-
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || "Request failed");
   }
-  return response.json() as Promise<T>;
+  return response.json();
 }
 
 export async function fetchMovies(): Promise<Movie[]> {
@@ -59,7 +64,6 @@ export async function fetchMovieById(id: number, day = 0): Promise<MovieWithScre
   }
 }
 
-
 export async function fetchSeatsByScreening(screeningId: number): Promise<ScreeningSeatData> {
   try {
     const response = await fetch(`${seatBaseUrl}/screening/${screeningId}`);
@@ -69,7 +73,6 @@ export async function fetchSeatsByScreening(screeningId: number): Promise<Screen
     throw error;
   }
 }
-
 
 export async function selectSeats(
   seatIds: number[],
@@ -88,38 +91,26 @@ export async function selectSeats(
   }
 }
 
-/**
- * Book selected seats for a screening.
- * @param customer - Optional customer info (guest or registered)
- * @param screeningId - ID of the screening
- * @param seatIds - Selected seat IDs
- * @param status - Optional booking status (default: "pending")
- * @returns Object with new booking ID
- */
 export async function bookSeats(
-  customer: { id?: number; name?: string; phone?: string } | null,
   screeningId: number,
   seatIds: number[],
   status: string = "pending"
 ): Promise<{ id: number }> {
   try {
-    const body: any = {
-      screening_id: screeningId,
-      seat_ids: seatIds,
-      status,
-    };
-    if (customer) {
-      if (customer.id) {
-        body.customer = { id: customer.id };
-      } else if (customer.name && customer.phone) {
-        body.customer = { name: customer.name, phone: customer.phone };
-      }
-    }
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("You must be logged in to book it.");
 
     const response = await fetch(bookingUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        screening_id: screeningId,
+        seat_ids: seatIds,
+        status,
+      }),
     });
 
     return handleResponse<{ id: number }>(response);
@@ -131,16 +122,22 @@ export async function bookSeats(
 
 export async function fetchBookingDetails(bookingId: number): Promise<BookingSummary> {
   try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("You must be logged in to view booking details.");
+
     const response = await fetch(`${bookingUrl}/${bookingId}`, {
-      credentials: "include",
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
     });
+
     return handleResponse<BookingSummary>(response);
   } catch (error) {
     console.error("fetchBookingDetails error:", error);
     throw error;
   }
 }
-
 
 export async function fetchTheaters(): Promise<Theater[]> {
   try {
@@ -150,4 +147,29 @@ export async function fetchTheaters(): Promise<Theater[]> {
     console.error("fetchTheaters error:", error);
     throw error;
   }
+}
+
+export async function fetchUserInfo(): Promise<{ id: number; name: string; phone?: string }> {
+  const token = localStorage.getItem("token");
+  console.log("[Frontend] Token from localStorage:", token);
+
+  if (!token) throw new Error("User not logged in");
+
+  const response = await fetch("http://localhost:3000/customer/users", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  console.log("[Frontend] Response status:", response.status);
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error("[Frontend] Error response:", errorData);
+    throw new Error(errorData.message || "Failed to fetch user info");
+  }
+
+  const data = await response.json();
+  console.log("[Frontend] Fetched user data:", data);
+  return data;
 }

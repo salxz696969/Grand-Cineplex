@@ -8,11 +8,11 @@ import Movie from "../../../db/models/Movie";
 import Theater from "../../../db/models/Theater";
 
 
-//  Fetch booking detail base on booking ID, only use it in payment summary page
 export const getBookingBasedOnId = async (req: Request, res: Response) => {
   try {
     const bookingId = parseInt(req.params.id);
-    if (isNaN(bookingId)) return res.status(400).json({ message: "Invalid booking ID" });
+    if (isNaN(bookingId))
+      return res.status(400).json({ message: "Invalid booking ID" });
 
     const booking = await Booking.findOne({
       where: { id: bookingId },
@@ -56,10 +56,11 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
 
     const b: any = booking;
 
-    const seats = b.tickets?.map((ticket: any) => ({
-      seat_number: ticket.seat?.seat_number,
-      price: ticket.seat?.price || 0,
-    })) || [];
+    const seats =
+      b.tickets?.map((ticket: any) => ({
+        seat_number: ticket.seat?.seat_number,
+        price: ticket.seat?.price || 0,
+      })) || [];
 
     const totalAmount = seats.reduce((sum: number, s: any) => sum + s.price, 0);
 
@@ -78,34 +79,32 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
     return res.status(200).json(summary);
   } catch (error) {
     console.error("getBookingBasedOnId error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-
+// Create booking for authenticated user
 export const createBooking = async (req: Request, res: Response) => {
   try {
-    const { screening_id, seat_ids, customer, status = "pending" } = req.body;
+    const user = (req as any).user;
+    if (!user || !user.id) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized. Please log in to book." });
+    }
+
+    const { screening_id, seat_ids, status = "pending" } = req.body;
 
     if (!screening_id || !Array.isArray(seat_ids) || seat_ids.length === 0) {
-      return res.status(400).json({ message: "screening_id and seat_ids are required" });
+      return res
+        .status(400)
+        .json({ message: "screening_id and seat_ids are required" });
     }
 
-    let customer_id: number | null = null;
-
-    if (customer && customer.id) {
-      customer_id = customer.id;
-    } else if (customer && customer.name && customer.phone) {
-      const newCustomer = await Customer.create({
-        name: customer.name,
-        phone: customer.phone,
-      });
-      customer_id = newCustomer.id;
-    }
-
+    // Use user.id directly as customer_id
     const booking = await Booking.create({
       screening_id,
-      customer_id,
+      customer_id: user.id,
       status,
     });
 
@@ -118,10 +117,9 @@ export const createBooking = async (req: Request, res: Response) => {
       )
     );
 
-    res.status(201).json({ id: booking.id });
+    return res.status(201).json({ id: booking.id });
   } catch (error) {
     console.error("createBooking error:", error);
-    res.status(500).json({ message: "Booking failed" });
+    return res.status(500).json({ message: "Booking failed" });
   }
 };
-

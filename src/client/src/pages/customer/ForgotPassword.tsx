@@ -2,7 +2,7 @@ import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/customer/homecomponents/Header";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
-import { ValidateEmail } from "../../components/customer/support";
+import { ValidateEmail } from "../../utils/validation";
 import hall6 from "../../assets/hall6.jpg";
 import { FaUserAlt } from "react-icons/fa";
 
@@ -31,7 +31,6 @@ export default function ForgotPassword() {
 
     setError(null);
     setSuccess("If this email is registered, a reset link will be sent.");
-    // Submit logic here (e.g., send reset request to backend)
   };
 
   const isFormValid = (): boolean => {
@@ -45,12 +44,10 @@ export default function ForgotPassword() {
       <Header />
       <div className="flex w-full h-150 items-center justify-center p-5">
         <div className="flex w-3/4 h-full border border-[#626364] rounded overflow-hidden">
-          {/* Image - hidden on small screens */}
           <div className="hidden md:block w-full h-full">
             <img className="w-full h-full" src={hall6} alt="Theater" />
           </div>
 
-          {/* Form Area */}
           <div className="w-full md:w-full h-full bg-[#0f1419]">
             <div className="w-full h-full flex flex-col p-8 text-white">
               <div className="relative w-fit mb-6">
@@ -62,20 +59,12 @@ export default function ForgotPassword() {
                 Please enter your Email to reset your password.
               </span>
 
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col gap-4 transition-all duration-300 mt-4"
-              >
-                <label htmlFor="email" className="text-gray-300">
-                  Email
-                </label>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 transition-all duration-300 mt-4">
+                <label htmlFor="email" className="text-gray-300">Email</label>
+                
                 <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded">
                   <FaUserAlt className="text-gray-400 mr-3" />
-                  <input
-                    id="email"
-                    type="text"
-                    className="w-full text-sm bg-transparent py-3 rounded outline-none text-white"
-                    value={email}
+                  <input id="email" type="text" className="w-full text-sm bg-transparent py-3 rounded outline-none text-white" value={email}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setEmail(e.target.value)
                     }
@@ -83,13 +72,12 @@ export default function ForgotPassword() {
                 </div>
 
                 {error && <span className="text-red-500 text-sm">{error}</span>}
+
                 {success && (
                   <span className="text-green-500 text-sm">{success}</span>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={!isFormValid()}
+                <button type="submit" disabled={!isFormValid()}
                   className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
                     isFormValid()
                       ? "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
@@ -98,6 +86,7 @@ export default function ForgotPassword() {
                 >
                   Continue
                 </button>
+
               </form>
             </div>
           </div>

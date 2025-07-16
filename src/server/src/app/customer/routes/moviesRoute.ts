@@ -2,12 +2,10 @@ import express from "express";
 import {
   getAllMovies,
   getMovieBasedOnId,
-  // getUpcomingMovies,
   getMoviesFor7Days,
   getComingSoonMovies,
   getMoviesAndItsScreenings
 } from "../controllers/moviesController";
-// import verifyToken from "../../../middleware/verifyToken";
 
 const route = express.Router();
 

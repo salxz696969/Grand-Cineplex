@@ -2,10 +2,11 @@ import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/customer/homecomponents/Header";
 import Password from "../../components/customer/useraccess/password";
-import { ValidateEmail } from "../../components/customer/support";
+import { ValidateEmail, extractNameFromEmail } from "../../utils/validation";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import hall6 from "../../assets/hall6.jpg";
 import { FaUserAlt, FaPhoneAlt } from "react-icons/fa";
+import TokenAPI from "../../api/tokenApi";
 
 export default function SignUp() {
   const [email, setEmail] = useState<string>("");
@@ -13,14 +14,13 @@ export default function SignUp() {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"login" | "signup">("signup");
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -43,7 +43,23 @@ export default function SignUp() {
     }
 
     setError(null);
-    // Sign-up API logic here
+    setSubmitting(true);
+
+    try {
+      await TokenAPI.post("/signup", {
+        email,
+        phone,
+        password,
+        name: extractNameFromEmail(email),
+      });
+
+      navigate("/signin");
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      setError(err.response?.data?.message || "Signup failed");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleTabChange = (tab: "login" | "signup") => {
@@ -54,9 +70,8 @@ export default function SignUp() {
     }
   };
 
-  const isFormValid = (): boolean => {
-    return phone.trim() !== "" && ValidateEmail(email) && password.trim().length > 0;
-  };
+  const isFormValid = (): boolean =>
+    phone.trim() !== "" && ValidateEmail(email) && password.trim().length > 0;
 
   if (loading) return <LoadingSpinner />;
 
@@ -65,21 +80,17 @@ export default function SignUp() {
       <Header />
       <div className="flex w-full h-150 items-center justify-center p-5">
         <div className="flex w-full sm:w-3/4 h-full border border-[#626364] rounded overflow-hidden">
-          {/* Image section - hidden on screen <= 980px */}
+
           <div className="hidden show-above-1000px w-full h-full">
-             <img className="w-full h-full" src={hall6} alt="Theater" />
+            <img className="w-full h-full" src={hall6} alt="Theater" />
           </div>
 
-          {/* Form section */}
+
           <div className="w-full md:w-full h-full bg-[#0f1419]">
             <div className="w-full h-full flex flex-col p-8 text-white">
 
-              {/* Tab switcher */}
               <div className="flex items-center gap-6 text-2xl mb-6">
-                <button
-                  onClick={() => handleTabChange("login")}
-                  className="relative pb-1 text-white"
-                >
+                <button onClick={() => handleTabChange("login")} className="relative pb-1 text-white">
                   <span
                     className={`${
                       activeTab === "login" ? "text-white" : "text-gray-500"
@@ -94,10 +105,7 @@ export default function SignUp() {
 
                 <div className="h-6 w-px bg-gray-400 opacity-90"></div>
 
-                <button
-                  onClick={() => handleTabChange("signup")}
-                  className="relative pb-1 text-white"
-                >
+                <button onClick={() => handleTabChange("signup")} className="relative pb-1 text-white">
                   <span
                     className={`${
                       activeTab === "signup" ? "text-white" : "text-gray-500"
@@ -111,21 +119,18 @@ export default function SignUp() {
                 </button>
               </div>
 
-              {/* Sign Up Form */}
-              <form
-                onSubmit={handleSignUp}
-                className="flex flex-col gap-4 transition-all duration-300 mt-4"
-              >
+              {/* Form */}
+              <form onSubmit={handleSignUp} className="flex flex-col gap-4 transition-all duration-300 mt-4">
+                
                 {/* Email */}
                 <label htmlFor="email" className="text-gray-300">Email</label>
                 <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded">
                   <FaUserAlt className="text-gray-400 mr-3" />
-                  <input
-                    id="email"
-                    type="text"
-                    className="w-full text-sm bg-transparent py-3 rounded outline-none text-white"
+                  <input id="email" type="text" className="w-full text-sm bg-transparent py-3 rounded outline-none text-white"
                     value={email}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setEmail(e.target.value)
+                    }
                   />
                 </div>
 
@@ -133,36 +138,33 @@ export default function SignUp() {
                 <label htmlFor="phone" className="text-gray-300">Phone Number</label>
                 <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded">
                   <FaPhoneAlt className="text-gray-400 mr-3" />
-                  <input
-                    id="phone"
-                    type="text"
-                    className="w-full text-sm bg-transparent py-3 rounded outline-none text-white"
-                    value={phone}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
+                  <input id="phone" type="text" className="w-full text-sm bg-transparent py-3 rounded outline-none text-white" value={phone}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setPhone(e.target.value)
+                    }
                   />
                 </div>
 
                 {/* Password */}
                 <label htmlFor="password" className="text-gray-300">Password</label>
-                <Password
-                  value={password}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                <Password value={password}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setPassword(e.target.value)
+                  }
                 />
 
-                {/* Error Message */}
+                {/* Error */}
                 {error && <span className="text-red-500 text-sm">{error}</span>}
 
-                {/* Create Account Button */}
-                <button
-                  type="submit"
-                  disabled={!isFormValid()}
+                {/* Submit Button */}
+                <button type="submit" disabled={!isFormValid() || submitting}
                   className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
-                    isFormValid()
-                      ? "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-                      : "bg-gray-600 text-gray-300 cursor-not-allowed"
+                    !isFormValid() || submitting
+                      ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                      : "bg-red-600 hover:bg-red-700 cursor-pointer"
                   }`}
                 >
-                  Create Account
+                  {submitting ? "Processing..." : "Create Account"}
                 </button>
               </form>
             </div>
