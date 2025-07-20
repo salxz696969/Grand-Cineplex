@@ -1,18 +1,11 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
 
-export enum TheaterStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  MAINTENANCE = "maintenance",
-}
-
 class Theater extends Model {
   declare id: number;
   declare name: string;
+  declare cinemaId: number;
   declare createdAt: Date;
   declare updatedAt: Date;
-  declare status: TheaterStatus;
-  declare cinemaId: number;
 
   // Static methods
   static async findWithSeats() {
@@ -61,17 +54,10 @@ export const initTheater = (sequelize: Sequelize) => {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      status:{
-        type: DataTypes.ENUM(
-          TheaterStatus.ACTIVE,
-          TheaterStatus.INACTIVE,
-          TheaterStatus.MAINTENANCE
-        ),
-        defaultValue: TheaterStatus.ACTIVE,
-      },
       cinemaId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "cinema_id",
         references: {
           model: "cinemas",
           key: "id",
@@ -79,7 +65,7 @@ export const initTheater = (sequelize: Sequelize) => {
       },
     },
     {
-      sequelize,  
+      sequelize,
       tableName: "theaters",
       timestamps: true,
       underscored: true,

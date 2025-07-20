@@ -7,7 +7,6 @@ import Screening from "../../../db/models/Screening";
 import Movie from "../../../db/models/Movie";
 import Theater from "../../../db/models/Theater";
 
-
 export const getBookingBasedOnId = async (req: Request, res: Response) => {
   try {
     const bookingId = parseInt(req.params.id);
@@ -45,7 +44,7 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
             {
               model: Seat,
               as: "seat",
-              attributes: ["seat_number", "price"],
+              attributes: ["seatNumber", "price"],
             },
           ],
         },
@@ -58,7 +57,7 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
 
     const seats =
       b.tickets?.map((ticket: any) => ({
-        seat_number: ticket.seat?.seat_number,
+        seatNumber: ticket.seat?.seatNumber,
         price: ticket.seat?.price || 0,
       })) || [];
 
@@ -67,8 +66,8 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
     const summary = {
       movieTitle: b.screening?.movie?.title || "",
       theater: b.screening?.theater?.name || "",
-      date: b.screening?.screening_date || "",
-      time: b.screening?.screening_time || "",
+      date: b.screening?.screeningDate || "",
+      time: b.screening?.screeningTime || "",
       seats,
       totalAmount,
       customerName: b.customer?.name || "",
@@ -103,16 +102,16 @@ export const createBooking = async (req: Request, res: Response) => {
 
     // Use user.id directly as customer_id
     const booking = await Booking.create({
-      screening_id,
-      customer_id: user.id,
+      screeningId: screening_id,
+      customerId: user.id,
       status,
     });
 
     await Promise.all(
       seat_ids.map((seat_id: number) =>
         Ticket.create({
-          booking_id: booking.id,
-          seat_id,
+          bookingId: booking.id,
+          seatId: seat_id,
         })
       )
     );

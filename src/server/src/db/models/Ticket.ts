@@ -4,7 +4,6 @@ class Ticket extends Model {
   declare id: number;
   declare bookingId: number;
   declare seatId: number;
-  // declare ticketType: string;
   declare createdAt: Date;
 
   // Custom instance methods
@@ -13,21 +12,21 @@ class Ticket extends Model {
   }
 
   // Static methods
-  static async findByBooking(booking_id: number) {
+  static async findByBooking(bookingId: number) {
     return this.findAll({
-      where: { booking_id },
+      where: { bookingId },
       include: [
         {
           association: "seat",
-          attributes: ["row_number", "seat_number", "seat_type"],
+          attributes: ["rowNumber", "seatNumber", "seatType"],
         },
       ],
-      order: [["created_at", "ASC"]],
+      order: [["createdAt", "ASC"]],
     });
   }
 
-  static async findWithDetails(ticket_id: number) {
-    return this.findByPk(ticket_id, {
+  static async findWithDetails(ticketId: number) {
+    return this.findByPk(ticketId, {
       include: [
         {
           association: "booking",
@@ -53,26 +52,26 @@ class Ticket extends Model {
         },
         {
           association: "seat",
-          attributes: ["row_number", "seat_number", "seat_type"],
+          attributes: ["rowNumber", "seatNumber", "seatType"],
         },
       ],
     });
   }
 
-  static async findForScreening(screening_id: number) {
+  static async findForScreening(screeningId: number) {
     return this.findAll({
       include: [
         {
           association: "booking",
-          where: { screening_id },
+          where: { screeningId },
           attributes: ["id", "status"],
         },
         {
           association: "seat",
-          attributes: ["id", "row_number", "seat_number", "seat_type"],
+          attributes: ["id", "rowNumber", "seatNumber", "seatType"],
         },
       ],
-      order: [["created_at", "ASC"]],
+      order: [["createdAt", "ASC"]],
     });
   }
 }
@@ -85,28 +84,25 @@ export const initTicket = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      booking_id: {
+      bookingId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "booking_id",
         references: {
           model: "bookings",
           key: "id",
         },
         onDelete: "CASCADE",
       },
-      seat_id: {
+      seatId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "seat_id",
         references: {
           model: "seats",
           key: "id",
         },
       },
-      // ticketType: {
-      //   type: DataTypes.STRING(20),
-      //   allowNull: false,
-      //   defaultValue: "adult",
-      // },
     },
     {
       sequelize,

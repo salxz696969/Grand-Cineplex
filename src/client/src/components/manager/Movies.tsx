@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from "react";
 
 import MovieCard from "./MovieCard";
-import { Movie } from "../cashier/MovieContainer";
-import { currentShow } from "../../utils/FakeData";
 import { PlusCircle, Search } from "lucide-react";
 import AddMovie from "./AddMovie";
 import { getAllMovies, getRecentlyAddedMovies } from "../../api/manager";
-import { updateMovie } from './../../../../server/src/app/customer/controllers/moviesController';
 
 type MovieData = {
     id: number;
-	title: string;
-	description: string;
-	posterUrl: string;
-	trailerUrl: string;
-	duration: string;
-	genre: string;
-	rating: number;
-	releaseDate: string;
-	director: string;
-	cast: string;
-	language: string;
+    title: string;
+    description: string;
+    posterUrl: string;
+    trailerUrl: string;
+    duration: string;
+    genre: string;
+    rating: number;
+    releaseDate: string;
+    director: string;
+    cast: string;
+    language: string;
 };
 
 export default function Movies() {
@@ -29,10 +26,10 @@ export default function Movies() {
     const [activeTab, setActiveTab] = useState<string>("recent");
     const [addingMovie, setAddingMovie] = useState(false);
 
-    useEffect(()=>{
+    useEffect(() => {
         const fetchMovies = async () => {
             try {
-                const response=await getRecentlyAddedMovies()
+                const response = await getRecentlyAddedMovies()
                 setMovies(response);
                 const allResponse = await getAllMovies(); // Assuming this fetches all movies
                 setAllMovies(allResponse);

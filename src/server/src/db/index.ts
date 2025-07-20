@@ -14,6 +14,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL!, {
 });
 
 // Import models for associations
+import Cinema, { initCinema } from "./models/Cinema";
 import Movie, { initMovie } from "./models/Movie";
 import Theater, { initTheater } from "./models/Theater";
 import Seat, { initSeat } from "./models/Seat";
@@ -26,25 +27,36 @@ import Payment, { initPayment } from "./models/Payment";
 
 // Define associations
 const setupAssociations = () => {
+  // Cinema associations
+  Cinema.hasMany(Theater, { foreignKey: "cinema_id", as: "theaters" });
+
+  // Theater associations
+  Theater.belongsTo(Cinema, { foreignKey: "cinema_id", as: "cinema" });
   Theater.hasMany(Seat, { foreignKey: "theater_id", as: "seats" });
   Theater.hasMany(Screening, { foreignKey: "theater_id", as: "screenings" });
 
+  // Movie associations
   Movie.hasMany(Screening, { foreignKey: "movie_id", as: "screenings" });
 
+  // Seat associations
   Seat.belongsTo(Theater, { foreignKey: "theater_id", as: "theater" });
   Seat.hasMany(Ticket, { foreignKey: "seat_id", as: "tickets" });
 
+  // Screening associations
   Screening.belongsTo(Movie, { foreignKey: "movie_id", as: "movie" });
   Screening.belongsTo(Theater, { foreignKey: "theater_id", as: "theater" });
   Screening.hasMany(Booking, { foreignKey: "screening_id", as: "bookings" });
 
+  // Customer associations
   Customer.hasMany(Booking, { foreignKey: "customer_id", as: "bookings" });
 
+  // Staff associations
   Staff.hasMany(Booking, {
     foreignKey: "created_by_staff_id",
     as: "createdBookings",
   });
 
+  // Booking associations
   Booking.belongsTo(Customer, { foreignKey: "customer_id", as: "customer" });
   Booking.belongsTo(Screening, { foreignKey: "screening_id", as: "screening" });
   Booking.belongsTo(Staff, {
@@ -54,9 +66,11 @@ const setupAssociations = () => {
   Booking.hasMany(Ticket, { foreignKey: "booking_id", as: "tickets" });
   Booking.hasMany(Payment, { foreignKey: "booking_id", as: "payments" });
 
+  // Ticket associations
   Ticket.belongsTo(Booking, { foreignKey: "booking_id", as: "booking" });
   Ticket.belongsTo(Seat, { foreignKey: "seat_id", as: "seat" });
 
+  // Payment associations
   Payment.belongsTo(Booking, { foreignKey: "booking_id", as: "booking" });
 };
 
@@ -66,6 +80,7 @@ const initializeDatabase = async () => {
     await sequelize.authenticate();
     console.log("Connected to database:", sequelize.getDatabaseName());
 
+    initCinema(sequelize);
     initMovie(sequelize);
     initTheater(sequelize);
     initSeat(sequelize);

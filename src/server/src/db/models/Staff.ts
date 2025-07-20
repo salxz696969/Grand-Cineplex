@@ -18,7 +18,7 @@ class Staff extends Model {
   declare isActive: boolean;
   declare createdAt: Date;
   declare updatedAt: Date;
-  declare department: string
+
   // Custom instance methods
   isManager(): boolean {
     return this.role === StaffRole.MANAGER;
@@ -108,15 +108,13 @@ export const initStaff = (sequelize: Sequelize) => {
       hiredDate: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        field: "hired_date",
       },
       isActive: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
-      },
-      department: {
-        type: DataTypes.STRING(50),
-        allowNull: true,
+        field: "is_active",
       },
     },
     {

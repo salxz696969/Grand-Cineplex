@@ -10,21 +10,24 @@ type ScreeningWithRelations = Screening & {
     name: string;
     seats: Array<{
       id: number;
-      row_number: string;
-      seat_number: number;
-      seat_type: string;
+      rowNumber: string;
+      seatNumber: number;
+      seatType: string;
       price: number;
     }>;
   };
   movie: {
     title: string;
   };
-  screening_date: string;
-  screening_time: string;
+  screeningDate: string;
+  screeningTime: string;
   price: number;
 };
 
-export const getAllSeatsBasedOnShowTime = async (req: Request, res: Response) => {
+export const getAllSeatsBasedOnShowTime = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const show_time_id = parseInt(req.params.id);
 
@@ -40,7 +43,13 @@ export const getAllSeatsBasedOnShowTime = async (req: Request, res: Response) =>
           include: [
             {
               association: "seats",
-              attributes: ["id", "row_number", "seat_number", "seat_type", "price"],
+              attributes: [
+                "id",
+                "rowNumber",
+                "seatNumber",
+                "seatType",
+                "price",
+              ],
             },
           ],
         },
@@ -59,17 +68,17 @@ export const getAllSeatsBasedOnShowTime = async (req: Request, res: Response) =>
           where: { screening_id: show_time_id },
         },
       ],
-      attributes: ["seat_id"],
+      attributes: ["seatId"],
     });
 
-    const bookedSeatIds = bookedTickets.map((ticket) => ticket.seat_id);
+    const bookedSeatIds = bookedTickets.map((ticket) => ticket.seatId);
     const theaterSeats = screening.theater.seats || [];
 
     const seatsWithStatus = theaterSeats.map((seat) => ({
       id: seat.id,
-      row_number: seat.row_number,
-      seat_number: seat.seat_number,
-      seat_type: seat.seat_type,
+      rowNumber: seat.rowNumber,
+      seatNumber: seat.seatNumber,
+      seatType: seat.seatType,
       price: seat.price,
       isBooked: bookedSeatIds.includes(seat.id),
     }));
@@ -77,8 +86,8 @@ export const getAllSeatsBasedOnShowTime = async (req: Request, res: Response) =>
     res.status(200).json({
       movieTitle: screening.movie.title,
       theaterName: screening.theater.name,
-      screeningDate: screening.screening_date,
-      screeningTime: screening.screening_time,
+      screeningDate: screening.screeningDate,
+      screeningTime: screening.screeningTime,
       price: screening.price,
       seats: seatsWithStatus,
     });
@@ -102,17 +111,20 @@ export const selectSeat = async (req: Request, res: Response) => {
     }
 
     const booked = await Ticket.findAll({
-      where: { seat_id: seat_ids },
+      where: { seatId: seat_ids },
       include: [
         {
           association: "booking",
-          where: { screening_id },
+          where: { screeningId: screening_id },
         },
       ],
     });
 
     if (booked.length > 0) {
-      return res.status(409).json({ message: "Some seats are already booked", bookedSeatIds: booked.map(b => b.seat_id) });
+      return res.status(409).json({
+        message: "Some seats are already booked",
+        bookedSeatIds: booked.map((b) => b.seatId),
+      });
     }
 
     res.status(200).json({ message: "Seats available", selected: seat_ids });
@@ -125,18 +137,23 @@ export const selectSeat = async (req: Request, res: Response) => {
 export const bookSeats = async (req: Request, res: Response) => {
   const t = await Seat.sequelize?.transaction();
   try {
-    const { user_id, screening_id, seat_ids } = req.body;
+    const { userId, screeningId, seatIds } = req.body;
 
-    if (!user_id || !screening_id || !Array.isArray(seat_ids) || seat_ids.length === 0) {
+    if (
+      !userId ||
+      !screeningId ||
+      !Array.isArray(seatIds) ||
+      seatIds.length === 0
+    ) {
       return res.status(400).json({ message: "Invalid booking request" });
     }
 
     const alreadyBooked = await Ticket.findAll({
-      where: { seat_id: seat_ids },
+      where: { seatId: seatIds },
       include: [
         {
           association: "booking",
-          where: { screening_id },
+          where: { screeningId },
         },
       ],
     });
@@ -144,24 +161,24 @@ export const bookSeats = async (req: Request, res: Response) => {
     if (alreadyBooked.length > 0) {
       return res.status(409).json({
         message: "Some seats already booked",
-        bookedSeatIds: alreadyBooked.map((b) => b.seat_id),
+        bookedSeatIds: alreadyBooked.map((b) => b.seatId),
       });
     }
 
     const booking = await Booking.create(
       {
-        user_id,
-        screening_id,
-        booking_date: new Date(),
+        userId,
+        screeningId,
+        bookingDate: new Date(),
       },
       { transaction: t }
     );
 
-    const ticketPromises = seat_ids.map((seat_id: number) =>
+    const ticketPromises = seatIds.map((seat_id: number) =>
       Ticket.create(
         {
-          booking_id: booking.id,
-          seat_id,
+          bookingId: booking.id,
+          seatId: seat_id,
         },
         { transaction: t }
       )
@@ -170,7 +187,9 @@ export const bookSeats = async (req: Request, res: Response) => {
     await Promise.all(ticketPromises);
     await t?.commit();
 
-    res.status(201).json({ message: "Booking successful", booking_id: booking.id });
+    res
+      .status(201)
+      .json({ message: "Booking successful", bookingId: booking.id });
   } catch (error: unknown) {
     await t?.rollback();
     const err = error instanceof Error ? error.message : error;

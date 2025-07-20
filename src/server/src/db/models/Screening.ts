@@ -1,25 +1,26 @@
 import { Model, DataTypes, Op, Sequelize } from "sequelize";
 import Movie from "./Movie";
+
 class Screening extends Model {
   declare id: number;
-  declare movie_id: number;
-  declare theater_id: number;
-  declare screening_date: Date;
-  declare screening_time: string;
+  declare movieId: number;
+  declare theaterId: number;
+  declare screeningDate: Date;
+  declare screeningTime: string;
   declare price: number;
-  declare created_at: Date;
-  declare updated_at: Date;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 
   // Custom instance methods
   getFormattedDateTime(): string {
-    const date = new Date(this.screening_date);
-    const time = this.screening_time;
+    const date = new Date(this.screeningDate);
+    const time = this.screeningTime;
     return `${date.toLocaleDateString()} at ${time}`;
   }
 
   getFullDateTime(): Date {
-    const date = new Date(this.screening_date);
-    const [hours, minutes] = this.screening_time.split(":");
+    const date = new Date(this.screeningDate);
+    const [hours, minutes] = this.screeningTime.split(":");
     date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     return date;
   }
@@ -28,7 +29,7 @@ class Screening extends Model {
   static async findUpcoming() {
     return this.findAll({
       where: {
-        screening_date: {
+        screeningDate: {
           [Op.gte]: new Date(),
         },
       },
@@ -43,15 +44,15 @@ class Screening extends Model {
         },
       ],
       order: [
-        ["screening_date", "ASC"],
-        ["screening_time", "ASC"],
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
       ],
     });
   }
 
-  static async findByMovie(movie_id: number) {
+  static async findByMovie(movieId: number) {
     return this.findAll({
-      where: { movie_id },
+      where: { movieId },
       include: [
         {
           association: "theater",
@@ -59,15 +60,15 @@ class Screening extends Model {
         },
       ],
       order: [
-        ["screening_date", "ASC"],
-        ["screening_time", "ASC"],
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
       ],
     });
   }
 
-  static async findByTheater(theater_id: number) {
+  static async findByTheater(theaterId: number) {
     return this.findAll({
-      where: { theater_id },
+      where: { theaterId },
       include: [
         {
           association: "movie",
@@ -75,8 +76,8 @@ class Screening extends Model {
         },
       ],
       order: [
-        ["screening_date", "ASC"],
-        ["screening_time", "ASC"],
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
       ],
     });
   }
@@ -90,29 +91,33 @@ export const initScreening = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      movie_id: {
+      movieId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "movie_id",
         references: {
-          model: "movie",
+          model: "movies",
           key: "id",
         },
       },
-      theater_id: {
+      theaterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "theater_id",
         references: {
           model: "theaters",
           key: "id",
         },
       },
-      screening_date: {
+      screeningDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
+        field: "screening_date",
       },
-      screening_time: {
+      screeningTime: {
         type: DataTypes.TIME,
         allowNull: false,
+        field: "screening_time",
       },
       price: {
         type: DataTypes.DECIMAL(8, 2),

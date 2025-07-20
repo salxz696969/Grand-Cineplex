@@ -38,12 +38,12 @@ export const getNowShowingMovies = async (req: Request, res: Response) => {
 
     const movies = await Movie.findAll({
       where: {
-        release_date: {
+        releaseDate: {
           [Op.gte]: twentyDaysAgo,
           [Op.lte]: today,
         },
       },
-      order: [["release_date", "DESC"]],
+      order: [["releaseDate", "DESC"]],
     });
 
     res.status(200).json(movies);
@@ -77,7 +77,7 @@ export const getMoviesFor7Days = async (req: Request, res: Response) => {
           model: Screening,
           as: "screenings",
           where: {
-            screening_date: {
+            screeningDate: {
               [Op.gte]: selectedDate,
               [Op.lt]: nextDay,
             },
@@ -85,7 +85,7 @@ export const getMoviesFor7Days = async (req: Request, res: Response) => {
           required: true,
         },
       ],
-      order: [["release_date", "ASC"]],
+      order: [["releaseDate", "ASC"]],
     });
 
     res.json(movies);
@@ -117,7 +117,7 @@ export const getComingSoonMovies = async (req: Request, res: Response) => {
           model: Screening,
           as: "screenings",
           where: {
-            screening_date: {
+            screeningDate: {
               [Op.gte]: startOfMonth,
               [Op.lt]: startOfNextMonth,
             },
@@ -125,7 +125,7 @@ export const getComingSoonMovies = async (req: Request, res: Response) => {
           required: true,
         },
       ],
-      order: [["release_date", "ASC"]],
+      order: [["releaseDate", "ASC"]],
     });
 
     res.status(200).json(movies);
@@ -181,7 +181,7 @@ export const getMoviesAndItsScreenings = async (
           model: Screening,
           as: "screenings",
           where: {
-            screening_date: {
+            screeningDate: {
               [Op.gte]: startDate,
               [Op.lt]: endDate,
             },
@@ -189,7 +189,7 @@ export const getMoviesAndItsScreenings = async (
           required: false, // ✅ allow returning movies even if they have no screenings
         },
       ],
-      order: [["release_date", "ASC"]],
+      order: [["releaseDate", "ASC"]],
     });
 
     if (!movieWithScreenings) {

@@ -5,13 +5,14 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "GrandCineplix_CADT";
 
-
 export const signup = async (req: Request, res: Response) => {
   try {
     const { name, email, phone, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Name, email and password are required." });
+      return res
+        .status(400)
+        .json({ message: "Name, email and password are required." });
     }
 
     const existingUser = await Customer.findByEmail(email);
@@ -47,13 +48,14 @@ export const signup = async (req: Request, res: Response) => {
   }
 };
 
-
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required." });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required." });
     }
 
     const user = await Customer.findByEmail(email);
@@ -66,11 +68,9 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     return res.status(200).json({
       id: user.id,
@@ -85,10 +85,9 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?.id; 
+    const userId = (req as any).user?.id;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -105,7 +104,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      date_of_birth: user.date_of_birth,
+      dateOfBirth: user.dateOfBirth,
     });
   } catch (error) {
     console.error("GetUserInfo error:", error);

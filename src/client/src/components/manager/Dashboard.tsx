@@ -78,10 +78,10 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, change, changeT
 };
 
 const recentBookings = [
-    { id: 'BK001', customer: 'John Doe', movie: 'The Great Adventure', amount: '$37.50', status: 'Confirmed', staff:"Kim Chaewon" },
-    { id: 'BK002', customer: 'Jane Smith', movie: 'Mystery of the Abyss', amount: '$25.00', status: 'Confirmed',staff:"Kim Chaewon" },
-    { id: 'BK003', customer: 'Sam Wilson', movie: 'The Great Adventure', amount: '$12.50', status: 'Pending',staff:"Kim Chaewon" },
-    { id: 'BK004', customer: 'Alice Johnson', movie: 'Comedy Night', amount: '$50.00', status: 'Confirmed',staff:"Kim Chaewon" },
+    { id: 'BK001', customer: 'John Doe', movie: 'The Great Adventure', amount: '$37.50', status: 'Confirmed', staff: "Kim Chaewon" },
+    { id: 'BK002', customer: 'Jane Smith', movie: 'Mystery of the Abyss', amount: '$25.00', status: 'Confirmed', staff: "Kim Chaewon" },
+    { id: 'BK003', customer: 'Sam Wilson', movie: 'The Great Adventure', amount: '$12.50', status: 'Pending', staff: "Kim Chaewon" },
+    { id: 'BK004', customer: 'Alice Johnson', movie: 'Comedy Night', amount: '$50.00', status: 'Confirmed', staff: "Kim Chaewon" },
 ];
 
 const recentMovies = [
@@ -133,15 +133,15 @@ export default function Dashboard() {
             <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
                 <StatCard
                     title="Total Revenue"
-                    value={`$${totalRevenue.revenue.toFixed(2)}`}
+                    value={`$${totalRevenue.revenue}`}
                     icon={<DollarSign />}
-                    change={totalRevenue.percentageFromLastMonth? `+${totalRevenue.percentageFromLastMonth}% from last month` : `No records for last month`}
+                    change={totalRevenue.percentageFromLastMonth ? `+${totalRevenue.percentageFromLastMonth}% from last month` : `No records for last month`}
                     changeType="increase"
                     description="Total income from all bookings."
                 />
                 <StatCard
                     title="Upcoming Screenings"
-                    value= {upcomingScreeningCount.thisWeekScreeningsCount.toString()}
+                    value={upcomingScreeningCount.thisWeekScreeningsCount.toString()}
                     icon={<CalendarClock />}
                     change={upcomingScreeningCount.percentageFromLastWeek ? `+${upcomingScreeningCount.percentageFromLastWeek}% from last week` : `No records for last week`}
                     changeType="increase"
@@ -149,25 +149,25 @@ export default function Dashboard() {
                 />
                 <StatCard
                     title="Pending Bookings"
-                    value= {pendingBookingsCount.toString()}
+                    value={pendingBookingsCount.toString()}
                     icon={<Ticket />}
                     description="Bookings awaiting confirmation or payment."
                 />
                 <StatCard
                     title="Total Movies"
-                    value= {movieCount.toString()}
+                    value={movieCount.toString()}
                     icon={<Film />}
                     description="Number of movies in your library."
                 />
                 <StatCard
                     title="Active Theaters"
-                    value= {activeTheatersCount.toString()}
+                    value={activeTheatersCount.toString()}
                     icon={<Theater />}
                     description="Theaters currently in operation."
                 />
                 <StatCard
                     title="Total Staff"
-                    value= {totalStaffCount.toString()}
+                    value={totalStaffCount.toString()}
                     icon={<Users />}
                     description="Number of active staff members."
                 />
@@ -193,8 +193,8 @@ export default function Dashboard() {
                                 {totalBookings.map((booking) => (
                                     <tr key={booking.id} className="border-b border-slate-800 hover:bg-slate-800/40">
                                         <td className="px-6 py-4 font-medium">{booking.id}</td>
-                                        <td className="px-6 py-4">{booking.customer?booking.customer.name:"null"}</td>
-                                        <td className="px-6 py-4">{booking.createdByStaff?booking.createdByStaff.name:"null"}</td>
+                                        <td className="px-6 py-4">{booking.customer ? booking.customer.name : "null"}</td>
+                                        <td className="px-6 py-4">{booking.createdByStaff ? booking.createdByStaff.name : "null"}</td>
                                         <td className="px-6 py-4">{booking.movieTitle}</td>
                                         <td className="px-6 py-4">${booking.amount}</td>
                                         <td className="px-6 py-4">

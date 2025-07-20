@@ -6,7 +6,7 @@ import {
   getShowTimesBasedOnMovieId,
   getTodayShowTimes,
   updateShowTime,
-} from "../controllers/showTimesController";
+} from "../controllers/screeningController";
 import { getComingSoonMovies } from "../controllers/moviesController";
 
 const route = express.Router();

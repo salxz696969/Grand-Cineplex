@@ -18,13 +18,13 @@ export enum PaymentStatus {
 
 class Payment extends Model {
   declare id: number;
-  declare booking_id: number;
+  declare bookingId: number;
   declare amount: number;
   declare method: PaymentType;
   declare status: PaymentStatus;
-  declare transaction_reference: string | null;
-  declare created_at: Date;
-  declare updated_at: Date;
+  declare transactionReference: string | null;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 
   // Custom instance methods
   isCompleted(): boolean {
@@ -48,10 +48,10 @@ class Payment extends Model {
   }
 
   // Static methods
-  static async findByBooking(booking_id: number) {
+  static async findByBooking(bookingId: number) {
     return this.findAll({
-      where: { booking_id },
-      order: [["created_at", "DESC"]],
+      where: { bookingId },
+      order: [["createdAt", "DESC"]],
     });
   }
 
@@ -78,7 +78,7 @@ class Payment extends Model {
           ],
         },
       ],
-      order: [["created_at", "DESC"]],
+      order: [["createdAt", "DESC"]],
     });
   }
 
@@ -96,7 +96,7 @@ class Payment extends Model {
           ],
         },
       ],
-      order: [["created_at", "ASC"]],
+      order: [["createdAt", "ASC"]],
     });
   }
 
@@ -104,7 +104,7 @@ class Payment extends Model {
     const whereClause: any = { status: PaymentStatus.COMPLETED };
 
     if (startDate && endDate) {
-      whereClause.created_at = {
+      whereClause.createdAt = {
         [Op.between]: [startDate, endDate],
       };
     }
@@ -122,9 +122,10 @@ export const initPayment = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      booking_id: {
+      bookingId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "booking_id",
         references: {
           model: "bookings",
           key: "id",
@@ -143,9 +144,10 @@ export const initPayment = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: PaymentStatus.PENDING,
       },
-      transaction_reference: {
+      transactionReference: {
         type: DataTypes.STRING(100),
         allowNull: true,
+        field: "transaction_reference",
       },
     },
     {
