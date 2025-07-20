@@ -2,9 +2,9 @@ import React from "react";
 import { User, Calendar, Clock, MapPin, Film, CreditCard, Smartphone, Monitor } from "lucide-react";
 
 export interface Booking {
-    id: string;
-    customerName: string;
-    customerEmail: string;
+    id: number;
+    customerName?: string;
+    customerEmail?: string;
     movieTitle: string;
     theater: string;
     date: string;

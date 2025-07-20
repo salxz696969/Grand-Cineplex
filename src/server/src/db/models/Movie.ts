@@ -11,6 +11,7 @@ class Movie extends Model {
   declare releaseDate: Date | null;
   declare createdAt: Date;
   declare updatedAt: Date;
+  declare trailerUrl: string | null;
 
   // Custom instance methods
   getFormattedDuration(): string {
@@ -76,6 +77,11 @@ export const initMovie = (sequelize: Sequelize) => {
       releaseDate: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+      },
+      trailerUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: "URL to the movie trailer",
       },
     },
     {

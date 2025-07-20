@@ -1,6 +1,12 @@
 import React from "react";
 import { Clock, MapPin, Users, Star, House, LaptopMinimal } from "lucide-react";
 import Home from "../../pages/customer/Home";
+import { Link } from "react-router-dom";
+
+interface Showtime {
+  time: string;
+  screeningId: string;
+}
 
 interface MovieInTheatreCardProps {
   theaterName: string;
@@ -9,19 +15,19 @@ interface MovieInTheatreCardProps {
   movieRating: string;
   availableSeats: number;
   totalSeats: number;
-  showtimes: string[];
+  showtimes: Showtime[];
   selectedTime?: string;
-  onTimeSelect?: (time: string) => void;
+  onTimeSelect?: (time: string, screeningId: string) => void;
 }
 
 export default function MovieInTheatreCard({
-  theaterName = "Theater #1",
-  theaterLocation = "Cinema Complex A",
-  movieTitle = "The Great Adventure",
-  movieRating = "PG-13",
-  availableSeats = 45,
-  totalSeats = 120,
-  showtimes = ["8:00", "10:00", "12:00", "2:30", "5:00", "7:30"],
+  theaterName,
+  theaterLocation,
+  movieTitle ,
+  movieRating,
+  availableSeats,
+  totalSeats ,
+  showtimes ,
   selectedTime,
   onTimeSelect
 }: MovieInTheatreCardProps) {
@@ -31,7 +37,7 @@ export default function MovieInTheatreCard({
     <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
       {/* Theater Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-5">
           <LaptopMinimal className="w-5 h-5 text-sky-500" />
           <div>
             <h2 className="text-lg font-bold text-white">{theaterName}</h2>
@@ -51,7 +57,7 @@ export default function MovieInTheatreCard({
       </div> */}
 
       {/* Seats Info */}
-      <div className="flex items-center justify-between bg-gray-800/50 rounded-md p-3">
+      {/* <div className="flex items-center justify-between bg-gray-800/50 rounded-md p-3">
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-green-500" />
           <span className="text-sm text-gray-300">Available Seats</span>
@@ -60,7 +66,7 @@ export default function MovieInTheatreCard({
           <p className="text-lg font-bold text-green-500">{availableSeats}</p>
           <p className="text-xs text-gray-400">of {totalSeats} total</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Occupancy Bar
       <div className="w-full">
@@ -82,21 +88,24 @@ export default function MovieInTheatreCard({
           <Clock className="w-4 h-4 text-sky-500" />
           <h4 className="text-sm font-semibold text-gray-300">Showtimes</h4>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {showtimes.map((time, index) => (
-            <button
-              key={index}
-              onClick={() => onTimeSelect?.(time)}
-              className={`rounded-md border px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                selectedTime === time
-                  ? "border-sky-500 bg-sky-500/20 text-sky-400"
-                  : "border-gray-600 text-gray-300 hover:border-sky-500 hover:text-sky-400 hover:bg-sky-500/10"
-              }`}
-            >
-              {time}
-            </button>
-          ))}
-        </div>
+        
+          <div className="flex flex-wrap gap-2">
+            {showtimes.sort((a, b) => a.time.localeCompare(b.time)).map((time, index) => (
+              <Link to={`/cashier/seats/${time.screeningId}`} key={index}>
+                <button
+                  key={index}
+                  onClick={() => onTimeSelect?.(time.time, time.screeningId)}
+                  className={`rounded-md border px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                    selectedTime === time.time
+                      ? "border-sky-500 bg-sky-500/20 text-sky-400"
+                      : "border-gray-600 text-gray-300 hover:border-sky-500 hover:text-sky-400 hover:bg-sky-500/10"
+                  }`}
+                >
+                  {time.time}
+                </button>
+              </Link>
+            ))}
+          </div>
       </div>
     </div>
   );

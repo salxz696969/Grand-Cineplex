@@ -4,7 +4,7 @@ class Ticket extends Model {
   declare id: number;
   declare bookingId: number;
   declare seatId: number;
-  declare ticketType: string;
+  // declare ticketType: string;
   declare createdAt: Date;
 
   // Custom instance methods
@@ -25,6 +25,8 @@ class Ticket extends Model {
       order: [["createdAt", "ASC"]],
     });
   }
+
+
 
   static async findWithDetails(ticketId: number) {
     return this.findByPk(ticketId, {
@@ -102,11 +104,11 @@ export const initTicket = (sequelize: Sequelize) => {
           key: "id",
         },
       },
-      ticketType: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-        defaultValue: "adult",
-      },
+      // ticketType: {
+      //   type: DataTypes.STRING(20),
+      //   allowNull: false,
+      //   defaultValue: "adult",
+      // },
     },
     {
       sequelize,

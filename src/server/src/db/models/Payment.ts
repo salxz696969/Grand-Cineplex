@@ -143,10 +143,10 @@ export const initPayment = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: PaymentStatus.PENDING,
       },
-      transactionReference: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-      },
+      // transactionReference: {
+      //   type: DataTypes.STRING(100),
+      //   allowNull: true,
+      // },
     },
     {
       sequelize,

@@ -1,16 +1,9 @@
 import React, { useState } from "react";
-import {
-	ArrowLeft,
-	Upload,
-	Play,
-	Calendar,
-	Clock,
-	Star,
-	Film,
-} from "lucide-react";
-import { addMovie } from "../../api/manager";
+import { ArrowLeft, Upload, Play, Film } from "lucide-react";
+import { updateMovie } from "../../api/manager";
 
-type MovieDatas = {
+type MovieData = {
+    id: number;
 	title: string;
 	description: string;
 	posterUrl: string;
@@ -24,51 +17,44 @@ type MovieDatas = {
 	language: string;
 };
 
-export default function AddMovie({ onBack }: { onBack: () => void }) {
-	const [formData, setFormData] = useState<MovieDatas>({
-		title: "",
-		description: "",
-		posterUrl: "",
-		trailerUrl: "",
-		duration: "",
-		genre: "",
-		rating: 7.5,
-		releaseDate: new Date().toISOString().split("T")[0], // Default to today
-		director: "",
-		cast: "",
-		language: "",
-	});
+type EditMovieProps = {
+    onBack: () => void;
+    movie: MovieData;
+};
+export default function EditMovie({ onBack, movie }: EditMovieProps) {
+    const [formData, setFormData] = useState<MovieData>({ ...movie });
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const handleInputChange = (field: keyof MovieDatas, value: string) => {
+	const handleInputChange = (field: keyof MovieData, value: string) => {
 		setFormData((prev) => ({
 			...prev,
 			[field]: value,
 		}));
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsSubmitting(true);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
 
-		// TODO: Implement API call to add movie
-		// console.log("Adding movie:", formData);
+        // Check if formData is exactly the same as movie
+        if (JSON.stringify(formData) === JSON.stringify(movie)) {
+            alert("Please change at least one field to edit the movie.");
+            setIsSubmitting(false);
+            return;
+        }
 
-		// // Simulate API call
-		// await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            console.log("Movie updated successfully:", formData);
+            await updateMovie(formData);
+        } catch (error) {
+            console.error("Error adding movie:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
 
-		try {
-			await addMovie(formData);
-            // console.log("Adding movie:", formData);
-		} catch (error) {
-			console.error("Error adding movie:", error);
-		} finally {
-			setIsSubmitting(false);
-		}
-
-		onBack();
-	};
+        onBack();
+    };
 
 	const genres = [
 		"Action",
@@ -83,10 +69,8 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 		"Animation",
 	];
 
-	const ratings = ["G", "PG", "PG-13", "R", "NC-17"];
-
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="fixed inset-0 z-50 bg-slate-900 overflow-y-auto p-6 flex flex-col gap-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-4">
@@ -97,6 +81,11 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 						<ArrowLeft className="w-5 h-5" />
 						Back to Movies
 					</button>
+				</div>
+				<div className="flex flex-col items-end">
+					<div className="text-slate-50 text-3xl mb-1">
+						Fill At Least One To Edit
+					</div>
 				</div>
 				<div className="flex flex-col items-end">
 					<h2 className="text-2xl font-bold tracking-tight text-white">
@@ -111,8 +100,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					{/* Left Column */}
 					<div className="space-y-6">
-						{/* Basic Info */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Film className="w-5 h-5" />
 								Basic Information
@@ -121,11 +109,10 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Movie Title *
+										Movie Title
 									</label>
 									<input
 										type="text"
-										required
 										value={formData.title}
 										onChange={(e) =>
 											handleInputChange(
@@ -133,17 +120,16 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter movie title"
 									/>
 								</div>
 
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Description *
+										Description
 									</label>
 									<textarea
-										required
 										rows={4}
 										value={formData.description}
 										onChange={(e) =>
@@ -152,19 +138,17 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter movie description"
 									/>
 								</div>
 
-								{/* <div className="grid grid-cols-2 gap-4"> */}
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Duration *
+										Duration (minutes)
 									</label>
 									<input
 										type="number"
-										required
 										value={formData.duration}
 										onChange={(e) =>
 											handleInputChange(
@@ -172,66 +156,17 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-										placeholder="Write duration in minutes. e.g., 120"
+										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										placeholder="e.g., 120"
 									/>
-									{/* </div> */}
-									{/* <div>
-                                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                                            Language *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={formData.language}
-                                            onChange={(e) => handleInputChange('language', e.target.value)}
-                                            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                            placeholder="e.g., English"
-                                        />
-                                    </div> */}
 								</div>
 							</div>
 						</div>
-
-						{/* Cast & Crew */}
-						{/* <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
-                            <h3 className="text-lg font-semibold text-white mb-4">Cast & Crew</h3>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                                        Director *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.director}
-                                        onChange={(e) => handleInputChange('director', e.target.value)}
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                        placeholder="Enter director name"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                                        Cast
-                                    </label>
-                                    <textarea
-                                        rows={3}
-                                        value={formData.cast}
-                                        onChange={(e) => handleInputChange('cast', e.target.value)}
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                        placeholder="Enter main cast members (comma separated)"
-                                    />
-                                </div>
-                            </div>
-                        </div> */}
 					</div>
 
 					{/* Right Column */}
 					<div className="space-y-6">
-						{/* Media */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4">
 								Media
 							</h3>
@@ -239,12 +174,11 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Poster Image URL *
+										Poster Image URL
 									</label>
 									<div className="relative">
 										<input
 											type="url"
-											required
 											value={formData.posterUrl}
 											onChange={(e) =>
 												handleInputChange(
@@ -252,7 +186,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="https://example.com/poster.jpg"
 										/>
 										<Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -273,20 +207,19 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="https://youtube.com/watch?v=..."
 										/>
 										<Play className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
 									</div>
 								</div>
 
-								{/* Poster Preview */}
 								{formData.posterUrl && (
 									<div className="mt-4">
 										<label className="block text-sm font-medium text-slate-300 mb-2">
 											Poster Preview
 										</label>
-										<div className="w-32 h-48 bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+										<div className="w-32 h-48 bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
 											<img
 												src={formData.posterUrl}
 												alt="Poster preview"
@@ -302,8 +235,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 							</div>
 						</div>
 
-						{/* Details */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4">
 								Details
 							</h3>
@@ -311,10 +243,9 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Genre *
+										Genre
 									</label>
 									<select
-										required
 										value={formData.genre}
 										onChange={(e) =>
 											handleInputChange(
@@ -322,7 +253,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">Select genre</option>
 										{genres.map((genre) => (
@@ -335,14 +266,13 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Rating *
+										Rating
 									</label>
 									<input
 										type="number"
 										step="0.1"
 										min="0"
 										max="10"
-										required
 										value={formData.rating}
 										onChange={(e) =>
 											handleInputChange(
@@ -350,18 +280,17 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="e.g., 7.5"
 									/>
 								</div>
 
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Release Date *
+										Release Date
 									</label>
 									<input
 										type="date"
-										required
 										value={formData.releaseDate}
 										onChange={(e) =>
 											handleInputChange(
@@ -369,7 +298,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									/>
 								</div>
 							</div>
@@ -399,7 +328,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 						) : (
 							<>
 								<Film className="w-4 h-4" />
-								Add Movie
+								Edit Movie
 							</>
 						)}
 					</button>

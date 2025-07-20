@@ -12,7 +12,7 @@ const route = express.Router();
 
 route.get("/", verifyToken, getAllBookingsForUser);
 route.get("/:id", verifyToken, getBookingBasedOnId);
-route.post("/staff", verifyToken, addBookingByStaff);
+route.post("/booking", addBookingByStaff);
 route.patch("/staff/:id", verifyToken, updateBookingByStaff);
 route.patch("/staff/:id", verifyToken, deleteBookingByStaff);
 export default route;

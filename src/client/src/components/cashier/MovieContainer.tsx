@@ -7,24 +7,27 @@ export interface Movie {
   title: string;
   releaseDate: string;
   duration: string;
-  image: string;
+  posterUrl: string;
   genre: string;
   overview: string;
   rating: number;
   director: string;
   cast: string;
   language: string;
+  trailerUrl?: string; // Optional field for trailer URL
+  description?: string; // Optional field for movie description
 }
 
 interface MovieContainerProps {
   searchTerm: string;
   activeTab: "now" | "upcoming";
+  movies: Movie[];
 }
 
-export default function MovieContainer({ searchTerm, activeTab }: MovieContainerProps) {
-  const [allMovies, setAllMovies] = useState<Movie[]>([]);
+export default function MovieContainer({ searchTerm, activeTab, movies }: MovieContainerProps) {
+  // const [allMovies, setAllMovies] = useState<Movie[]>([movies[0], movies[1], movies[2]]); // Initialize with some default movies
   const [movieList, setMovieList] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
 
   const [isSearching, setIsSearching] = useState(false);
@@ -33,31 +36,87 @@ export default function MovieContainer({ searchTerm, activeTab }: MovieContainer
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const noResultTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    const loadMovies = async () => {
-      try {
-        setIsLoading(true);
-        setIsError(null);
+  // useEffect(() => {
+  //   const loadMovies = async () => {
+  //     try {
+  //       setIsLoading(true);
+  //       setIsError(null);
 
-        // Load movies based on activeTab
-        if (activeTab === "now") {
-          setAllMovies(currentShow);
-          setMovieList(currentShow);
-        } else {
-          setAllMovies(upcomingShow);
-          setMovieList(upcomingShow);
-        }
-      } catch (error: any) {
-        setIsError(error.message || "Failed to load movies");
-        setAllMovies([]);
-        setMovieList([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       // Load movies based on activeTab
+  //       if (activeTab === "now") {
+  //         setAllMovies(
+  //           currentShow.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "", // Add director if available in data
+  //             cast: "",     // Add cast if available in data
+  //             language: movie.language,
+  //           }))
+  //         );
+  //         setMovieList(
+  //           currentShow.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "",
+  //             cast: "",
+  //             language: movie.language,
+  //           }))
+  //         );
+  //       } else {
+  //         setAllMovies(
+  //           upcomingShowJune.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "",
+  //             cast: "",
+  //             language: movie.language,
+  //           }))
+  //         );
+  //         setMovieList(
+  //           upcomingShowJune.map((movie) => ({
+  //             id: movie.id,
+  //             title: movie.title,
+  //             releaseDate: movie.release_date,
+  //             duration: movie.duration,
+  //             image: movie.poster_url,
+  //             genre: movie.genre,
+  //             overview: movie.description,
+  //             rating: movie.rating,
+  //             director: "",
+  //             cast: "",
+  //             language: movie.language,
+  //           }))
+  //         );
+  //       }
+  //     } catch (error: any) {
+  //       setIsError(error.message || "Failed to load movies");
+  //       setAllMovies([]);
+  //       setMovieList([]);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    loadMovies();
-  }, [activeTab]);
+  //   loadMovies();
+  // }, [activeTab]);
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
@@ -69,11 +128,11 @@ export default function MovieContainer({ searchTerm, activeTab }: MovieContainer
 
     if (trimmedTerm === "") {
       setIsSearching(false);
-      setMovieList(allMovies);
+      setMovieList(movies);
       return;
     }
 
-    const filtered = allMovies.filter((movie) =>
+    const filtered = movies.filter((movie) =>
       movie.title.toLowerCase().includes(trimmedTerm)
     );
 
@@ -89,7 +148,7 @@ export default function MovieContainer({ searchTerm, activeTab }: MovieContainer
         setShowNoResults(true);
       }, 3000);
     }
-  }, [searchTerm, allMovies]);
+  }, [searchTerm, movies]);
 
   if (isLoading) return <p className="text-white">Loading movies...</p>;
   if (isError) return <p className="text-red-500">Error: {isError}</p>;
@@ -107,7 +166,7 @@ export default function MovieContainer({ searchTerm, activeTab }: MovieContainer
             title={movie.title}
             releaseDate={movie.releaseDate}
             duration={movie.duration}
-            image={movie.image}
+            posterUrl={movie.posterUrl}
           />
         ))
       )}

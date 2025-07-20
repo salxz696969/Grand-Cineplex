@@ -12,23 +12,23 @@ interface ScreeningDayProps {
     onSelect: (index: number) => void;
 }
 
-const fakeDays = [
-    { number: 15, day: "Today", month: "Dec" },
-    { number: 16, day: "Mon", month: "Dec" },
-    { number: 17, day: "Tue", month: "Dec" },
-    { number: 18, day: "Wed", month: "Dec" },
-    // { number: 19, day: "Thu", month: "Dec" },
-    // { number: 20, day: "Fri", month: "Dec" },
-    // { number: 21, day: "Sat", month: "Dec" },
-    // { number: 22, day: "Sun", month: "Dec" },
-    // { number: 23, day: "Mon", month: "Dec" },
-    // { number: 24, day: "Tue", month: "Dec" },
-    // { number: 25, day: "Wed", month: "Dec" },
-    // { number: 26, day: "Thu", month: "Dec" }
-];
+// const fakeDays = [
+//     { number: 15, day: "Today", month: "Dec" },
+//     { number: 16, day: "Mon", month: "Dec" },
+//     { number: 17, day: "Tue", month: "Dec" },
+//     { number: 18, day: "Wed", month: "Dec" },
+//     // { number: 19, day: "Thu", month: "Dec" },
+//     // { number: 20, day: "Fri", month: "Dec" },
+//     // { number: 21, day: "Sat", month: "Dec" },
+//     // { number: 22, day: "Sun", month: "Dec" },
+//     // { number: 23, day: "Mon", month: "Dec" },
+//     // { number: 24, day: "Tue", month: "Dec" },
+//     // { number: 25, day: "Wed", month: "Dec" },
+//     // { number: 26, day: "Thu", month: "Dec" }
+// ];
 
 export default function ScreeningDay({ days, selectedIndex, onSelect }: ScreeningDayProps) {
-    days = fakeDays;
+    
     return (
         <div className="flex flex-wrap gap-3 justify-center items-center mt-4 w-full">
             <div className="flex max-w-5xl w-full gap-3 justify-center items-center">
