@@ -13,23 +13,21 @@ class Ticket extends Model {
   }
 
   // Static methods
-  static async findByBooking(bookingId: number) {
+  static async findByBooking(booking_id: number) {
     return this.findAll({
-      where: { bookingId },
+      where: { booking_id },
       include: [
         {
           association: "seat",
-          attributes: ["rowNumber", "seatNumber", "seatType"],
+          attributes: ["row_number", "seat_number", "seat_type"],
         },
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["created_at", "ASC"]],
     });
   }
 
-
-
-  static async findWithDetails(ticketId: number) {
-    return this.findByPk(ticketId, {
+  static async findWithDetails(ticket_id: number) {
+    return this.findByPk(ticket_id, {
       include: [
         {
           association: "booking",
@@ -55,26 +53,26 @@ class Ticket extends Model {
         },
         {
           association: "seat",
-          attributes: ["rowNumber", "seatNumber", "seatType"],
+          attributes: ["row_number", "seat_number", "seat_type"],
         },
       ],
     });
   }
 
-  static async findForScreening(screeningId: number) {
+  static async findForScreening(screening_id: number) {
     return this.findAll({
       include: [
         {
           association: "booking",
-          where: { screeningId },
+          where: { screening_id },
           attributes: ["id", "status"],
         },
         {
           association: "seat",
-          attributes: ["id", "rowNumber", "seatNumber", "seatType"],
+          attributes: ["id", "row_number", "seat_number", "seat_type"],
         },
       ],
-      order: [["createdAt", "ASC"]],
+      order: [["created_at", "ASC"]],
     });
   }
 }
@@ -87,7 +85,7 @@ export const initTicket = (sequelize: Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      bookingId: {
+      booking_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -96,7 +94,7 @@ export const initTicket = (sequelize: Sequelize) => {
         },
         onDelete: "CASCADE",
       },
-      seatId: {
+      seat_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

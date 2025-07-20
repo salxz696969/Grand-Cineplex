@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Create Sequelize instance
 const sequelize = new Sequelize(process.env.DATABASE_URL!, {
   dialect: "postgres",
-  logging: process.env.NODE_ENV === "development" ? console.log : false,
+  logging: false,
   define: {
+    freezeTableName: true,
     timestamps: true,
     underscored: true,
   },
@@ -26,57 +26,46 @@ import Payment, { initPayment } from "./models/Payment";
 
 // Define associations
 const setupAssociations = () => {
-  // Theater associations
-  Theater.hasMany(Seat, { foreignKey: "theaterId", as: "seats" });
-  Theater.hasMany(Screening, { foreignKey: "theaterId", as: "screenings" });
+  Theater.hasMany(Seat, { foreignKey: "theater_id", as: "seats" });
+  Theater.hasMany(Screening, { foreignKey: "theater_id", as: "screenings" });
 
-  // Movie associations
-  Movie.hasMany(Screening, { foreignKey: "movieId", as: "screenings" });
+  Movie.hasMany(Screening, { foreignKey: "movie_id", as: "screenings" });
 
-  // Seat associations
-  Seat.belongsTo(Theater, { foreignKey: "theaterId", as: "theater" });
-  Seat.hasMany(Ticket, { foreignKey: "seatId", as: "tickets" });
+  Seat.belongsTo(Theater, { foreignKey: "theater_id", as: "theater" });
+  Seat.hasMany(Ticket, { foreignKey: "seat_id", as: "tickets" });
 
-  // Screening associations
-  Screening.belongsTo(Movie, { foreignKey: "movieId", as: "movie" });
-  Screening.belongsTo(Theater, { foreignKey: "theaterId", as: "theater" });
-  Screening.hasMany(Booking, { foreignKey: "screeningId", as: "bookings" });
+  Screening.belongsTo(Movie, { foreignKey: "movie_id", as: "movie" });
+  Screening.belongsTo(Theater, { foreignKey: "theater_id", as: "theater" });
+  Screening.hasMany(Booking, { foreignKey: "screening_id", as: "bookings" });
 
-  // Customer associations
-  Customer.hasMany(Booking, { foreignKey: "customerId", as: "bookings" });
+  Customer.hasMany(Booking, { foreignKey: "customer_id", as: "bookings" });
 
-  // Staff associations
   Staff.hasMany(Booking, {
-    foreignKey: "createdByStaffId",
+    foreignKey: "created_by_staff_id",
     as: "createdBookings",
   });
 
-  // Booking associations
-  Booking.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-  Booking.belongsTo(Screening, { foreignKey: "screeningId", as: "screening" });
+  Booking.belongsTo(Customer, { foreignKey: "customer_id", as: "customer" });
+  Booking.belongsTo(Screening, { foreignKey: "screening_id", as: "screening" });
   Booking.belongsTo(Staff, {
-    foreignKey: "createdByStaffId",
+    foreignKey: "created_by_staff_id",
     as: "createdByStaff",
   });
-  Booking.hasMany(Ticket, { foreignKey: "bookingId", as: "tickets" });
-  Booking.hasMany(Payment, { foreignKey: "bookingId", as: "payments" });
+  Booking.hasMany(Ticket, { foreignKey: "booking_id", as: "tickets" });
+  Booking.hasMany(Payment, { foreignKey: "booking_id", as: "payments" });
 
-  // Ticket associations
-  Ticket.belongsTo(Booking, { foreignKey: "bookingId", as: "booking" });
-  Ticket.belongsTo(Seat, { foreignKey: "seatId", as: "seat" });
+  Ticket.belongsTo(Booking, { foreignKey: "booking_id", as: "booking" });
+  Ticket.belongsTo(Seat, { foreignKey: "seat_id", as: "seat" });
 
-  // Payment associations
-  Payment.belongsTo(Booking, { foreignKey: "bookingId", as: "booking" });
+  Payment.belongsTo(Booking, { foreignKey: "booking_id", as: "booking" });
 };
 
 // Initialize models and associations
 const initializeDatabase = async () => {
   try {
-    // Test connection
     await sequelize.authenticate();
-    console.log("Database connection established successfully.");
+    console.log("Connected to database:", sequelize.getDatabaseName());
 
-    // Initialize models first
     initMovie(sequelize);
     initTheater(sequelize);
     initSeat(sequelize);
@@ -87,10 +76,8 @@ const initializeDatabase = async () => {
     initTicket(sequelize);
     initPayment(sequelize);
 
-    // Setup associations
     setupAssociations();
 
-    // Sync models with database (in development)
     if (process.env.NODE_ENV === "development") {
       await sequelize.sync({ alter: true });
       console.log("Database synchronized.");

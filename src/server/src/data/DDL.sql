@@ -2,12 +2,13 @@
 -- IMPROVED CINEMA MANAGEMENT SYSTEM DDL
 -- ========================================
 
--- Custom ENUM types
-CREATE TYPE payment_type AS ENUM ('cash', 'card', 'digital_wallet', 'bank_transfer');
-CREATE TYPE booking_status AS ENUM ('pending', 'reserved', 'confirmed', 'cancelled', 'refunded');
-CREATE TYPE payment_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
-CREATE TYPE staff_role AS ENUM ('cashier', 'admin', 'manager');
-CREATE TYPE seat_type AS ENUM ('regular', 'premium', 'vip');
+-- -- Custom ENUM types
+-- -- Enums
+-- CREATE TYPE payment_type AS ENUM ('cash', 'card', 'digital_wallet', 'bank_transfer');
+-- CREATE TYPE booking_status AS ENUM ('pending', 'reserved', 'confirmed', 'cancelled', 'refunded');
+-- CREATE TYPE payment_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
+-- CREATE TYPE staff_role AS ENUM ('cashier', 'admin', 'manager');
+-- CREATE TYPE seat_type AS ENUM ('regular', 'premium', 'vip');
 
 -- ========================================
 -- CORE TABLES
@@ -106,22 +107,17 @@ CREATE TABLE screenings
     UNIQUE (theater_id, screening_date, screening_time)
 );
 
--- ========================================
--- USER MANAGEMENT
--- ========================================
-
--- Customers table
-CREATE TABLE customers
-(
-    id            SERIAL PRIMARY KEY,
-    name          VARCHAR(100)        NOT NULL,
-    email         VARCHAR(100) UNIQUE NOT NULL,
-    phone         VARCHAR(20),
-    password      VARCHAR(255)        NOT NULL,
-    date_of_birth DATE,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- -- Table customers
+-- CREATE TABLE customers (
+--   id SERIAL PRIMARY KEY,
+--   name VARCHAR(100) NOT NULL,
+--   email VARCHAR(100) UNIQUE NOT NULL,
+--   phone VARCHAR(20),
+--   password VARCHAR(255) NOT NULL,
+--   date_of_birth DATE,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
 
 -- Staff table for cashier or admin support
 CREATE TABLE staff
@@ -186,13 +182,14 @@ CREATE TABLE payments
     FOREIGN KEY (booking_id) REFERENCES bookings (id)
 );
 
--- ========================================
--- INDEXES FOR PERFORMANCE
--- ========================================
 
--- Customers
-CREATE INDEX idx_customers_email ON customers (email);
-CREATE INDEX idx_customers_phone ON customers (phone);
+-- -- ========================================
+-- -- INDEXES FOR PERFORMANCE
+-- -- ========================================
+
+-- -- Customers
+-- CREATE INDEX idx_customers_email ON customers (email);
+-- CREATE INDEX idx_customers_phone ON customers (phone);
 
 -- Screenings
 CREATE INDEX idx_screenings_movie_date ON screenings (movie_id, screening_date);
@@ -238,9 +235,9 @@ CREATE INDEX idx_movies_rating ON movies (rating);
 CREATE INDEX idx_seats_theater_type ON seats (theater_id, seat_type);
 CREATE INDEX idx_seats_theater_row ON seats (theater_id, row_number);
 
--- ========================================
--- CONSTRAINTS AND TRIGGERS
--- ========================================
+-- -- ========================================
+-- -- CONSTRAINTS AND TRIGGERS
+-- -- ========================================
 
 CREATE FUNCTION create_created_at_column()
     RETURNS TRIGGER AS

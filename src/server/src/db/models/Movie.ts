@@ -24,11 +24,11 @@ class Movie extends Model {
   static async findUpcoming() {
     return this.findAll({
       where: {
-        releaseDate: {
+        release_date: {
           [Op.gte]: new Date(),
         },
       },
-      order: [["releaseDate", "ASC"]],
+      order: [["release_date", "ASC"]],
     });
   }
 
@@ -67,14 +67,18 @@ export const initMovie = (sequelize: Sequelize) => {
         allowNull: true,
       },
       rating: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.FLOAT,
         allowNull: true,
       },
-      posterUrl: {
+      poster_url: {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      releaseDate: {
+      trailer_url: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      release_date: {
         type: DataTypes.DATEONLY,
         allowNull: true,
       },
@@ -86,7 +90,7 @@ export const initMovie = (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      tableName: "movies",
+      tableName: "movie",
       timestamps: true,
       underscored: true,
     }

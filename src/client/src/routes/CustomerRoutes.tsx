@@ -6,20 +6,22 @@ import SignUp from "../pages/customer/SignUp";
 import SignIn from "../pages/customer/SignIn";
 import SeatContainer from "../pages/customer/SeatContainer";
 import PaymentContainer from "../pages/customer/PaymentContainer";
-import MovieChosen from "../pages/customer/MovieChose";
+import MovieSelectedContainer from "../pages/customer/MovieSelectedContainer";
+import ForgotPassword from "../pages/customer/ForgotPassword";
 
 const CustomerRoutes = () => {
   return (
       <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/theatres" element={<TheatrePage/>} />
-          <Route path="/seats/:movieId/:cinemaId/:time" element={<SeatContainer />} />
+          <Route path="/seats/:screeningId" element={<SeatContainer />} />
+          {/* <Route path="/payment/:bookingId" element={<PaymentContainer />} /> */}
           <Route path="/payment" element={<PaymentContainer />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/SignIn" element={<SignIn />} />
-          <Route path="/movie/:id" element={<MovieChosen/>} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/movie/:id" element={<MovieSelectedContainer/>} />
       </Routes>
   );
 };
-
 export default CustomerRoutes;

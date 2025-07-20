@@ -1,5 +1,3 @@
-// This is the footer for our website
-
 import React from "react";
 
 export default function Footer() {
@@ -20,8 +18,8 @@ export default function Footer() {
           <div>
             <h3 className="text-white text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition break-words">Now Showing</a></li>
-              <li><a href="#" className="hover:text-white transition break-words">Upcoming</a></li>
+              <li><a href="#now-showing" className="hover:text-white transition break-words">Now Showing</a></li>
+              <li><a href="#upcoming" className="hover:text-white transition break-words">Upcoming</a></li>
               <li><a href="#" className="hover:text-white transition break-words">Membership</a></li>
               <li><a href="#" className="hover:text-white transition break-words">Promotions</a></li>
             </ul>
@@ -31,8 +29,8 @@ export default function Footer() {
           <div>
             <h3 className="text-white text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2 break-words">
-              <li>Email: <a href="mailto:support@cineview.com" className="hover:text-white">Jack@GrandCineplex.com</a></li>
-              <li>Phone: <span className="text-white">+855 363138</span></li>
+              <li>Email: <a href="#" className="hover:text-white">GrandCineplex-Cadt@gmail.com</a></li>
+              <li>Phone: <span className="text-white">+855 9875430</span></li>
               <li>Location: <span className="text-white">Phnom Penh, Cambodia</span></li>
             </ul>
           </div>

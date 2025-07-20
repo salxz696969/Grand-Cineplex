@@ -1,131 +1,125 @@
 import { Request, Response } from "express";
 import Booking from "../../../db/models/Booking";
-import { BookingStatus } from "../../../db/models/Booking";
+import Customer from "../../../db/models/Customer";
+import Seat from "../../../db/models/Seat";
+import Ticket from "../../../db/models/Ticket";
+import Screening from "../../../db/models/Screening";
+import Movie from "../../../db/models/Movie";
+import Theater from "../../../db/models/Theater";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
-
-export const getAllBookingsForUser = async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const bookingsInfo = await Booking.findByCustomer(userId);
-    res.status(200).json(bookingsInfo);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-};
 
 export const getBookingBasedOnId = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
     const bookingId = parseInt(req.params.id);
-    const bookingInfo = await Booking.findWithDetails(bookingId);
+    if (isNaN(bookingId))
+      return res.status(400).json({ message: "Invalid booking ID" });
 
-    if (!bookingInfo) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
-
-    // Check if the booking belongs to the user
-    if (bookingInfo.customerId !== userId) {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    res.status(200).json(bookingInfo);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-};
-
-export const addBookingByStaff = async (req: Request, res: Response) => {
-  try {
-    const staffId = req.user?.id;
-    const { customerId, screeningId, status } = req.body;
-
-    if (!customerId || !screeningId || !status) {
-      return res.status(400).json({
-        message: "Customer ID, screening ID, and status are required",
-      });
-    }
-
-    // Validate status
-    if (!Object.values(BookingStatus).includes(status)) {
-      return res.status(400).json({ message: "Invalid booking status" });
-    }
-
-    const newBooking = await Booking.create({
-      customerId,
-      screeningId,
-      status,
-      createdByStaffId: staffId,
+    const booking = await Booking.findOne({
+      where: { id: bookingId },
+      include: [
+        {
+          model: Customer,
+          as: "customer",
+          attributes: ["name", "phone"],
+        },
+        {
+          model: Screening,
+          as: "screening",
+          include: [
+            {
+              model: Movie,
+              as: "movie",
+              attributes: ["title"],
+            },
+            {
+              model: Theater,
+              as: "theater",
+              attributes: ["name"],
+            },
+          ],
+        },
+        {
+          model: Ticket,
+          as: "tickets",
+          include: [
+            {
+              model: Seat,
+              as: "seat",
+              attributes: ["seat_number", "price"],
+            },
+          ],
+        },
+      ],
     });
 
-    res.status(201).json(newBooking);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    const b: any = booking;
+
+    const seats =
+      b.tickets?.map((ticket: any) => ({
+        seat_number: ticket.seat?.seat_number,
+        price: ticket.seat?.price || 0,
+      })) || [];
+
+    const totalAmount = seats.reduce((sum: number, s: any) => sum + s.price, 0);
+
+    const summary = {
+      movieTitle: b.screening?.movie?.title || "",
+      theater: b.screening?.theater?.name || "",
+      date: b.screening?.screening_date || "",
+      time: b.screening?.screening_time || "",
+      seats,
+      totalAmount,
+      customerName: b.customer?.name || "",
+      customerPhone: b.customer?.phone || "",
+      screeningId: b.screening?.id || null,
+    };
+
+    return res.status(200).json(summary);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    console.error("getBookingBasedOnId error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const updateBookingByStaff = async (req: Request, res: Response) => {
+// Create booking for authenticated user
+export const createBooking = async (req: Request, res: Response) => {
   try {
-    const bookingId = parseInt(req.params.id);
-    const { customerId, screeningId, status } = req.body;
-
-    if (!customerId || !screeningId || !status) {
-      return res.status(400).json({
-        message: "Customer ID, screening ID, and status are required",
-      });
+    const user = (req as any).user;
+    if (!user || !user.id) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized. Please log in to book." });
     }
 
-    // Validate status
-    if (!Object.values(BookingStatus).includes(status)) {
-      return res.status(400).json({ message: "Invalid booking status" });
+    const { screening_id, seat_ids, status = "pending" } = req.body;
+
+    if (!screening_id || !Array.isArray(seat_ids) || seat_ids.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "screening_id and seat_ids are required" });
     }
 
-    const booking = await Booking.findByPk(bookingId);
-
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
-
-    await booking.update({
-      customerId,
-      screeningId,
+    // Use user.id directly as customer_id
+    const booking = await Booking.create({
+      screening_id,
+      customer_id: user.id,
       status,
     });
 
-    res.status(200).json(booking);
+    await Promise.all(
+      seat_ids.map((seat_id: number) =>
+        Ticket.create({
+          booking_id: booking.id,
+          seat_id,
+        })
+      )
+    );
+
+    return res.status(201).json({ id: booking.id });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-};
-
-export const deleteBookingByStaff = async (req: Request, res: Response) => {
-  try {
-    const bookingId = parseInt(req.params.id);
-
-    const booking = await Booking.findByPk(bookingId);
-
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
-
-    await booking.destroy();
-
-    res.status(200).json({ message: "Booking deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    console.error("createBooking error:", error);
+    return res.status(500).json({ message: "Booking failed" });
   }
 };
