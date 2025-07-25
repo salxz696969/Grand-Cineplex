@@ -44,7 +44,7 @@ const content = [
 export default function Sidebar({ tab, setTab }: { tab: string, setTab: (tab: string) => void }) {
 
     return (
-        <div>
+        <div className="relative">
             <div className="hidden lg:block fixed  top-20 left-0 h-screen w-80 bg-gray-950 border-r border-slate-800">
                 <div className="flex flex-col h-full py-6 px-4 gap-6">
                     {content.map((item) => {
@@ -67,7 +67,7 @@ export default function Sidebar({ tab, setTab }: { tab: string, setTab: (tab: st
                     })}
                 </div>
             </div>
-            <div className="block lg:hidden fixed z-50 bottom-0 left-0 w-full bg-gray-950 border-t border-slate-800">
+            <div className="lg:hidden fixed z-50 bottom-0 w-full bg-gray-950 border-t border-slate-800">
                 <div className="flex flex-row items-center justify-between w-full bg-gray-950 px-1 ">
                     {content.map((item) => {
                         const isActive = tab === item.id;
