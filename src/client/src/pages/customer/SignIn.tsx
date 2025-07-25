@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Header from "../../components/customer/homecomponents/Header";
+import Header from "../../components/customer/Header";
 import Password from "../../components/customer/useraccess/password";
 import { ValidateEmail } from "../../utils/validation";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
@@ -97,9 +97,8 @@ export default function SignIn() {
               <div className="flex items-center gap-6 text-2xl mb-6">
                 <button onClick={() => handleTabChange("login")} className="relative pb-1 text-white">
                   <span
-                    className={`${
-                      activeTab === "login" ? "text-white" : "text-gray-500"
-                    } transition-colors duration-200 font-semibold`}
+                    className={`${activeTab === "login" ? "text-white" : "text-gray-500"
+                      } transition-colors duration-200 font-semibold`}
                   >
                     Log In
                   </span>
@@ -112,9 +111,8 @@ export default function SignIn() {
 
                 <button onClick={() => handleTabChange("signup")} className="relative pb-1 text-white">
                   <span
-                    className={`${
-                      activeTab === "signup" ? "text-white" : "text-gray-500"
-                    } transition-colors duration-200 font-semibold`}
+                    className={`${activeTab === "signup" ? "text-white" : "text-gray-500"
+                      } transition-colors duration-200 font-semibold`}
                   >
                     Sign Up
                   </span>
@@ -136,8 +134,8 @@ export default function SignIn() {
                 <label htmlFor="password" className="text-gray-300">Password</label>
 
                 <Password value={password} onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setPassword(e.target.value)
-                  }
+                  setPassword(e.target.value)
+                }
                 />
 
                 <div className="text-right mt-2">
@@ -151,11 +149,10 @@ export default function SignIn() {
                 {error && <span className="text-red-500 text-sm">{error}</span>}
 
                 <button type="submit" disabled={!isFormValid() || submitting}
-                  className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
-                    !isFormValid() || submitting
+                  className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${!isFormValid() || submitting
                       ? "bg-gray-600 text-gray-300 cursor-not-allowed"
                       : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-                  }`}
+                    }`}
                 >
                   {submitting ? "Processing..." : "Log In"}
                 </button>

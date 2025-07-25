@@ -60,9 +60,9 @@ const MovieContainer: React.FC<MovieContainerProps> = ({
           movies = await fetchUpcomingMovies(selectedMonth, selectedYear);
 
           movies = movies.filter((movie) => {
-            if (!movie.release_date) return false;
-            const release = new Date(movie.release_date);
-            return(
+            if (!movie.releaseDate) return false;
+            const release = new Date(movie.releaseDate);
+            return (
               release.getMonth() + 1 === selectedMonth &&
               release.getFullYear() === selectedYear
             );
@@ -104,10 +104,10 @@ const MovieContainer: React.FC<MovieContainerProps> = ({
       movie.title.toLowerCase().includes(trimmedTerm)
     );
 
-    if(filtered.length > 0){
+    if (filtered.length > 0) {
       setIsSearching(false);
       setMovieList(filtered);
-    }else{
+    } else {
       setIsSearching(true);
       setMovieList([]);
 
@@ -131,7 +131,7 @@ const MovieContainer: React.FC<MovieContainerProps> = ({
     );
   }
 
-  if (isError){
+  if (isError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] p-6 border border-gray-400 rounded-lg bg-gradient-to-br from-gray-900 via-black to-gray-900 text-red-500 text-center">
         <svg className="w-14 h-14 mb-4 text-red-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -144,8 +144,8 @@ const MovieContainer: React.FC<MovieContainerProps> = ({
   }
 
 
-  if ( activeTab === "upcoming" && movieList.length === 0 && !isSearching && !isLoading){
-    
+  if (activeTab === "upcoming" && movieList.length === 0 && !isSearching && !isLoading) {
+
     const monthName = selectedMonth ? month[selectedMonth - 1] : "";
     return (
       <div className="flex flex-col items-center justify-center min-h-[230px] p-6 border border-gray-400 rounded-lg bg-gradient-to-br from-gray-900 via-black to-gray-900 text-gray-300 text-center">
@@ -174,19 +174,20 @@ const MovieContainer: React.FC<MovieContainerProps> = ({
         <div className="grid gap-5 custom-cols">
           {movieList.map((movie) => {
             const today = new Date();
-            const dayOffset = selectedNowShowingDay ? differenceInCalendarDays(selectedNowShowingDay, today): 0;
+            const dayOffset = selectedNowShowingDay ? differenceInCalendarDays(selectedNowShowingDay, today) : 0;
 
             return (
               <MovieCard key={movie.id} id={movie.id} title={movie.title}
-                release_date={movie.release_date || ""} duration={movie.duration.toString()}
-                image={movie.poster_url || ""} dayOffset={dayOffset}
+                release_date={movie.releaseDate || ""} duration={movie.duration.toString()}
+                image={movie.posterUrl || ""} dayOffset={dayOffset}
+                isUpcoming={activeTab === "upcoming"}
               />
             );
           })}
         </div>
       )}
     </>
-);
+  );
 
 };
 

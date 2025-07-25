@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import Header from "../../components/customer/homecomponents/Header";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import Header from "../../components/customer/Header";
 import Footer from "../../components/customer/Footer";
 import MovieSelectedCard from "../../components/customer/movie/MovieSelectedCard";
 import TheatreContainer from "../../components/customer/theatres/TheatreContainer";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import { Movie, Screening, Theater } from "../../../../shared/types/type";
 import { fetchMovieById, fetchTheaters } from "../../api/customer";
+import { ArrowLeft } from "lucide-react";
+
 
 type MovieWithScreenings = Movie & {
   screenings: Screening[];
@@ -21,7 +23,7 @@ function isScreeningWithin6Days(screeningDateStr: string): boolean {
   return diffDays >= 0 && diffDays <= 5;
 }
 
-function joinScreeningsWithTheaters( screenings: Screening[], theaters: Theater[]):(Screening & {theaterName: string })[]{
+function joinScreeningsWithTheaters(screenings: Screening[], theaters: Theater[]): (Screening & { theaterName: string })[] {
   const theaterMap = theaters.reduce<Record<number, string>>((acc, t) => {
     acc[t.id] = t.name;
     return acc;
@@ -29,17 +31,19 @@ function joinScreeningsWithTheaters( screenings: Screening[], theaters: Theater[
 
   return screenings.map((s) => ({
     ...s,
-    theaterName: theaterMap[s.theater_id] || "Unknown Theater",
+    theaterName: theaterMap[s.theaterId] || "Unknown Theater",
   }));
 }
 
 export default function MovieSelectedContainer() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
-
+  const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const dayParam = query.get("day");
   const dayOffset = dayParam ? parseInt(dayParam, 10) : 0;
+  const isUpcomingParam = query.get("isUpcoming");
+  const isUpcoming = isUpcomingParam === "true" ? true : false;
 
   const [movie, setMovie] = useState<MovieWithScreenings | null>(null);
   const [theaters, setTheaters] = useState<Theater[]>([]);
@@ -82,18 +86,19 @@ export default function MovieSelectedContainer() {
   const enrichedScreenings = joinScreeningsWithTheaters(movie.screenings, theaters);
 
   const hasCurrentScreenings = enrichedScreenings.some((screening) =>
-    isScreeningWithin6Days(screening.screening_date || screening.created_at || "")
+    isScreeningWithin6Days(screening.screeningDate || screening.createdAt || "")
   );
 
   return (
-    <div className="min-h-screen bg-[#171c20] text-white">
+    <div className="min-h-screen bg-gray-950 text-white flex justify-start items-center flex-col">
       <Header />
-      <div className="px-[20px] sm:px-[60px] md:px-[100px] lg:px-[180px] py-6">
+      <div className="max-w-7xl w-full px-4 ">
+
         {hasCurrentScreenings ? (
           <div className="relative flex flex-row justify-center items-start gap-4">
             <div className="wrapper relative max-w-7xl w-full flex lg:flex-row gap-4 flex-col">
               <div className="w-full lg:w-80 lg:top-22 lg:left-0 lg:h-full flex-shrink-0 z-10">
-                <MovieSelectedCard movie={movie} />
+                <MovieSelectedCard movie={movie} isUpcoming={isUpcoming} />
               </div>
               <div className="flex-1">
                 <TheatreContainer movieId={movie.id} screenings={enrichedScreenings} />
@@ -102,8 +107,12 @@ export default function MovieSelectedContainer() {
           </div>
         ) : (
           <div className="flex justify-center items-center min-h-[400px]">
-            <div className="w-220 rounded-2xl shadow-lg">
-              <MovieSelectedCard movie={movie} isUpcoming={!hasCurrentScreenings} />
+            <button className="flex gap-2 py-2 mb-12 text-white" onClick={() => navigate("/")}>
+              <ArrowLeft size={20} />
+              Back to movies
+            </button>
+            <div className=" w-full rounded-2xl shadow-lg">
+              <MovieSelectedCard movie={movie} isUpcoming={isUpcoming} />
             </div>
           </div>
         )}

@@ -52,7 +52,7 @@ export default function PaymentSuccess({ bookingSummary }: { bookingSummary: Boo
                   <span className="text-gray-400">Seats:</span>
                   <span>
                     {bookingSummary.seats
-                      .map((s) => (s.seat_number ? s.seat_number : s))
+                      .map((s) => (s.seatNumber ? s.seatNumber : s))
                       .join(", ")}
                   </span>
                 </div>

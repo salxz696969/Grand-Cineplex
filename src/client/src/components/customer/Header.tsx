@@ -1,7 +1,7 @@
 import { useContext, useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Clapperboard } from "lucide-react";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Header() {
 
@@ -29,8 +29,8 @@ export default function Header() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent){
-      if( dropdownRef.current && !dropdownRef.current.contains(event.target as Node)){
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
       }
     }
@@ -42,9 +42,9 @@ export default function Header() {
 
 
   const handleUserClick = () => {
-    if(!isLoggedIn){
+    if (!isLoggedIn) {
       navigate("/signin");
-    }else{
+    } else {
       setDropdownOpen(!dropdownOpen);
     }
   };
@@ -58,18 +58,18 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full h-20 mb-4 flex items-center bg-gray-900/60 backdrop-blur-md sticky top-0 z-50 px-5 sm:px-14 md:px-24 lg:px-44">
-      <div className="flex items-center justify-between font-bold text-white w-full">
-        
+    <header className="w-full h-20 mb-4 flex items-center bg-gray-950/50 backdrop-blur-md sticky top-0 z-50 justify-center px-4">
+      <div className="flex items-center justify-between font-bold text-white w-full max-w-7xl">
+
         {/* Left side */}
         <Link className="sm:text-xl text-x flex gap-2" to="/">
           <Clapperboard /> Grand-Cineplex
         </Link>
 
         {/* Right side */}
-        <div ref={dropdownRef} className="relative group flex items-center gap-4 border border-sky-800 p-2 rounded-md cursor-pointer"
+        <div ref={dropdownRef} className="relative group flex items-center gap-4 border border-blue-800 p-2 rounded-md cursor-pointer"
           onClick={handleUserClick}>
-          <div className="flex items-center justify-center bg-gradient-to-r from-sky-800 to-sky-600 p-2 rounded-md w-8 h-8 text-xs font-semibold text-white select-none">
+          <div className="flex items-center justify-center bg-blue-800 p-2 rounded-md w-8 h-8 text-xs font-semibold text-white select-none">
             {isLoggedIn ? getInitials(userName) : <User className="w-4 h-4" />}
           </div>
 
@@ -95,7 +95,7 @@ export default function Header() {
           )}
 
         </div>
-        
+
       </div>
     </header>
   );

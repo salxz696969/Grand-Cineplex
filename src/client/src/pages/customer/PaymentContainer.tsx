@@ -8,7 +8,7 @@ import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import AuthModal from "../../components/customer/useraccess/PopupLogSign";
 import { bookSeats, fetchSeatsByScreening } from "../../api/customer";
 import { BookingSummary, ApiSeat } from "../../../../shared/types/type";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { fetchUserInfo } from "../../api/customer";
 
 export default function PaymentContainer() {
@@ -64,10 +64,10 @@ export default function PaymentContainer() {
               setBookingSummary((prev) =>
                 prev
                   ? {
-                      ...prev,
-                      customerName: userData.name,
-                      customerPhone: userData.phone || "-",
-                    }
+                    ...prev,
+                    customerName: userData.name,
+                    customerPhone: userData.phone || "-",
+                  }
                   : prev
               );
             })
@@ -114,7 +114,7 @@ export default function PaymentContainer() {
           customerName: "Guest",
           customerPhone: "-",
           seats: selectedSeats.map((s) => ({
-            seat_number: s.row_number + s.seat_number,
+            seatNumber: s.rowNumber + s.seatNumber,
             price: s.price,
           })),
           totalAmount,
@@ -139,10 +139,10 @@ export default function PaymentContainer() {
       setBookingSummary((prev) =>
         prev
           ? {
-              ...prev,
-              customerName: userData.name,
-              customerPhone: userData.phone || "-",
-            }
+            ...prev,
+            customerName: userData.name,
+            customerPhone: userData.phone || "-",
+          }
           : prev
       );
     } catch (error) {
@@ -196,8 +196,7 @@ export default function PaymentContainer() {
         </div>
       )}
 
-      <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-4 lg:p-8 transition-filter duration-300 ${
-          isAuthRequired ? "blur-sm pointer-events-none overflow-hidden h-screen" : ""
+      <div className={`min-h-screen bg-gray-950 text-white p-4 lg:p-8 transition-filter duration-300 ${isAuthRequired ? "blur-sm pointer-events-none overflow-hidden h-screen" : ""
         }`}
       >
         <div className="max-w-7xl mx-auto mb-8">

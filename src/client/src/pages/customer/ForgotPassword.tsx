@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../components/customer/homecomponents/Header";
+import Header from "../../components/customer/Header";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import { ValidateEmail } from "../../utils/validation";
 import hall6 from "../../assets/hall6.jpg";
@@ -52,8 +52,8 @@ export default function ForgotPassword() {
             <div className="w-full h-full flex flex-col p-8 text-white">
               <div className="relative w-fit mb-6">
                 <h2 className="text-2xl font-semibold text-white">Forgot Password</h2>
-                 <div className="absolute left-0 bottom-[-6px] w-15 h-[3px] bg-red-600 rounded-full"></div>
-                </div>
+                <div className="absolute left-0 bottom-[-6px] w-15 h-[3px] bg-red-600 rounded-full"></div>
+              </div>
 
               <span className="mb-7 text-gray-300 text-sm">
                 Please enter your Email to reset your password.
@@ -61,7 +61,7 @@ export default function ForgotPassword() {
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 transition-all duration-300 mt-4">
                 <label htmlFor="email" className="text-gray-300">Email</label>
-                
+
                 <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded">
                   <FaUserAlt className="text-gray-400 mr-3" />
                   <input id="email" type="text" className="w-full text-sm bg-transparent py-3 rounded outline-none text-white" value={email}
@@ -78,11 +78,10 @@ export default function ForgotPassword() {
                 )}
 
                 <button type="submit" disabled={!isFormValid()}
-                  className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
-                    isFormValid()
+                  className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${isFormValid()
                       ? "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
                       : "bg-gray-600 text-gray-300 cursor-not-allowed"
-                  }`}
+                    }`}
                 >
                   Continue
                 </button>

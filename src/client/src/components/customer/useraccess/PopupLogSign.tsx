@@ -84,33 +84,33 @@ const AuthModal = ({ onSuccess }: AuthModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-5" style={{ backdropFilter: "blur(5px)", WebkitBackdropFilter: "blur(5px)" }}>
-      <div className="flex w-full max-w-4xl h-[550px] border border-[#626364] rounded overflow-hidden bg-[#0f1419] shadow-lg">
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-black/60 backdrop-blur-sm">
+      <div className="flex w-full max-w-4xl h-[550px] border border-gray-800 rounded-xl overflow-hidden bg-gray-950 shadow-lg">
+
         <div className="hidden lg:block w-1/2 h-full">
-          <img className="w-full h-full object-cover select-none" src={hall6} alt="Theater" draggable={false}/>
+          <img className="w-full h-full object-cover select-none" src={hall6} alt="Theater" draggable={false} />
         </div>
 
-        <div className="w-full lg:w-1/2 h-full flex flex-col p-8 text-white overflow-auto">
-          
+        <div className="w-full lg:w-1/2 h-full flex flex-col p-8 text-white overflow-auto bg-gray-950">
+
           <div className="flex items-center gap-6 text-2xl mb-6">
             <button onClick={() => setActiveTab("login")} className="relative pb-1">
-              <span className={`${ activeTab === "login" ? "text-white" : "text-gray-500" } transition-colors duration-200 font-semibold`}>
+              <span className={`${activeTab === "login" ? "text-white" : "text-gray-400"} transition-colors duration-200 font-semibold`}>
                 Log In
               </span>
               {activeTab === "login" && (
-                <div className="absolute left-5 -translate-x-1/2 bottom-[-6px] w-1/2 h-[3px] bg-red-600 rounded-full"></div>
+                <div className="absolute left-5 -translate-x-1/2 bottom-[-6px] w-1/2 h-[3px] bg-blue-800 rounded-full"></div>
               )}
             </button>
 
-            <div className="h-6 w-px bg-gray-400 opacity-90"></div>
+            <div className="h-6 w-px bg-gray-700 opacity-90"></div>
 
             <button onClick={() => setActiveTab("signup")} className="relative pb-1">
-              <span className={`${ activeTab === "signup" ? "text-white" : "text-gray-500" } transition-colors duration-200 font-semibold`}>
+              <span className={`${activeTab === "signup" ? "text-white" : "text-gray-400"} transition-colors duration-200 font-semibold`}>
                 Sign Up
               </span>
               {activeTab === "signup" && (
-                <div className="absolute left-7 -translate-x-1/2 bottom-[-6px] w-1/2 h-[3px] bg-red-600 rounded-full"></div>
+                <div className="absolute left-7 -translate-x-1/2 bottom-[-6px] w-1/2 h-[3px] bg-blue-800 rounded-full"></div>
               )}
             </button>
 
@@ -120,24 +120,23 @@ const AuthModal = ({ onSuccess }: AuthModalProps) => {
             <form onSubmit={handleLogin} className="flex flex-col gap-4 mt-4">
               <label htmlFor="email" className="text-gray-300">Email</label>
 
-              <div className="flex items-center border px-5 rounded">
+              <div className="flex items-center border border-gray-800 bg-gray-900 rounded-lg px-5">
                 <FaUserAlt className="text-gray-400 mr-3" />
-                <input id="email" type="text" className="w-full bg-transparent py-3 text-white outline-none text-sm"value={email}
+                <input id="email" type="text" className="w-full bg-transparent py-3 text-white outline-none text-sm" value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
               <label htmlFor="password" className="text-gray-300">Password</label>
-              <Password value={password} onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}/>
+              <Password value={password} onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
 
               {error && <span className="text-red-500 text-sm">{error}</span>}
 
               <button type="submit" disabled={!isFormValid() || loading}
-                className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
-                  !isFormValid() || loading
-                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
+                className={`p-3 font-semibold rounded-xl mt-4 transition-all duration-200 shadow-lg ${!isFormValid() || loading
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-800 hover:bg-blue-700 text-white hover:scale-105"
+                  }`}
               >
                 {loading ? "Processing..." : "Log In"}
               </button>
@@ -146,7 +145,7 @@ const AuthModal = ({ onSuccess }: AuthModalProps) => {
           ) : (
             <form onSubmit={handleSignUp} className="flex flex-col gap-4 mt-4">
               <label htmlFor="email" className="text-gray-300">Email</label>
-              <div className="flex items-center border px-5 rounded">
+              <div className="flex items-center border border-gray-800 bg-gray-900 rounded-lg px-5">
                 <FaUserAlt className="text-gray-400 mr-3" />
                 <input id="email" type="text" className="w-full bg-transparent py-3 text-white outline-none text-sm" value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -154,7 +153,7 @@ const AuthModal = ({ onSuccess }: AuthModalProps) => {
               </div>
 
               <label htmlFor="phone" className="text-gray-300">Phone Number</label>
-              <div className="flex items-center border px-5 rounded">
+              <div className="flex items-center border border-gray-800 bg-gray-900 rounded-lg px-5">
                 <FaPhoneAlt className="text-gray-400 mr-3" />
                 <input id="phone" type="text" className="w-full bg-transparent py-3 text-white outline-none text-sm" value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -162,17 +161,16 @@ const AuthModal = ({ onSuccess }: AuthModalProps) => {
               </div>
 
               <label htmlFor="password" className="text-gray-300">Password</label>
-              <Password value={password} onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}/>
+              <Password value={password} onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
 
               {error && <span className="text-red-500 text-sm">{error}</span>}
 
               <button type="submit" disabled={!isFormValid() || loading}
-                className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
-                  !isFormValid() || loading
-                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
-                >
+                className={`p-3 font-semibold rounded-xl mt-4 transition-all duration-200 shadow-lg ${!isFormValid() || loading
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-800 hover:bg-blue-700 text-white hover:scale-105"
+                  }`}
+              >
                 {loading ? "Processing..." : "Create Account"}
               </button>
             </form>

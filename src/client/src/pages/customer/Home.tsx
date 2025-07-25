@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../components/customer/homecomponents/Header";
+import Header from "../../components/customer/Header";
 import ScheduleHeader from "../../components/customer/homecomponents/ScheduleShow";
 import MovieContainer from "../../components/customer/movie/MovieContainer";
 import Footer from "../../components/customer/Footer";
@@ -36,10 +36,10 @@ export default function Home() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-[#171c20] text-white">
+    <div className="min-h-screen bg-gray-950 text-white flex justify-center items-center flex-col">
       <Header />
-      <div className="px-[20px] sm:px-[60px] md:px-[100px] lg:px-[180px]">
-        <Featured/>
+      <div className="max-w-7xl w-full px-4">
+        <Featured />
         <ScheduleHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} activeTab={activeTab} setActiveTab={setActiveTab}
           onUpcomingMonthChange={(month, year) => {
             setSelectedMonth(month);
@@ -47,7 +47,7 @@ export default function Home() {
           }}
           onNowShowingDayChange={(date) => setSelectedNowShowingDay(date)}
         />
-        <MovieContainer searchTerm={searchTerm} activeTab={activeTab} 
+        <MovieContainer searchTerm={searchTerm} activeTab={activeTab}
           selectedMonth={selectedMonth} selectedYear={selectedYear} selectedNowShowingDay={selectedNowShowingDay}
         />
       </div>

@@ -16,7 +16,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.message || "Request failed");
   }
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 export async function fetchMovies(): Promise<Movie[]> {

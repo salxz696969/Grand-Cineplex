@@ -2,7 +2,7 @@ import React from "react";
 import { Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Seat } from "../../../../../shared/types/type";
- 
+
 
 interface SelectedSeatsProps {
   selectedSeats: string[];
@@ -29,13 +29,13 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
   };
 
   return (
-    <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 max-w-3xl mx-auto">
+    <div className="bg-gray-950 rounded-xl p-6 border border-gray-700 max-w-7xl mx-auto">
       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
         <Sofa className="w-5 h-5" /> Selected Seats
       </h2>
       {selectedSeats.length > 0 ? (
         <>
-          <div className="flex flex-wrap gap-2 mb-4 justify-center">
+          <div className="flex flex-wrap gap-2 mb-4">
             {selectedSeats
               .slice()
               .sort()
@@ -49,11 +49,11 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
                 );
               })}
           </div>
-          <div className="flex justify-between items-center border-t border-gray-700 pt-3">
+          <div className="flex items-center justify-between pt-3 border-t border-gray-700">
             <span className="text-gray-300">Total ({selectedSeats.length} seats):</span>
             <span className="text-2xl font-bold text-green-400">${totalPrice.toFixed(2)}</span>
           </div>
-          <button onClick={handleContinue} className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all">
+          <button onClick={handleContinue} className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform">
             Continue to Payment
           </button>
         </>

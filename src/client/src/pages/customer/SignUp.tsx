@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../components/customer/homecomponents/Header";
+import Header from "../../components/customer/Header";
 import Password from "../../components/customer/useraccess/password";
 import { ValidateEmail, extractNameFromEmail } from "../../utils/validation";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
@@ -92,9 +92,8 @@ export default function SignUp() {
               <div className="flex items-center gap-6 text-2xl mb-6">
                 <button onClick={() => handleTabChange("login")} className="relative pb-1 text-white">
                   <span
-                    className={`${
-                      activeTab === "login" ? "text-white" : "text-gray-500"
-                    } transition-colors duration-200 font-semibold`}
+                    className={`${activeTab === "login" ? "text-white" : "text-gray-500"
+                      } transition-colors duration-200 font-semibold`}
                   >
                     Log In
                   </span>
@@ -107,9 +106,8 @@ export default function SignUp() {
 
                 <button onClick={() => handleTabChange("signup")} className="relative pb-1 text-white">
                   <span
-                    className={`${
-                      activeTab === "signup" ? "text-white" : "text-gray-500"
-                    } transition-colors duration-200 font-semibold`}
+                    className={`${activeTab === "signup" ? "text-white" : "text-gray-500"
+                      } transition-colors duration-200 font-semibold`}
                   >
                     Sign Up
                   </span>
@@ -121,7 +119,7 @@ export default function SignUp() {
 
               {/* Form */}
               <form onSubmit={handleSignUp} className="flex flex-col gap-4 transition-all duration-300 mt-4">
-                
+
                 {/* Email */}
                 <label htmlFor="email" className="text-gray-300">Email</label>
                 <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded">
@@ -158,11 +156,10 @@ export default function SignUp() {
 
                 {/* Submit Button */}
                 <button type="submit" disabled={!isFormValid() || submitting}
-                  className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${
-                    !isFormValid() || submitting
+                  className={`p-3 font-semibold rounded-full mt-4 transition-colors duration-300 ${!isFormValid() || submitting
                       ? "bg-gray-600 text-gray-300 cursor-not-allowed"
                       : "bg-red-600 hover:bg-red-700 cursor-pointer"
-                  }`}
+                    }`}
                 >
                   {submitting ? "Processing..." : "Create Account"}
                 </button>

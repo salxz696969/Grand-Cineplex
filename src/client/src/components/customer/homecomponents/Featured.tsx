@@ -5,7 +5,7 @@ export default function Featured() {
   const totalSlides = featuredHalls.length;
   const [index, setIndex] = useState(0);
 
-  
+
   useEffect(() => {
 
     const interval = setInterval(() => {
@@ -16,8 +16,7 @@ export default function Featured() {
   }, [totalSlides]);
 
   return (
-    <div className="relative w-full h-[320px] sm:h-[360px] md:h-[420px] lg:h-[480px] mt-10 rounded-2xl bg-[#111518] overflow-hidden flex justify-center items-center">
-
+    <div className="relative w-full h-[200px] lg:h-[300px] mt-10 rounded-2xl bg-gray-950 overflow-hidden flex justify-center items-center">
       {/* Background image for showing and pop up with breath style */}
       {featuredHalls.map((hall, i) => (
         <img key={i} src={hall} alt={`Hall ${i + 1}`} loading="lazy"
@@ -26,17 +25,15 @@ export default function Featured() {
           style={{ transitionProperty: "opacity" }}
         />
       ))}
-
       {/* Dots in the background to navigate */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-4">
+      {/* <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-4">
         {featuredHalls.map((_, i) => (
           <button key={i} onClick={() => setIndex(i)}
-            className={`w-2 h-2 rounded-full transition-colors duration-300 ${i === index ? "bg-white" : "bg-gray-600"}`}
+            className={`w-2 h-2 rounded-full transition-colors duration-300 ${i === index ? "bg-blue-800" : "bg-blue-400 hover:bg-blue-800"}`}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
-      </div>
-      
+      </div> */}
     </div>
   );
 }

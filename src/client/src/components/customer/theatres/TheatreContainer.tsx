@@ -10,10 +10,10 @@ interface Props {
 export default function TheatreContainer({ screenings, movieId }: Props) {
 
   const screeningsByTheater = screenings.reduce((acc, screening) => {
-    if (!acc[screening.theater_id]) {
-      acc[screening.theater_id] = [];
+    if (!acc[screening.theaterId]) {
+      acc[screening.theaterId] = [];
     }
-    acc[screening.theater_id].push(screening);
+    acc[screening.theaterId].push(screening);
     return acc;
   }, {} as Record<number, (Screening & { theaterName: string })[]>);
 
@@ -26,7 +26,7 @@ export default function TheatreContainer({ screenings, movieId }: Props) {
 
       <div className="space-y-4 lg:max-h-[600px] lg:overflow-y-auto pr-2 lg:scrollbar-thin lg:scrollbar-thumb-sky-500 lg:scrollbar-track-gray-800">
         {Object.entries(screeningsByTheater).map(([theaterId, theaterScreenings]) => (
-          <TheatreCard key={theaterId} name={theaterScreenings[0].theaterName} cinema_id={Number(theaterId)}
+          <TheatreCard key={theaterId} name={theaterScreenings[0].theaterName} cinemaId={Number(theaterId)}
             movieId={movieId} screenings={theaterScreenings}
           />
         ))}

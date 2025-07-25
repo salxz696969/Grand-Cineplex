@@ -120,7 +120,7 @@ export default function Movies() {
 			<div className="min-h-screen content flex flex-col justify-start items-center bg-black pt-24">
 				<div className="flex flex-col max-w-7xl w-full justify-center items-center">
 					{/* Horizontally scrollable parent on mobile, normal on desktop */}
-					<div className="w-full lg:hidden p-4">
+					<div className="w-full lg:hidden p-4 ">
 						<SearchBar searchTerm={""} setSearchTerm={() => { }} />
 					</div>
 					<div className="flex flex-nowrap overflow-x-auto gap-4 px-4 justify-between items-center scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent lg:flex-wrap lg:overflow-x-visible lg:whitespace-normal w-full">
@@ -131,7 +131,7 @@ export default function Movies() {
 								onSelect={(index) => setSelectedIndex(index)}
 							/>
 						</div>
-						<div className="hidden lg:flex p-4 min-w-[300px]">
+						<div className="hidden lg:flex p-4 min-w-[300px] pr-0">
 							<SearchBar searchTerm={""} setSearchTerm={() => { }} />
 						</div>
 					</div>

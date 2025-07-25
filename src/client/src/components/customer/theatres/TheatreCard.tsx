@@ -7,12 +7,12 @@ import { formatTime12h } from '../../../utils/Function';
 
 interface Props {
   name: string;
-  cinema_id: number;
+  cinemaId: number;
   movieId: number;
   screenings: Screening[];
 }
 
-export default function TheatreCard({ name, cinema_id, movieId, screenings}: Props) {
+export default function TheatreCard({ name, cinemaId, movieId, screenings }: Props) {
   const navigate = useNavigate();
 
   const [availableSeats, setAvailableSeats] = useState<number>(0);
@@ -48,32 +48,16 @@ export default function TheatreCard({ name, cinema_id, movieId, screenings}: Pro
   }
 
   return (
-    <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
-      
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <LaptopMinimal className="w-5 h-5 text-sky-500" />
-          <div>
-            <h2 className="text-lg font-bold text-white">{name}</h2>
-            <p className="text-sm text-gray-400">Cinema ID: {cinema_id}</p>
-          </div>
-        </div>
+    <div className="flex flex-col gap-4 border border-gray-800 rounded-xl p-6 text-white w-full bg-gray-950 hover:bg-gray-900/50 transition-colors">
+      {/* Theater Header */}
+      <div className="flex items-center gap-2 ">
+        <LaptopMinimal className="w-5 h-5 text-blue-800" />
+        <h2 className="text-lg font-bold text-white">{name}</h2>
       </div>
-
-      <div className="flex items-center justify-between bg-gray-800/50 rounded-md p-3">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-green-500" />
-          <span className="text-sm text-gray-300">Available Seats</span>
-        </div>
-        <div className="text-right">
-          <p className="text-lg font-bold text-green-500">{availableSeats}</p>
-          <p className="text-xs text-gray-400">of {totalSeats} total</p>
-        </div>
-      </div>
-
+      {/* Showtimes */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Clock className="w-4 h-4 text-sky-500" />
+          <Clock className="w-4 h-4 text-blue-800" />
           <h4 className="text-sm font-semibold text-gray-300">Showtimes</h4>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -81,21 +65,17 @@ export default function TheatreCard({ name, cinema_id, movieId, screenings}: Pro
             <p className="text-gray-500">No showtimes available</p>
           )}
           {screenings
-            .sort((a, b) => a.screening_time.localeCompare(b.screening_time))
+            .sort((a, b) => a.screeningTime.localeCompare(b.screeningTime))
             .map((screening) => {
-              const isPast = isPastShowtime(screening.screening_date, screening.screening_time);
+              const isPast = isPastShowtime(screening.screeningDate, screening.screeningTime);
               return (
                 <button key={screening.id} onClick={() => {
-                    if (!isPast) navigate(`/seats/${screening.id}`);
-                  }}
+                  if (!isPast) navigate(`/seats/${screening.id}`);
+                }}
                   disabled={isPast}
-                  className={`rounded-md border px-3 py-2 text-sm font-medium transition-all duration-200
-                    ${isPast
-                      ? "border-gray-700 text-gray-500 bg-gray-800/30 cursor-not-allowed blur-[1px]"
-                      : "border-gray-600 text-gray-300 hover:border-sky-500 hover:text-sky-400 hover:bg-sky-500/10"
-                    }`}
+                  className={`rounded-md border border-slate-800 px-3 py-2 text-sm font-medium transition-all duration-200 bg-gray-900/50 hover:bg-gray-900 hover:border-blue-800 ${isPast ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  {formatTime12h(screening.screening_time)}
+                  {formatTime12h(screening.screeningTime)}
                 </button>
               );
             })}
