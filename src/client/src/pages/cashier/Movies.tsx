@@ -37,19 +37,37 @@ type Movie = {
 	updatedAt: string;
 };
 
+// Skeleton component for loading state
+const SkeletonCard = () => (
+	<div className="overflow-hidden shadow-lg flex flex-col group bg-gray-900/50 border border-gray-800 rounded-xl animate-pulse">
+		<div className="aspect-[9/14] w-full bg-center bg-cover overflow-hidden">
+			<div className="w-full h-full bg-gray-800" />
+		</div>
+		<div className="pt-3 px-3 pb-2 flex flex-col gap-1 flex-1">
+			<div className="h-5 w-3/4 bg-gray-800 rounded mb-1" /> {/* Title line */}
+			<div className="h-3 w-1/2 bg-gray-800 rounded" /> {/* Release date & duration */}
+		</div>
+	</div>
+);
+
 export default function Movies() {
 	const [movies, setMovies] = useState<any[]>([]);
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [showedMovies, setShowedMovies] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
+
 	useEffect(() => {
-        console.log("Movies component rendered");
+		console.log("Movies component rendered");
 		const fetchMovies = async () => {
 			try {
+				setLoading(true);
 				const response = await getMoviesFor7Days();
 				console.log("Movies fetched:", response);
 				setMovies(response);
 			} catch (error) {
 				console.error("Error fetching movies:", error);
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchMovies();
@@ -93,26 +111,46 @@ export default function Movies() {
 		}
 		return daysArray;
 	};
+
 	return (
 		<div>
 			<div className="relative">
 				<Header />
 			</div>
-			<div className="min-h-screen content flex flex-col justify-start items-center bg-black">
+			<div className="min-h-screen content flex flex-col justify-start items-center bg-black pt-24">
 				<div className="flex flex-col max-w-7xl w-full justify-center items-center">
-					<div className="flex flex-wrap-reverse p-4 w-full justify-between items-center gap-4 px-4 lg:flex-row lg:gap-20 lg:flex-nowrap">
-						<ScreeningDay
-							days={sevenDaysArray(new Date())}
-							selectedIndex={selectedIndex}
-							onSelect={(index) => setSelectedIndex(index)}
-						/>
-						<SearchBar searchTerm={""} setSearchTerm={() => {}} />
+					{/* Horizontally scrollable parent on mobile, normal on desktop */}
+					<div className="w-full lg:hidden p-4">
+						<SearchBar searchTerm={""} setSearchTerm={() => { }} />
 					</div>
-					<MovieContainer
-						searchTerm={""}
-						activeTab={"now"}
-						movies={showedMovies || []}
-					/>
+					<div className="flex flex-nowrap overflow-x-auto gap-4 px-4 justify-between items-center scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent lg:flex-wrap lg:overflow-x-visible lg:whitespace-normal w-full">
+						<div className="min-w-max ">
+							<ScreeningDay
+								days={sevenDaysArray(new Date())}
+								selectedIndex={selectedIndex}
+								onSelect={(index) => setSelectedIndex(index)}
+							/>
+						</div>
+						<div className="hidden lg:flex p-4 min-w-[300px]">
+							<SearchBar searchTerm={""} setSearchTerm={() => { }} />
+						</div>
+					</div>
+					{
+						loading ? (
+							<div className="grid w-full gap-5 custom-cols mt-4 px-4">
+								{[...Array(6)].map((_, i) => (
+									<SkeletonCard key={i} />
+								))}
+							</div>
+						) : (
+							<MovieContainer
+								searchTerm={""}
+								activeTab={"now"}
+								movies={showedMovies || []}
+							/>
+						)
+					}
+
 				</div>
 			</div>
 		</div>

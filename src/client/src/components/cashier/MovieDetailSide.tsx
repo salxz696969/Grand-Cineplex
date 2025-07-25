@@ -29,8 +29,8 @@ export default function SelectedMovieSidebar({
 	};
 
 	return (
-		<div className="w-full h-full">
-			<div className="bg-black flex flex-row lg:flex-col gap-4 items-center lg:items-start justify-start lg:justify-start border-b border-gray-700 lg:border-b-0  lg:border-gray-700 lg:pr-4 pb-4 pt-4 lg:pb-0">
+		<div className="w-full h-full overflow-hidden">
+			<div className="bg-gray-950 flex flex-row lg:flex-col gap-4 items-center lg:items-start justify-start lg:justify-start border-b border-gray-800 lg:border-b-0  lg:border-gray-800 lg:pr-4 pb-4 pt-4 lg:pb-0">
 				<div className="relative">
 					<img
 						src={movieDetail.posterUrl}
@@ -39,12 +39,12 @@ export default function SelectedMovieSidebar({
 					/>
 					<button
 						onClick={handlePlayClick}
-						className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 hover:bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition"
+						className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-800 hover:bg-blue-700 text-white w-10 h-10 flex items-center justify-center rounded-full transition"
 					>
 						<Play size={18} />
 					</button>
 				</div>
-				<div className="flex-1 lg:flex-none w-full bg-black/50 flex flex-col gap-4">
+				<div className="flex-1 lg:flex-none w-full bg-gray-950 flex flex-col gap-4">
 					<div className="hidden lg:flex flex-col gap-2 text-white">
 						<h1 className="text-xl font-bold">
 							{movieDetail.title}

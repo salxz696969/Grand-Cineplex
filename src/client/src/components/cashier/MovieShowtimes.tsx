@@ -10,28 +10,28 @@ type Screening = {
 	price: number;
 	createdAt: string;
 	updatedAt: string;
-    theater:{
-        name:string
-    }
+	theater: {
+		name: string
+	}
 };
 export default function MovieShowTimes({
 	screening, movie
 }: {
 	screening: Screening[]; movie: string
 }) {
-    const movieTheatersSet= new Set(screening.map((s) => s.theater.name));
-    const groupedScreenings = {}
-    for(const theater of movieTheatersSet){
-        groupedScreenings[theater] = screening.filter((s) => s.theater.name === theater);
-    }
+	const movieTheatersSet = new Set(screening.map((s) => s.theater.name));
+	const groupedScreenings: { [key: string]: Screening[] } = {};
+	for (const theater of movieTheatersSet) {
+		groupedScreenings[theater] = screening.filter((s) => s.theater.name === theater);
+	}
 	return (
-		<div className="flex flex-col gap-4 w-full lg:border-l border-gray-700 pl-4 py-4">
-			<div className="flex flex-row justify-start items-center gap-2 mb-4">
-				<MapPin className="w-5 h-5 text-sky-500" />
+		<div className="flex flex-col gap-4 w-full bg-gray-950 lg:border-l border-gray-800 lg:pl-4 py-4">
+			{/* <div className="flex flex-row justify-start items-center gap-2 mb-4">
+				<MapPin className="w-5 h-5 text-blue-800" />
 				<h1 className="text-xl font-bold text-white">
-					Showing in Grand Cineplex CADT
+					Showing in ...
 				</h1>
-			</div>
+			</div> */}
 			{/* {screening.map((showtime) => (
 				<MovieInTheatreCard
 					theaterName={showtime.theater.name}

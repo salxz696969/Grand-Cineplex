@@ -23,22 +23,22 @@ interface MovieInTheatreCardProps {
 export default function MovieInTheatreCard({
   theaterName,
   theaterLocation,
-  movieTitle ,
+  movieTitle,
   movieRating,
   availableSeats,
-  totalSeats ,
-  showtimes ,
+  totalSeats,
+  showtimes,
   selectedTime,
   onTimeSelect
 }: MovieInTheatreCardProps) {
   const occupancyRate = Math.round(((totalSeats - availableSeats) / totalSeats) * 100);
 
   return (
-    <div className="flex flex-col gap-4 border border-gray-700 rounded-lg p-6 text-white w-full bg-gray-900/50 hover:bg-gray-800/50 transition-colors">
+    <div className="flex flex-col gap-4 border border-gray-800 rounded-xl p-6 text-white w-full bg-gray-950 hover:bg-gray-900/50 transition-colors">
       {/* Theater Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 mb-5">
-          <LaptopMinimal className="w-5 h-5 text-sky-500" />
+        <div className="flex items-center gap-2 ">
+          <LaptopMinimal className="w-5 h-5 text-blue-800" />
           <div>
             <h2 className="text-lg font-bold text-white">{theaterName}</h2>
             {/* <p className="text-sm text-gray-400">{theaterLocation}</p> */}
@@ -85,27 +85,23 @@ export default function MovieInTheatreCard({
       {/* Showtimes */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Clock className="w-4 h-4 text-sky-500" />
-          <h4 className="text-sm font-semibold text-gray-300">Showtimes</h4>
+          <Clock className="w-4 h-4 text-blue-800" />
+          <h4 className="text-sm font-semibold text-gray-300">Screenings</h4>
         </div>
-        
-          <div className="flex flex-wrap gap-2">
-            {showtimes.sort((a, b) => a.time.localeCompare(b.time)).map((time, index) => (
-              <Link to={`/cashier/seats/${time.screeningId}`} key={index}>
-                <button
-                  key={index}
-                  onClick={() => onTimeSelect?.(time.time, time.screeningId)}
-                  className={`rounded-md border px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                    selectedTime === time.time
-                      ? "border-sky-500 bg-sky-500/20 text-sky-400"
-                      : "border-gray-600 text-gray-300 hover:border-sky-500 hover:text-sky-400 hover:bg-sky-500/10"
-                  }`}
-                >
-                  {time.time}
-                </button>
-              </Link>
-            ))}
-          </div>
+
+        <div className="flex flex-wrap gap-2">
+          {showtimes.sort((a, b) => a.time.localeCompare(b.time)).map((time, index) => (
+            <Link to={`/cashier/seats/${time.screeningId}`} key={index}>
+              <button
+                key={index}
+                onClick={() => onTimeSelect?.(time.time, time.screeningId)}
+                className={`rounded-md border border-slate-800 px-3 py-2 text-sm font-medium transition-all duration-200 bg-gray-900/50 hover:bg-gray-900 hover:border-blue-800 `}
+              >
+                {time.time.split(":").slice(0, 2).join(":")}
+              </button>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

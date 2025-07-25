@@ -13,6 +13,8 @@ import {
 	User,
 	Calendar,
 	MapPin,
+	Film,
+	Clapperboard,
 } from "lucide-react";
 import sequelize from "./../../../../server/src/db/index";
 import { getMoviesAndItsScreenings, submitBooking } from "../../api/cashier";
@@ -172,10 +174,10 @@ export function Payment() {
 
 	if (isCompleted) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-green-900 via-black to-green-900 text-white p-4 lg:p-8">
+			<div className="min-h-screen bg-gray-950 text-white p-4 lg:p-8 space-y-8">
 				<div className="max-w-4xl mx-auto">
-					<div className="bg-green-600/20 border border-green-500/30 rounded-2xl p-8 text-center">
-						<CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+					<div className="bg-blue-600/20 border border-blue-500/30 rounded-2xl p-8 text-center">
+						<CheckCircle className="w-16 h-16 text-blue-600 mx-auto mb-4" />
 						<h1 className="text-2xl font-bold mb-2">
 							Payment Complete!
 						</h1>
@@ -207,8 +209,7 @@ export function Payment() {
 											Date & Time:
 										</span>
 										<span>
-											{bookingSummary.date} at{" "}
-											{bookingSummary.time}
+											{bookingSummary.date} at {bookingSummary.time}
 										</span>
 									</div>
 									<div className="flex justify-between">
@@ -248,7 +249,7 @@ export function Payment() {
 										<span className="text-gray-400">
 											Total Paid:
 										</span>
-										<span className="text-green-400 font-bold">
+										<span className="text-blue-600 font-bold">
 											${bookingSummary.totalAmount}
 										</span>
 									</div>
@@ -256,26 +257,107 @@ export function Payment() {
 							</div>
 						</div>
 
+						{/* Printable Tickets */}
+						<div className="mb-8 print:block hidden">
+							{bookingSummary.seats.map((seat, index) => (
+								<div key={index} className="bg-white text-black p-6 rounded-lg mb-4 border-2 border-gray-800 print:break-inside-avoid">
+									<div className="flex justify-between items-center border-b border-dashed border-gray-300 pb-4 mb-4">
+										<div className="text-2xl font-bold">CINEPLEX</div>
+										<div className="text-xl font-mono">{seat}</div>
+									</div>
+
+									<div className="grid grid-cols-2 gap-4">
+										<div>
+											<div className="text-sm text-gray-600">MOVIE</div>
+											<div className="font-semibold">{bookingSummary.movieTitle}</div>
+										</div>
+										<div>
+											<div className="text-sm text-gray-600">THEATER</div>
+											<div className="font-semibold">{bookingSummary.theater}</div>
+										</div>
+										<div>
+											<div className="text-sm text-gray-600">DATE</div>
+											<div className="font-semibold">{bookingSummary.date}</div>
+										</div>
+										<div>
+											<div className="text-sm text-gray-600">TIME</div>
+											<div className="font-semibold">{bookingSummary.time}</div>
+										</div>
+									</div>
+
+									<div className="mt-4 pt-4 border-t border-dashed border-gray-300 text-center text-sm text-gray-500">
+										Ticket #{index + 1} of {bookingSummary.seats.length}
+									</div>
+								</div>
+							))}
+						</div>
+
 						<div className="flex gap-4 justify-center">
 							<Link to={"/cashier"}>
-								<button className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+								<button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
 									Print Tickets
 								</button>
 							</Link>
 							<Link to={"/cashier"}>
 								<button className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-									New Booking
+									Done
 								</button>
 							</Link>
 						</div>
 					</div>
 				</div>
+				<div className="w-full flex items-center justify-between max-w-4xl gap-6 bg-gray-900 text-white p-8 border-2 border-blue-800/30 rounded-xl shadow-2xl print:break-inside-avoid mb-6 mx-auto">
+					<div className="text-center w-1/2 bg-blue-800/20 rounded-xl p-4 h-[300px] flex flex-col items-center justify-center">
+						<Clapperboard className="w-16 h-16 text-blue-600 mb-2" />
+						<div className="text-sm font-medium text-blue-500">GRAND CINEPLEX</div>
+					</div>
+					<div className="flex flex-col gap-6 w-1/2 h-full">
+						<div className="flex flex-col items-center border-b border-dashed border-gray-700 pb-4">
+							<div className="text-3xl font-bold tracking-wider text-blue-600 rounded-lg p-2">
+								GRAND CINEPLEX
+							</div>
+						</div>
+
+						<div className="grid grid-cols-2 gap-x-12 gap-y-6 text-sm">
+							<div>
+								<div className="text-gray-400 uppercase text-xs font-medium mb-1">Movie</div>
+								<div className="font-semibold">{bookingSummary.movieTitle || "Inception"}</div>
+							</div>
+							<div>
+								<div className="text-gray-400 uppercase text-xs font-medium mb-1">Theater</div>
+								<div className="font-semibold">{bookingSummary.theater || "Hall 2"}</div>
+							</div>
+							<div>
+								<div className="text-gray-400 uppercase text-xs font-medium mb-1">Date</div>
+								<div className="font-semibold">{bookingSummary.date || "06/10/2024"}</div>
+							</div>
+							<div>
+								<div className="text-gray-400 uppercase text-xs font-medium mb-1">Time</div>
+								<div className="font-semibold">{bookingSummary.time || "11:30"}</div>
+							</div>
+							<div className="col-span-2">
+								<div className="text-gray-400 uppercase text-xs font-medium mb-1">Seat</div>
+								<div className="font-semibold">{bookingSummary.seats?.join(", ") || "D8, D9"}</div>
+							</div>
+						</div>
+
+						<div className="mt-4 pt-6 border-t border-dashed border-gray-700 text-center">
+							<div className="text-3xl font-mono tracking-wider text-blue-500 mb-2">
+								{bookingSummary.seats?.join(", ") || "D8, D9"}
+							</div>
+							<div className="text-xs text-gray-400">
+								Ticket #{bookingSummary.seats?.length || 2} of {bookingSummary.seats?.length || 2}
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
+
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-4 lg:p-8">
+		<div className="min-h-screen bg-gray-950 text-white p-4 lg:p-8">
 			{/* Header */}
 			<div className="max-w-7xl mx-auto mb-8">
 				<div className="flex items-center justify-between mb-6">
@@ -283,20 +365,7 @@ export function Payment() {
 						<ArrowLeft className="w-5 h-5" />
 						Back to Seat Selection
 					</button>
-					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-2 text-gray-300">
-							<Clock className="w-4 h-4" />
-							<span>1h 45m remaining</span>
-						</div>
-					</div>
 				</div>
-
-				<h1 className="text-3xl lg:text-4xl font-bold text-center mb-2">
-					Complete Booking
-				</h1>
-				<p className="text-gray-400 text-center">
-					Process payment and confirm booking
-				</p>
 			</div>
 
 			<div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
@@ -308,27 +377,27 @@ export function Payment() {
 					</h2>
 
 					{/* Main Booking Card */}
-					<div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-						<div className="flex items-start gap-4 mb-6">
-							<div className="p-3 bg-sky-600/20 rounded-lg">
-								<Monitor className="w-8 h-8 text-sky-400" />
+					<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
+						<div className="flex items-center gap-4 mb-6">
+							<div className="p-3 bg-blue-600/20 rounded-lg">
+								<Film className="w-8 h-8 text-blue-600" />
 							</div>
 							<div className="flex-1">
 								<h3 className="text-2xl font-bold mb-2">
-									{bookingSummary.movieTitle}
+									{bookingSummary.movieTitle || "Unknown Movie"}
 								</h3>
 								<div className="flex items-center gap-4 text-gray-400">
 									<div className="flex items-center gap-1">
 										<MapPin className="w-4 h-4" />
-										<span>{bookingSummary.theater}</span>
+										<span>{bookingSummary.theater || "Unknown Theater"}</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<Calendar className="w-4 h-4" />
-										<span>{bookingSummary.date}</span>
+										<span>{bookingSummary.date || "Unknown Date"}</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<Clock className="w-4 h-4" />
-										<span>{bookingSummary.time}</span>
+										<span>{bookingSummary.time || "Unknown Time"}</span>
 									</div>
 								</div>
 							</div>
@@ -336,7 +405,7 @@ export function Payment() {
 
 						{/* Customer Info */}
 						<div className="grid md:grid-cols-2 gap-6 mb-6">
-							<div className="bg-gray-700/50 rounded-lg p-4">
+							<div className="bg-gray-900/50 rounded-lg p-4">
 								<h4 className="font-semibold mb-3 flex items-center gap-2">
 									<User className="w-4 h-4" />
 									Customer Information
@@ -361,7 +430,7 @@ export function Payment() {
 								</div>
 							</div>
 
-							<div className="bg-gray-700/50 rounded-lg p-4">
+							<div className="bg-gray-900/50 rounded-lg p-4">
 								<h4 className="font-semibold mb-3 flex items-center gap-2">
 									<Sofa className="w-4 h-4" />
 									Seat Details
@@ -380,8 +449,7 @@ export function Payment() {
 											Quantity:
 										</span>
 										<span>
-											{bookingSummary.seats.length}{" "}
-											tickets
+											{bookingSummary.seats.length} tickets
 										</span>
 									</div>
 								</div>
@@ -390,7 +458,7 @@ export function Payment() {
 					</div>
 
 					{/* Price Breakdown */}
-					<div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+					<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 						<h3 className="text-xl font-semibold mb-4">
 							Price Breakdown
 						</h3>
@@ -401,8 +469,8 @@ export function Payment() {
 									className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0"
 								>
 									<div className="flex items-center gap-3">
-										<div className="w-8 h-8 bg-sky-600/20 rounded-lg flex items-center justify-center">
-											<Sofa className="w-4 h-4 text-sky-400" />
+										<div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center">
+											<Sofa className="w-4 h-4 text-blue-600" />
 										</div>
 										<span>Seat {seat}</span>
 									</div>
@@ -416,7 +484,7 @@ export function Payment() {
 									<span className="text-lg font-semibold">
 										Total Amount:
 									</span>
-									<span className="text-2xl font-bold text-green-400">
+									<span className="text-2xl font-bold text-blue-600">
 										${bookingSummary.totalAmount}
 									</span>
 								</div>
@@ -430,7 +498,7 @@ export function Payment() {
 					<h2 className="text-xl font-bold mb-6">Payment</h2>
 
 					{/* Payment Methods */}
-					<div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+					<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 						<h3 className="text-lg font-semibold mb-4">
 							Payment Method
 						</h3>
@@ -438,23 +506,21 @@ export function Payment() {
 							{paymentMethods.map((method) => (
 								<button
 									key={method.id}
-									className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-										selectedPaymentMethod === method.id
-											? "border-sky-500 bg-sky-500/10"
-											: "border-gray-600 bg-gray-700/50 hover:border-gray-500"
-									}`}
+									className={`p-4 rounded-lg border-2 transition-all duration-200 ${selectedPaymentMethod === method.id
+										? "border-blue-800 bg-blue-500/10"
+										: "border-slate-800 bg-gray-900/50 hover:border-gray-500"
+										}`}
 									onClick={() =>
 										setSelectedPaymentMethod(method.id)
 									}
 								>
 									<div className="text-center">
 										<div
-											className={`p-2 rounded-lg mx-auto mb-2 w-fit ${
-												selectedPaymentMethod ===
+											className={`p-2 rounded-lg mx-auto mb-2 w-fit ${selectedPaymentMethod ===
 												method.id
-													? "bg-sky-500 text-white"
-													: "bg-gray-600 text-gray-300"
-											}`}
+												? "bg-blue-800 text-white"
+												: "bg-gray-950 text-gray-300"
+												}`}
 										>
 											{method.icon}
 										</div>
@@ -469,7 +535,7 @@ export function Payment() {
 
 					{/* Payment Form (for card payment) */}
 					{selectedPaymentMethod === "card" && (
-						<div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 							<h3 className="text-lg font-semibold mb-4">
 								Card Details
 							</h3>
@@ -477,18 +543,18 @@ export function Payment() {
 								<input
 									type="text"
 									placeholder="Card Number"
-									className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-sky-500 focus:outline-none text-sm"
+									className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-blue-600 focus:outline-none text-sm"
 								/>
 								<div className="grid grid-cols-2 gap-3">
 									<input
 										type="text"
 										placeholder="MM/YY"
-										className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-sky-500 focus:outline-none text-sm"
+										className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-blue-600 focus:outline-none text-sm"
 									/>
 									<input
 										type="text"
 										placeholder="CVV"
-										className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-sky-500 focus:outline-none text-sm"
+										className="w-full bg-gray-900/50 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-blue-600 focus:outline-none text-sm"
 									/>
 								</div>
 							</div>
@@ -497,7 +563,7 @@ export function Payment() {
 
 					{/* Quick Payment Form */}
 					{selectedPaymentMethod === "qr" && (
-						<div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 							<h3 className="text-lg font-semibold mb-4">
 								QR Payment
 							</h3>
@@ -513,26 +579,26 @@ export function Payment() {
 
 					{/* Digital Payment Form */}
 					{selectedPaymentMethod === "digital" && (
-						<div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 							<h3 className="text-lg font-semibold mb-4">
 								Digital Payment
 							</h3>
 							<div className="space-y-3">
 								<div className="flex flex-col gap-2 ">
 									<div className="flex gap-4 border border-gray-700 rounded-lg p-4 items-center">
-										<div className="bg-sky-800 rounded-lg p-1">
+										<div className="bg-blue-800 rounded-lg p-1">
 											<CreditCard className="w-10 h-10" />
 										</div>
 										<p>Apple Pay</p>
 									</div>
 									<div className="flex  gap-4 border border-gray-700 rounded-lg p-4 items-center">
-										<div className="bg-sky-800 rounded-lg p-1">
+										<div className="bg-blue-800 rounded-lg p-1">
 											<CreditCard className="w-10 h-10" />
 										</div>
 										<p>Google Pay</p>
 									</div>
 									<div className="flex  gap-4 border border-gray-700 rounded-lg p-4 items-center">
-										<div className="bg-sky-800 rounded-lg p-1">
+										<div className="bg-blue-800 rounded-lg p-1">
 											<CreditCard className="w-10 h-10" />
 										</div>
 										<p>PayPal</p>
@@ -546,11 +612,10 @@ export function Payment() {
 					<button
 						onClick={handlePayment}
 						disabled={!selectedPaymentMethod || isProcessing}
-						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-							selectedPaymentMethod && !isProcessing
-								? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white transform hover:scale-105"
-								: "bg-gray-700 text-gray-400 cursor-not-allowed"
-						}`}
+						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${selectedPaymentMethod && !isProcessing
+							? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white transform hover:scale-105"
+							: "bg-gray-700 text-gray-400 cursor-not-allowed"
+							}`}
 					>
 						{isProcessing ? (
 							<div className="flex items-center justify-center gap-2">

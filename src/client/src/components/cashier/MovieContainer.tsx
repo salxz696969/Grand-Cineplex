@@ -24,8 +24,17 @@ interface MovieContainerProps {
   movies: Movie[];
 }
 
+// Skeleton component for loading state
+const SkeletonCard = () => (
+  <div className="flex flex-col gap-3 p-4 bg-gray-950/50 rounded-lg animate-pulse shadow">
+    <div className="h-48 w-full bg-gray-900/50 rounded mb-2" />
+    <div className="h-6 w-3/4 bg-gray-900/50 rounded" />
+    <div className="h-4 w-1/2 bg-gray-900/50 rounded" />
+    <div className="h-4 w-1/3 bg-gray-900/50 rounded" />
+  </div>
+);
+
 export default function MovieContainer({ searchTerm, activeTab, movies }: MovieContainerProps) {
-  // const [allMovies, setAllMovies] = useState<Movie[]>([movies[0], movies[1], movies[2]]); // Initialize with some default movies
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
@@ -146,18 +155,49 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
       noResultTimeout.current = setTimeout(() => {
         setIsSearching(false);
         setShowNoResults(true);
-      }, 3000);
+      }, 1200);
     }
   }, [searchTerm, movies]);
 
-  if (isLoading) return <p className="text-white">Loading movies...</p>;
-  if (isError) return <p className="text-red-500">Error: {isError}</p>;
-  if (isSearching) return <p className="text-white">Searching movies...</p>;
+  // Subtle skeleton while loading
+  if (isLoading) {
+    return (
+      <div className="grid w-full gap-5 custom-cols mt-4 px-4">
+        {[...Array(6)].map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  // Better error UI
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="text-3xl text-red-500 mb-2">⚠️</div>
+        <p className="text-red-400 font-semibold text-lg mb-1">Something went wrong</p>
+        <p className="text-slate-400">{isError}</p>
+      </div>
+    );
+  }
+
+  // Better searching UI
+  if (isSearching) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 animate-pulse">
+        <div className="h-8 w-8 rounded-full bg-sky-700 mb-4 animate-bounce" />
+        <p className="text-sky-400 font-semibold text-lg">Searching movies...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid w-full gap-5 custom-cols mt-4 px-4">
       {showNoResults ? (
-        <p className="text-white">No movies found.</p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="text-3xl text-slate-500 mb-2">😕</div>
+          <p className="text-slate-400 font-semibold text-lg">No movies found.</p>
+        </div>
       ) : (
         movieList.map((movie) => (
           <MovieCard
@@ -172,4 +212,4 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
       )}
     </div>
   );
-};
+}
