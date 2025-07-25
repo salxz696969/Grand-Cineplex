@@ -91,15 +91,15 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 		setIsSubmitting(true);
 
 		// TODO: Implement API call to add screening
-        try {
-            await addScreening(formData);
-            // console.log("Screening added:", formData);
-        } catch (error) {
-            console.error("Error adding screening:", error);
-        }finally{
-            setIsSubmitting(false);
-            onBack();
-        }
+		try {
+			await addScreening(formData);
+			// console.log("Screening added:", formData);
+		} catch (error) {
+			console.error("Error adding screening:", error);
+		} finally {
+			setIsSubmitting(false);
+			onBack();
+		}
 	};
 
 	const selectedMovie = movies.find((m) => m.id === formData.movieId);
@@ -130,9 +130,9 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 	];
 
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="flex flex-col gap-6 w-full">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col">
 				<div className="flex items-center gap-4">
 					<button
 						onClick={onBack}
@@ -142,12 +142,12 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 						Back to Screenings
 					</button>
 				</div>
-				<div className="flex flex-col items-end">
-					<h2 className="text-2xl font-bold tracking-tight text-white">
-						Add New Screening
-					</h2>
-					<p className="text-slate-400">Schedule a movie showing</p>
-				</div>
+			</div>
+			<div className="flex flex-col ">
+				<h2 className="text-2xl font-bold tracking-tight text-white">
+					Add New Screening
+				</h2>
+				<p className="text-slate-400">Schedule a movie showing</p>
 			</div>
 
 			{/* Form */}
@@ -156,7 +156,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 					{/* Left Column */}
 					<div className="space-y-6">
 						{/* Movie Selection */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Film className="w-5 h-5" />
 								Select Movie
@@ -176,7 +176,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">Select a movie</option>
 										{movies.map((movie) => (
@@ -184,7 +184,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												key={movie.id}
 												value={movie.id}
 											>
-												{movie.title} ({movie.duration+" min"})
+												{movie.title} ({movie.duration + " min"})
 											</option>
 										))}
 									</select>
@@ -192,7 +192,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 
 								{/* Selected Movie Preview */}
 								{selectedMovie && (
-									<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 										<div className="flex items-center gap-3">
 											<div className="w-16 h-24 bg-slate-700 rounded overflow-hidden">
 												<img
@@ -212,8 +212,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 													{selectedMovie.title}
 												</h4>
 												<p className="text-slate-400 text-sm">
-													Duration:{" "}
-													{selectedMovie.duration}
+													Duration: {selectedMovie.duration}
 												</p>
 											</div>
 										</div>
@@ -223,7 +222,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 						</div>
 
 						{/* Theater Selection */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<MapPin className="w-5 h-5" />
 								Select Theater
@@ -243,7 +242,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">
 											Select a theater
@@ -253,9 +252,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												key={theater.id}
 												value={theater.id}
 											>
-												{theater.name} -{" "}
-												{theater.location} (
-												{theater.capacity} seats)
+												{theater.name} - {theater.location} ({theater.capacity} seats)
 											</option>
 										))}
 									</select>
@@ -263,7 +260,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 
 								{/* Selected Theater Info */}
 								{selectedTheater && (
-									<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 										<h4 className="text-white font-semibold">
 											{selectedTheater.name}
 										</h4>
@@ -271,8 +268,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 											{selectedTheater.location}
 										</p>
 										<p className="text-slate-400 text-sm">
-											Capacity: {selectedTheater.capacity}{" "}
-											seats
+											Capacity: {selectedTheater.capacity} seats
 										</p>
 									</div>
 								)}
@@ -283,7 +279,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 					{/* Right Column */}
 					<div className="space-y-6">
 						{/* Date & Time */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Calendar className="w-5 h-5" />
 								Date & Time
@@ -309,7 +305,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												.toISOString()
 												.split("T")[0]
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									/>
 								</div>
 
@@ -326,7 +322,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">Select time</option>
 										{timeSlots.map((time) => (
@@ -339,7 +335,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 
 								{/* Screening Preview */}
 								{formData.screeningDate && formData.screeningTime && (
-									<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 										<div className="flex items-center gap-2 text-slate-300">
 											<Calendar className="w-4 h-4" />
 											<span>
@@ -358,7 +354,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 						</div>
 
 						{/* Pricing & Type */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<DollarSign className="w-5 h-5" />
 								Pricing & Type
@@ -378,7 +374,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										{screeningTypes.map((type) => (
 											<option
@@ -406,14 +402,14 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Leave empty to use default price"
 									/>
 								</div>
 
 								{/* Price Preview */}
 								{formData.type && (
-									<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 										<div className="flex items-center justify-between">
 											<span className="text-slate-300">
 												Ticket Price:
@@ -440,7 +436,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 					<button
 						type="button"
 						onClick={onBack}
-						className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-900/50 text-white font-semibold rounded-lg transition"
 					>
 						Cancel
 					</button>

@@ -209,14 +209,17 @@ export default function Staff() {
     const [selectedStatus, setSelectedStatus] = useState<string>("all");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
     const [addingStaff, setAddingStaff] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        const getStaff=async()=>{
+    useEffect(() => {
+        const getStaff = async () => {
             try {
                 const response = await getAllStaff()
                 setStaff(response)
             } catch (error) {
                 console.error("error getting staff: ", error)
+            } finally {
+                setLoading(false);
             }
         }
         getStaff()
@@ -290,42 +293,98 @@ export default function Staff() {
         );
     }
 
+    if (loading) {
+        // Subtle skeleton loader
+        return (
+            <div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
+                <div className="flex flex-row items-center justify-between">
+                    <div className="flex flex-col gap-2">
+                        <div className="h-8 w-64 bg-gray-900 rounded mb-1 animate-pulse" />
+                        <div className="h-4 w-80 bg-gray-900 rounded animate-pulse" />
+                    </div>
+                    <div className="h-10 w-40 bg-gray-900 rounded animate-pulse" />
+                </div>
+                <div className="flex w-full justify-between items-center mt-4">
+                    <div className="h-6 w-48 bg-gray-900 rounded animate-pulse" />
+                    <div className="h-10 w-80 bg-gray-900 rounded-full animate-pulse" />
+                </div>
+                {/* Mobile skeleton cards */}
+                <div className="grid gap-4 sm:hidden mt-4">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="bg-gray-900 border border-gray-800 rounded-lg p-4 animate-pulse">
+                            <div className="h-6 w-32 bg-gray-800 rounded mb-2" />
+                            <div className="h-4 w-24 bg-gray-800 rounded mb-1" />
+                            <div className="h-4 w-40 bg-gray-800 rounded mb-1" />
+                            <div className="h-4 w-20 bg-gray-800 rounded" />
+                        </div>
+                    ))}
+                </div>
+                {/* Desktop skeleton table */}
+                <div className="hidden lg:block rounded-xl border bg-gray-900 border-gray-800 shadow-lg overflow-hidden mt-4">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-gray-300">
+                            <thead className="text-xs text-gray-400 uppercase bg-gray-900">
+                                <tr>
+                                    {[...Array(7)].map((_, i) => (
+                                        <th key={i} className="px-6 py-4"><div className="h-4 w-20 bg-gray-800 rounded animate-pulse" /></th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[...Array(4)].map((_, i) => (
+                                    <tr key={i} className="border-b border-gray-800">
+                                        {[...Array(7)].map((_, j) => (
+                                            <td key={j} className="px-6 py-4"><div className="h-4 w-24 bg-gray-800 rounded animate-pulse" /></td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col gap-6 p-4 w-full">
+        <div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
             {/* Header */}
             <div className="flex flex-row items-center justify-between">
                 <div className="flex flex-col">
                     <h2 className="text-2xl font-bold tracking-tight text-white">Staff Management</h2>
-                    <p className="text-slate-400">Manage your cinema staff members and roles.</p>
+                    <p className="text-gray-400">Manage your cinema staff members and roles.</p>
                 </div>
                 <button
                     onClick={handleAddStaff}
-                    className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform hover:scale-105"
+                    className="bg-blue-800 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
                 >
-                    <PlusCircle className="w-4 h-4" />
+                    <PlusCircle className="w-4 h-4 text-blue-200" />
                     Add Staff Member
                 </button>
             </div>
 
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex   sm:items-center  w-full justify-between items-center">
+                <div className="text-sm text-gray-400">
+                    {filteredStaff.length} staff member{filteredStaff.length !== 1 ? 's' : ''} found
+                </div>
                 <div className="relative flex-1 sm:flex-none sm:w-80">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                         type="text"
                         placeholder="Search staff by name, email, or phone..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full rounded-full border border-slate-700 bg-slate-800 px-10 py-2 text-white"
+                        className="w-full rounded-full border border-gray-800 bg-gray-900 px-10 py-2 text-white"
                     />
                 </div>
-
+                {/*
                 <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-slate-400" />
+                    <Filter className="w-4 h-4 text-gray-400" />
                     <select
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
-                        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
+                        className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
                     >
                         <option value="all">All Roles</option>
                         <option value="manager">Manager</option>
@@ -334,22 +393,20 @@ export default function Staff() {
                         <option value="cleaner">Cleaner</option>
                         <option value="technician">Technician</option>
                     </select>
-
                     <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
+                        className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
                     >
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                         <option value="on-leave">On Leave</option>
                     </select>
-
                     <select
                         value={selectedDepartment}
                         onChange={(e) => setSelectedDepartment(e.target.value)}
-                        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
+                        className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
                     >
                         <option value="all">All Departments</option>
                         {departments.map(dept => (
@@ -357,12 +414,11 @@ export default function Staff() {
                         ))}
                     </select>
                 </div>
+                */}
             </div>
 
             {/* Results count */}
-            <div className="text-sm text-slate-400">
-                {filteredStaff.length} staff member{filteredStaff.length !== 1 ? 's' : ''} found
-            </div>
+
 
             {/* Mobile Cards View (sm and below) */}
             <div className="grid gap-4 sm:hidden">
@@ -372,18 +428,18 @@ export default function Staff() {
                     ))
                 ) : (
                     <div className="text-center py-8">
-                        <User className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                        <p className="text-slate-400 text-lg mb-2">No staff members found</p>
-                        <p className="text-slate-500">Try adjusting your search or filters</p>
+                        <User className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                        <p className="text-gray-400 text-lg mb-2">No staff members found</p>
+                        <p className="text-gray-500">Try adjusting your search or filters</p>
                     </div>
                 )}
             </div>
 
             {/* Desktop Table View (lg and above) */}
-            <div className="hidden lg:block rounded-xl border bg-slate-900/50 border-slate-800 shadow-lg overflow-hidden">
+            <div className="hidden lg:block rounded-xl border bg-gray-900 border-gray-800 shadow-lg overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-slate-300">
-                        <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
+                    <table className="w-full text-sm text-left text-gray-300">
+                        <thead className="text-xs text-gray-400 uppercase bg-gray-900">
                             <tr>
                                 <th scope="col" className="px-6 py-4">Staff Member</th>
                                 <th scope="col" className="px-6 py-4">Contact</th>
@@ -396,15 +452,15 @@ export default function Staff() {
                         </thead>
                         <tbody>
                             {filteredStaff.map((member) => (
-                                <tr key={member.id} className="border-b border-slate-800 hover:bg-slate-800/40">
+                                <tr key={member.id} className="border-b border-gray-800 hover:bg-gray-900/40">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
-                                                <User className="w-5 h-5 text-slate-400" />
+                                            <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center">
+                                                <User className="w-5 h-5 text-gray-400" />
                                             </div>
                                             <div>
                                                 <div className="font-medium text-white">{member.name}</div>
-                                                <div className="text-slate-400 text-xs">ID: {member.id}</div>
+                                                <div className="text-gray-400 text-xs">ID: {member.id}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -426,10 +482,10 @@ export default function Staff() {
                                             {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-slate-300">
+                                    <td className="px-6 py-4 text-gray-300">
                                         {member.department}
                                     </td>
-                                    <td className="px-6 py-4 text-slate-300">
+                                    <td className="px-6 py-4 text-gray-300">
                                         {new Date(member.hireDate).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4">
@@ -439,14 +495,14 @@ export default function Staff() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <button className="p-1 rounded hover:bg-slate-700 transition-colors">
+                                            <button className="p-1 rounded hover:bg-gray-800 transition-colors">
                                                 <Edit className="w-4 h-4 text-blue-400" />
                                             </button>
-                                            <button className="p-1 rounded hover:bg-slate-700 transition-colors">
+                                            <button className="p-1 rounded hover:bg-gray-800 transition-colors">
                                                 <Trash2 className="w-4 h-4 text-red-400" />
                                             </button>
-                                            <button className="p-1 rounded hover:bg-slate-700 transition-colors">
-                                                <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                                            <button className="p-1 rounded hover:bg-gray-800 transition-colors">
+                                                <MoreHorizontal className="w-4 h-4 text-gray-400" />
                                             </button>
                                         </div>
                                     </td>
@@ -460,9 +516,9 @@ export default function Staff() {
             {/* Empty State for Desktop */}
             {filteredStaff.length === 0 && (
                 <div className="hidden lg:block text-center py-12">
-                    <User className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                    <p className="text-slate-400 text-lg mb-2">No staff members found</p>
-                    <p className="text-slate-500">Try adjusting your search or filters</p>
+                    <User className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400 text-lg mb-2">No staff members found</p>
+                    <p className="text-gray-500">Try adjusting your search or filters</p>
                 </div>
             )}
         </div>

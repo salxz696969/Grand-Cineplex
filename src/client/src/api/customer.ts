@@ -6,10 +6,10 @@ import {
   Theater,
 } from "../../../shared/types/type";
 
-const movieBaseUrl = "http://localhost:3000/customer/movies";
-const seatBaseUrl = "http://localhost:3000/customer/seats";
-const bookingUrl = "http://localhost:3000/customer/bookings";
-const theaterBaseUrl = "http://localhost:3000/customer/theaters";
+const movieBaseUrl = "http://localhost:6900/customer/movies";
+const seatBaseUrl = "http://localhost:6900/customer/seats";
+const bookingUrl = "http://localhost:6900/customer/bookings";
+const theaterBaseUrl = "http://localhost:6900/customer/theaters";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -41,7 +41,10 @@ export async function fetchNowShowingMovies(date?: string): Promise<Movie[]> {
   }
 }
 
-export async function fetchUpcomingMovies(month?: number, year?: number): Promise<Movie[]> {
+export async function fetchUpcomingMovies(
+  month?: number,
+  year?: number
+): Promise<Movie[]> {
   try {
     let url = `${movieBaseUrl}/upcoming`;
     if (month && year) url += `?month=${month}&year=${year}`;
@@ -53,7 +56,10 @@ export async function fetchUpcomingMovies(month?: number, year?: number): Promis
   }
 }
 
-export async function fetchMovieById(id: number, day = 0): Promise<MovieWithScreenings> {
+export async function fetchMovieById(
+  id: number,
+  day = 0
+): Promise<MovieWithScreenings> {
   try {
     const url = `${movieBaseUrl}/screenings?id=${id}&day=${day}`;
     const response = await fetch(url);
@@ -64,7 +70,9 @@ export async function fetchMovieById(id: number, day = 0): Promise<MovieWithScre
   }
 }
 
-export async function fetchSeatsByScreening(screeningId: number): Promise<ScreeningSeatData> {
+export async function fetchSeatsByScreening(
+  screeningId: number
+): Promise<ScreeningSeatData> {
   try {
     const response = await fetch(`${seatBaseUrl}/screening/${screeningId}`);
     return handleResponse<ScreeningSeatData>(response);
@@ -104,7 +112,7 @@ export async function bookSeats(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         screening_id: screeningId,
@@ -120,15 +128,18 @@ export async function bookSeats(
   }
 }
 
-export async function fetchBookingDetails(bookingId: number): Promise<BookingSummary> {
+export async function fetchBookingDetails(
+  bookingId: number
+): Promise<BookingSummary> {
   try {
     const token = localStorage.getItem("token");
-    if (!token) throw new Error("You must be logged in to view booking details.");
+    if (!token)
+      throw new Error("You must be logged in to view booking details.");
 
     const response = await fetch(`${bookingUrl}/${bookingId}`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -149,7 +160,11 @@ export async function fetchTheaters(): Promise<Theater[]> {
   }
 }
 
-export async function fetchUserInfo(): Promise<{ id: number; name: string; phone?: string }> {
+export async function fetchUserInfo(): Promise<{
+  id: number;
+  name: string;
+  phone?: string;
+}> {
   const token = localStorage.getItem("token");
   console.log("[Frontend] Token from localStorage:", token);
 

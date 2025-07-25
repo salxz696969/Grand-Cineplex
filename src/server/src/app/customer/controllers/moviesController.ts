@@ -29,7 +29,6 @@ export const getMovieBasedOnId = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getNowShowingMovies = async (req: Request, res: Response) => {
   try {
     const today = new Date();
@@ -51,9 +50,6 @@ export const getNowShowingMovies = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
-
-
-
 
 export const getMoviesFor7Days = async (req: Request, res: Response) => {
   try {
@@ -135,7 +131,6 @@ export const getComingSoonMovies = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getMoviesAndItsScreenings = async (
   req: Request,
   res: Response
@@ -157,11 +152,21 @@ export const getMoviesAndItsScreenings = async (
     let dayOffset = 0;
     if (dayParam !== undefined) {
       if (!/^\d+$/.test(dayParam)) {
-        return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Invalid day parameter. It must be an integer between 0 and 6.",
+          });
       }
       dayOffset = parseInt(dayParam, 10);
       if (isNaN(dayOffset) || dayOffset < 0 || dayOffset > 6) {
-        return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Invalid day parameter. It must be an integer between 0 and 6.",
+          });
       }
     }
 

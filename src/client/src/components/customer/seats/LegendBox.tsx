@@ -7,7 +7,7 @@ interface LegendBoxProps {
   opacity?: boolean;
 }
 
-export function LegendBox({ colorFrom, colorTo, label, opacity = false }: LegendBoxProps) {
+export default function LegendBox({ colorFrom, colorTo, label, opacity = false }: LegendBoxProps) {
   return (
     <div className="flex items-center gap-2">
       <div

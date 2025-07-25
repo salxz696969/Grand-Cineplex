@@ -105,6 +105,8 @@ export default function Bookings() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 	const [selectedMethod, setSelectedMethod] = useState<string>("all");
+	const [loading, setLoading] = useState(true);
+
 	useEffect(() => {
 		const fetchBookings = async () => {
 			try {
@@ -113,6 +115,8 @@ export default function Bookings() {
 				console.log("Bookings fetched successfully:", response);
 			} catch (error) {
 				console.error("Error fetching bookings:", error);
+			} finally {
+				setLoading(false);
 			}
 		};
 		fetchBookings();
@@ -145,15 +149,48 @@ export default function Bookings() {
 		return matchesTab && matchesSearch && matchesStatus && matchesMethod;
 	});
 
+	if (loading) {
+		// Subtle skeleton loader
+		return (
+			<div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
+				<div className="flex flex-row items-center justify-between">
+					<div className="flex flex-col gap-2">
+						<div className="h-8 w-64 bg-gray-900 rounded mb-1 animate-pulse" />
+						<div className="h-4 w-80 bg-gray-900 rounded animate-pulse" />
+					</div>
+					<div className="h-10 w-40 bg-gray-900 rounded animate-pulse" />
+				</div>
+				<div className="flex flex-row items-center gap-4 mt-4">
+					<div className="h-8 w-32 bg-gray-900 rounded animate-pulse" />
+					<div className="h-8 w-32 bg-gray-900 rounded animate-pulse" />
+				</div>
+				<div className="flex w-full justify-between items-center mt-4">
+					<div className="h-6 w-48 bg-gray-900 rounded animate-pulse" />
+					<div className="h-10 w-80 bg-gray-900 rounded-full animate-pulse" />
+				</div>
+				<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-4">
+					{[...Array(6)].map((_, i) => (
+						<div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg animate-pulse">
+							<div className="h-6 w-32 bg-gray-800 rounded mb-2" />
+							<div className="h-4 w-24 bg-gray-800 rounded mb-1" />
+							<div className="h-4 w-40 bg-gray-800 rounded mb-1" />
+							<div className="h-4 w-20 bg-gray-800 rounded" />
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
 			{/* Header */}
 			<div className="flex flex-row items-center justify-between">
 				<div className="flex flex-col">
 					<h2 className="text-2xl font-bold tracking-tight text-white">
 						Bookings
 					</h2>
-					<p className="text-slate-400">
+					<p className="text-gray-400">
 						Manage customer bookings and tickets.
 					</p>
 				</div>
@@ -164,21 +201,19 @@ export default function Bookings() {
 				{/* Tabs */}
 				<div className="flex flex-row items-center gap-4">
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${
-							activeTab === "today"
-								? "border-sky-600 font-bold"
-								: "border-transparent"
-						}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "today"
+							? "border-blue-600 font-bold"
+							: "border-transparent"
+							}`}
 						onClick={() => setActiveTab("today")}
 					>
 						Today's Bookings
 					</button>
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${
-							activeTab === "all"
-								? "border-sky-600 font-bold"
-								: "border-transparent"
-						}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "all"
+							? "border-blue-600 font-bold"
+							: "border-transparent"
+							}`}
 						onClick={() => setActiveTab("all")}
 					>
 						All Bookings
@@ -188,45 +223,45 @@ export default function Bookings() {
 				{/* Search and Filters */}
 				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
 					<div className="relative flex-1 sm:flex-none sm:w-64">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
 						<input
 							type="text"
 							placeholder="Search bookings..."
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							className="w-full rounded-full border border-slate-700 bg-slate-800 px-10 py-2 text-white"
+							className="w-full rounded-full border border-gray-800 bg-gray-900 px-10 py-2 text-white"
 						/>
 					</div>
-
-					<div className="flex items-center gap-2">
-						<Filter className="w-4 h-4 text-slate-400" />
-						<select
-							value={selectedStatus}
-							onChange={(e) => setSelectedStatus(e.target.value)}
-							className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
-						>
-							<option value="all">All Status</option>
-							<option value="confirmed">Confirmed</option>
-							<option value="pending">Pending</option>
-							<option value="cancelled">Cancelled</option>
-							<option value="completed">Completed</option>
-						</select>
-
-						<select
-							value={selectedMethod}
-							onChange={(e) => setSelectedMethod(e.target.value)}
-							className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
-						>
-							<option value="all">All Methods</option>
-							<option value="walk-in">Walk-in</option>
-							<option value="online">Online</option>
-						</select>
-					</div>
+					{/*
+                    <div className="flex items-center gap-2">
+                        <Filter className="w-4 h-4 text-gray-400" />
+                        <select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <select
+                            value={selectedMethod}
+                            onChange={(e) => setSelectedMethod(e.target.value)}
+                            className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
+                        >
+                            <option value="all">All Methods</option>
+                            <option value="walk-in">Walk-in</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                    */}
 				</div>
 			</div>
 
 			{/* Results count */}
-			<div className="text-sm text-slate-400">
+			<div className="text-sm text-gray-400">
 				{filteredBookings.length} booking
 				{filteredBookings.length !== 1 ? "s" : ""} found
 			</div>
@@ -239,8 +274,8 @@ export default function Bookings() {
 					))
 				) : (
 					<div className="col-span-full text-center py-8">
-						<Ticket className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-						<p className="text-slate-400">
+						<Ticket className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+						<p className="text-gray-400">
 							No bookings found matching your criteria.
 						</p>
 					</div>

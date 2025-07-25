@@ -7,7 +7,7 @@ import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import TimeoutPopup from "../../components/customer/TimeoutPopup";
 import { fetchSeatsByScreening } from "../../api/customer";
 import { ApiSeat } from "../../../../shared/types/type";
-import { LegendBox } from "../../components/customer/seats/Legendbox";
+import LegendBox from "../../components/customer/seats/LegendBox";
 import { Seat } from "../../../../shared/types/type";
 import { formatTime12h } from "../../utils/Function";
 
@@ -163,12 +163,12 @@ export default function SeatContainer() {
                   <div className="flex flex-col sm:flex-row gap-1">
                     <div className="flex gap-1 justify-center">
                       {firstHalf.map((seat) => (
-                        <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat}/>
+                        <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat} />
                       ))}
                     </div>
                     <div className="flex gap-1 justify-center sm:ml-2 mt-1 sm:mt-0">
                       {secondHalf.map((seat) => (
-                        <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat}/>
+                        <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat} />
                       ))}
                     </div>
                   </div>

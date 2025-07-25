@@ -83,7 +83,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 				department: formData.department,
 			};
 			await addStaff(dataToSend);
-            // console.log("Adding staff:", dataToSend);
+			// console.log("Adding staff:", dataToSend);
 		} catch (error) {
 			console.error("Error adding staff:", error);
 		} finally {
@@ -154,7 +154,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="flex flex-col gap-6  w-full">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-4">
@@ -166,13 +166,13 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 						Back to Staff
 					</button>
 				</div>
-				<div className="flex flex-col items-end">
+			</div>
+				<div className="flex flex-col ">
 					<h2 className="text-2xl font-bold tracking-tight text-white">
 						Add New Staff Member
 					</h2>
 					<p className="text-slate-400">Create a new staff account</p>
 				</div>
-			</div>
 
 			{/* Form */}
 			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -180,7 +180,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 					{/* Left Column */}
 					<div className="space-y-6">
 						{/* Personal Information */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<User className="w-5 h-5" />
 								Personal Information
@@ -202,7 +202,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="Enter first name"
 										/>
 									</div>
@@ -220,7 +220,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="Enter last name"
 										/>
 									</div>
@@ -241,7 +241,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="Enter email address"
 										/>
 										<Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -262,7 +262,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="Enter phone number"
 										/>
 										<Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -285,7 +285,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 						</div>
 
 						{/* Account Security */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Lock className="w-5 h-5" />
 								Account Security
@@ -311,7 +311,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="Enter password"
 											minLength={8}
 										/>
@@ -346,7 +346,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="Confirm password"
 										/>
 										<button
@@ -368,15 +368,14 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 								{formData.password &&
 									formData.confirmPassword && (
 										<div
-											className={`text-sm ${
-												formData.password ===
-												formData.confirmPassword
+											className={`text-sm ${formData.password ===
+													formData.confirmPassword
 													? "text-green-400"
 													: "text-red-400"
-											}`}
+												}`}
 										>
 											{formData.password ===
-											formData.confirmPassword
+												formData.confirmPassword
 												? "✓ Passwords match"
 												: "✗ Passwords do not match"}
 										</div>
@@ -388,7 +387,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 					{/* Right Column */}
 					<div className="space-y-6">
 						{/* Role & Department */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Shield className="w-5 h-5" />
 								Role & Department
@@ -408,7 +407,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">Select role</option>
 										{roles.map((role) => (
@@ -424,7 +423,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 
 								{/* Role Description */}
 								{formData.role && (
-									<div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
+									<div className="bg-gray-900/50 rounded-lg p-3 border border-slate-800">
 										<div
 											className={`font-medium ${getRoleColor(
 												formData.role
@@ -462,7 +461,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">
 											Select department
@@ -478,7 +477,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 						</div>
 
 						{/* Employment Details */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Building className="w-5 h-5" />
 								Employment Details
@@ -504,7 +503,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 												.toISOString()
 												.split("T")[0]
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									/>
 								</div>
 
@@ -528,9 +527,9 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 
 								{/* Staff Preview */}
 								{formData.firstName && formData.lastName && (
-									<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-800">
 										<div className="flex items-center gap-3">
-											<div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+											<div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
 												<User className="w-6 h-6 text-slate-400" />
 											</div>
 											<div>
@@ -570,7 +569,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 					<button
 						type="button"
 						onClick={onBack}
-						className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-800 text-white font-semibold rounded-lg transition"
 					>
 						Cancel
 					</button>

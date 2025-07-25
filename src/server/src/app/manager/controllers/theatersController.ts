@@ -6,12 +6,7 @@ import { fn, col } from "sequelize";
 export const getTheaters = async (req: Request, res: Response) => {
   try {
     const theaters = await Theater.findAll({
-      attributes: [
-        "id",
-        "name",
-        "status",
-        [fn("COUNT", col("seats.id")), "capacity"],
-      ],
+      attributes: ["id", "name", [fn("COUNT", col("seats.id")), "capacity"]],
       include: [
         {
           model: Seat,
@@ -19,8 +14,7 @@ export const getTheaters = async (req: Request, res: Response) => {
           attributes: [],
         },
       ],
-      group: ["Theater.id"],
-      order: [["status", "ASC"]],
+      group: ["Theater.id", "Theater.name"],
     });
 
     const formatted = theaters.map((theater: any) => {

@@ -8,7 +8,6 @@ import {
   updateShowTime,
 } from "../controllers/showTimesController";
 
-
 const route = express.Router();
 
 route.get("/today", getTodayShowTimes);

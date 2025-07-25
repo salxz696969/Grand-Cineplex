@@ -15,8 +15,7 @@ type MovieData = {
   language: string;
 };
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:6900";
+const API_BASE_URL = "http://localhost:6900";
 
 export const getHomePageInfo = async () => {
   try {

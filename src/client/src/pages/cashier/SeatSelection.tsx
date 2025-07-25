@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Sofa, Monitor, ArrowLeft, ShoppingCart, Clock } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getSeatsBasedOnScreeningId } from "../../api/cashier";
 import sequelize from "./../../../../server/src/db/index";
 
@@ -65,6 +65,7 @@ export function SeatSelection() {
 		"Z",
 	]);
 	const seatsPerRow = 10;
+	const router = useNavigate()
 
 	useEffect(() => {
 		try {
@@ -220,7 +221,7 @@ export function SeatSelection() {
 			{/* Header */}
 			<div className="max-w-7xl mx-auto mb-8">
 				<div className="flex items-center justify-between mb-6">
-					<button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+					<button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors" onClick={() => router(-1)}>
 						<ArrowLeft className="w-5 h-5" />
 						Back to Movies
 					</button>

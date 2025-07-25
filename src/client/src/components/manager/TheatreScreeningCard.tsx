@@ -24,7 +24,7 @@ export default function TheaterScreeningCard({ screening }: { screening: Screeni
     const occupancyRate = ((screening.totalSeats - screening.availableSeats) / screening.totalSeats) * 100;
 
     return (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors duration-300">
+        <div className="bg-gray-900/50 border border-slate-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors duration-300">
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                     <MapPin className="w-4 h-4 text-sky-500" />
@@ -59,10 +59,10 @@ export default function TheaterScreeningCard({ screening }: { screening: Screeni
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-green-400">${screening.price}</span>
                     <div className="flex gap-2">
-                        <button className="px-2 py-1 text-xs rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">
+                        <button className="px-2 py-1 text-xs rounded bg-blue-800 hover:bg-blue-700 text-white font-semibold transition">
                             Edit
                         </button>
-                        <button className="px-2 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white font-semibold transition">
+                        <button className="px-2 py-1 text-xs rounded bg-red-800 hover:bg-red-700 text-white font-semibold transition">
                             Cancel
                         </button>
                     </div>

@@ -60,7 +60,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 
 		try {
 			await addMovie(formData);
-            // console.log("Adding movie:", formData);
+			// console.log("Adding movie:", formData);
 		} catch (error) {
 			console.error("Error adding movie:", error);
 		} finally {
@@ -86,9 +86,9 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 	const ratings = ["G", "PG", "PG-13", "R", "NC-17"];
 
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="flex flex-col gap-6  w-full">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col  ">
 				<div className="flex items-center gap-4">
 					<button
 						onClick={onBack}
@@ -98,12 +98,12 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 						Back to Movies
 					</button>
 				</div>
-				<div className="flex flex-col items-end">
-					<h2 className="text-2xl font-bold tracking-tight text-white">
-						Add New Movie
-					</h2>
-					<p className="text-slate-400">Create a new movie entry</p>
-				</div>
+			</div>
+			<div className="flex flex-col ">
+				<h2 className="text-2xl font-bold tracking-tight text-white">
+					Add New Movie
+				</h2>
+				<p className="text-slate-400">Create a new movie entry</p>
 			</div>
 
 			{/* Form */}
@@ -112,7 +112,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 					{/* Left Column */}
 					<div className="space-y-6">
 						{/* Basic Info */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Film className="w-5 h-5" />
 								Basic Information
@@ -133,7 +133,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter movie title"
 									/>
 								</div>
@@ -152,7 +152,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter movie description"
 									/>
 								</div>
@@ -172,7 +172,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Write duration in minutes. e.g., 120"
 									/>
 									{/* </div> */}
@@ -231,7 +231,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 					{/* Right Column */}
 					<div className="space-y-6">
 						{/* Media */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4">
 								Media
 							</h3>
@@ -252,7 +252,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="https://example.com/poster.jpg"
 										/>
 										<Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -273,7 +273,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="https://youtube.com/watch?v=..."
 										/>
 										<Play className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -286,7 +286,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 										<label className="block text-sm font-medium text-slate-300 mb-2">
 											Poster Preview
 										</label>
-										<div className="w-32 h-48 bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+										<div className="w-32 h-48 bg-gray-900/50 rounded-lg overflow-hidden border border-slate-700">
 											<img
 												src={formData.posterUrl}
 												alt="Poster preview"
@@ -303,7 +303,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 						</div>
 
 						{/* Details */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4">
 								Details
 							</h3>
@@ -322,7 +322,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">Select genre</option>
 										{genres.map((genre) => (
@@ -350,7 +350,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="e.g., 7.5"
 									/>
 								</div>
@@ -369,7 +369,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									/>
 								</div>
 							</div>
@@ -382,7 +382,7 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 					<button
 						type="button"
 						onClick={onBack}
-						className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-900/50 text-white font-semibold rounded-lg transition"
 					>
 						Cancel
 					</button>

@@ -9,7 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "jsx": "react-jsx",
-    "types": ["node", "react", "react-dom"]
+    "types": ["node", "react", "react-dom", "jest"]
   },
   "include": ["src"]
 }

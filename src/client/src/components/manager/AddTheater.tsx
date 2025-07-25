@@ -141,9 +141,9 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="flex flex-col gap-6 w-full">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col">
 				<div className="flex items-center gap-4">
 					<button
 						onClick={onBack}
@@ -153,14 +153,14 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 						Back to Theaters
 					</button>
 				</div>
-				<div className="flex flex-col items-end">
-					<h2 className="text-2xl font-bold tracking-tight text-white">
-						Add New Theater
-					</h2>
-					<p className="text-slate-400">
-						Create a new theater with seating layout
-					</p>
-				</div>
+			</div>
+			<div className="flex flex-col ">
+				<h2 className="text-2xl font-bold tracking-tight text-white">
+					Add New Theater
+				</h2>
+				<p className="text-slate-400">
+					Create a new theater with seating layout
+				</p>
 			</div>
 
 			{/* Form */}
@@ -169,7 +169,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 					{/* Left Column */}
 					<div className="space-y-6">
 						{/* Basic Information */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<MapPin className="w-5 h-5" />
 								Theater Information
@@ -190,7 +190,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter theater name"
 									/>
 								</div>
@@ -209,7 +209,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="e.g., Ground Floor, First Floor"
 									/>
 								</div>
@@ -227,7 +227,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter theater description"
 									/>
 								</div>
@@ -245,7 +245,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										{statusOptions.map((option) => (
 											<option
@@ -274,7 +274,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 													: undefined
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter cinema id"
 									/>
 								</div>
@@ -282,7 +282,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 						</div>
 
 						{/* Seating Configuration */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Sofa className="w-5 h-5" />
 								Seating Configuration
@@ -306,7 +306,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 													parseInt(e.target.value)
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										/>
 									</div>
 									<div>
@@ -325,13 +325,13 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 													parseInt(e.target.value)
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										/>
 									</div>
 								</div>
 
 								{/* Capacity Display */}
-								<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 									<div className="flex items-center justify-between">
 										<div className="flex items-center gap-2">
 											<Users className="w-5 h-5 text-slate-400" />
@@ -351,7 +351,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 					{/* Right Column */}
 					<div className="space-y-6">
 						{/* Layout Preview */}
-						<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Monitor className="w-5 h-5" />
 								Layout Preview
@@ -373,7 +373,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 								</div>
 
 								{/* Preview Info */}
-								<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 									<div className="grid grid-cols-2 gap-4 text-sm">
 										<div>
 											<span className="text-slate-400">
@@ -404,13 +404,12 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 												Status:
 											</span>
 											<span
-												className={`ml-2 ${
-													statusOptions.find(
-														(s) =>
-															s.value ===
-															formData.status
-													)?.color
-												}`}
+												className={`ml-2 ${statusOptions.find(
+													(s) =>
+														s.value ===
+														formData.status
+												)?.color
+													}`}
 											>
 												{
 													statusOptions.find(
@@ -450,14 +449,14 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 
 						{/* Theater Preview */}
 						{formData.name && (
-							<div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+							<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 								<h3 className="text-lg font-semibold text-white mb-4">
 									Theater Preview
 								</h3>
 
-								<div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
+								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
 									<div className="flex items-center gap-3 mb-3">
-										<div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+										<div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
 											<MapPin className="w-6 h-6 text-slate-400" />
 										</div>
 										<div>
@@ -501,7 +500,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 					<button
 						type="button"
 						onClick={onBack}
-						className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-800 text-white font-semibold rounded-lg transition"
 					>
 						Cancel
 					</button>

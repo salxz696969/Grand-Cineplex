@@ -6,7 +6,7 @@ import {
 	Clock,
 	MapPin,
 	Users,
-	Filter, 
+	Filter,
 	Film,
 } from "lucide-react";
 import MovieScreeningCard from "./MovieScreeningCard";
@@ -27,138 +27,6 @@ export interface Screening {
 	status: "upcoming" | "ongoing" | "completed";
 }
 
-const dummyScreenings: Screening[] = [
-	{
-		id: 1,
-		movieTitle: "The Great Adventure",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+1",
-		theater: "Theater A",
-		date: "2025-07-07",
-		time: "14:30",
-		duration: "145 min",
-		availableSeats: 45,
-		totalSeats: 120,
-		price: 12.5,
-		status: "upcoming",
-	},
-	{
-		id: 2,
-		movieTitle: "Mystery of the Abyss",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+2",
-		theater: "Theater B",
-		date: "2025-07-07",
-		time: "16:00",
-		duration: "120 min",
-		availableSeats: 12,
-		totalSeats: 80,
-		price: 10.0,
-		status: "upcoming",
-	},
-	{
-		id: 3,
-		movieTitle: "Comedy Night",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+3",
-		theater: "Theater C",
-		date: "2025-07-07",
-		time: "19:30",
-		duration: "95 min",
-		availableSeats: 0,
-		totalSeats: 100,
-		price: 8.5,
-		status: "ongoing",
-	},
-	{
-		id: 4,
-		movieTitle: "The Great Adventure",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+1",
-		theater: "Theater A",
-		date: "2025-07-07",
-		time: "20:00",
-		duration: "145 min",
-		availableSeats: 78,
-		totalSeats: 120,
-		price: 12.5,
-		status: "upcoming",
-	},
-	{
-		id: 5,
-		movieTitle: "Mystery of the Abyss",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+2",
-		theater: "Theater B",
-		date: "2025-07-07",
-		time: "15:00",
-		duration: "120 min",
-		availableSeats: 45,
-		totalSeats: 80,
-		price: 10.0,
-		status: "upcoming",
-	},
-	{
-		id: 5,
-		movieTitle: "Mystery of the Abyss",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+2",
-		theater: "Theater B",
-		date: "2025-07-07",
-		time: "15:00",
-		duration: "120 min",
-		availableSeats: 45,
-		totalSeats: 80,
-		price: 10.0,
-		status: "upcoming",
-	},
-	{
-		id: 5,
-		movieTitle: "Mystery of the Abyss",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+2",
-		theater: "Theater B",
-		date: "2025-07-07",
-		time: "15:00",
-		duration: "120 min",
-		availableSeats: 45,
-		totalSeats: 80,
-		price: 10.0,
-		status: "upcoming",
-	},
-	{
-		id: 5,
-		movieTitle: "Mystery of the Abyss",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+2",
-		theater: "Theater B",
-		date: "2025-07-07",
-		time: "15:00",
-		duration: "120 min",
-		availableSeats: 45,
-		totalSeats: 80,
-		price: 10.0,
-		status: "upcoming",
-	},
-	{
-		id: 5,
-		movieTitle: "Mystery of the Abyss",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+2",
-		theater: "Theater B",
-		date: "2025-07-07",
-		time: "15:00",
-		duration: "120 min",
-		availableSeats: 45,
-		totalSeats: 80,
-		price: 10.0,
-		status: "upcoming",
-	},
-	{
-		id: 6,
-		movieTitle: "The Great Adventure",
-		movieImage: "https://via.placeholder.com/300x450?text=Movie+1",
-		theater: "Theater C",
-		date: "2025-07-07",
-		time: "22:00",
-		duration: "145 min",
-		availableSeats: 95,
-		totalSeats: 120,
-		price: 12.5,
-		status: "upcoming",
-	},
-];
 
 export default function Screenings() {
 	const [screenings, setScreenings] = useState<Screening[]>([]);
@@ -167,19 +35,22 @@ export default function Screenings() {
 	const [selectedTheater, setSelectedTheater] = useState<string>("all");
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 	const [addingScreening, setAddingScreening] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	// Use today's date for filtering
 	const today = new Date().toISOString().split("T")[0];
 	useEffect(() => {
-		try {
-			const fetchScreenings = async () => {
+		const fetchScreenings = async () => {
+			try {
 				const response = await getTodayShowTimes();
-                setScreenings(response);
-			};
-            fetchScreenings();
-		} catch (error) {
-			console.error("Error fetching screenings:", error);
-		}
+				setScreenings(response);
+			} catch (error) {
+				console.error("Error fetching screenings:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchScreenings();
 	}, []);
 	const filteredScreenings = screenings.filter((screening) => {
 		const matchesTab =
@@ -225,23 +96,56 @@ export default function Screenings() {
 		return <AddScreening onBack={handleBackToScreenings} />;
 	}
 
+	if (loading) {
+		// Subtle skeleton loader
+		return (
+			<div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
+				<div className="flex flex-row items-center justify-between">
+					<div className="flex flex-col gap-2">
+						<div className="h-8 w-64 bg-gray-900 rounded mb-1 animate-pulse" />
+						<div className="h-4 w-80 bg-gray-900 rounded animate-pulse" />
+					</div>
+					<div className="h-10 w-40 bg-gray-900 rounded animate-pulse" />
+				</div>
+				<div className="flex flex-row items-center gap-4 mt-4">
+					<div className="h-8 w-32 bg-gray-900 rounded animate-pulse" />
+					<div className="h-8 w-32 bg-gray-900 rounded animate-pulse" />
+				</div>
+				<div className="flex w-full justify-between items-center mt-4">
+					<div className="h-6 w-48 bg-gray-900 rounded animate-pulse" />
+					<div className="h-10 w-80 bg-gray-900 rounded-full animate-pulse" />
+				</div>
+				<div className="grid gap-6 mt-4">
+					{[...Array(4)].map((_, i) => (
+						<div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg animate-pulse">
+							<div className="h-6 w-32 bg-gray-800 rounded mb-2" />
+							<div className="h-4 w-24 bg-gray-800 rounded mb-1" />
+							<div className="h-4 w-40 bg-gray-800 rounded mb-1" />
+							<div className="h-4 w-20 bg-gray-800 rounded" />
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
 	return (
-		<div className="flex flex-col gap-6 p-4 w-full">
+		<div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
 			{/* Header */}
 			<div className="flex flex-row items-center justify-between">
 				<div className="flex flex-col">
 					<h2 className="text-2xl font-bold tracking-tight text-white">
 						Screenings
 					</h2>
-					<p className="text-slate-400">
+					<p className="text-gray-400">
 						Manage movie screenings and showtimes.
 					</p>
 				</div>
 				<button
 					onClick={handleAddScreening}
-					className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-transform hover:scale-105"
+					className="bg-blue-800 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
 				>
-					<PlusCircle className="w-4 h-4" />
+					<PlusCircle className="w-4 h-4 text-blue-200" />
 					Add Screening
 				</button>
 			</div>
@@ -251,21 +155,19 @@ export default function Screenings() {
 				{/* Tabs */}
 				<div className="flex flex-row items-center gap-4">
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${
-							activeTab === "today"
-								? "border-sky-600 font-bold"
-								: "border-transparent"
-						}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "today"
+							? "border-blue-600 font-bold"
+							: "border-transparent"
+							}`}
 						onClick={() => setActiveTab("today")}
 					>
 						Today's Screenings
 					</button>
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${
-							activeTab === "all"
-								? "border-sky-600 font-bold"
-								: "border-transparent"
-						}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "all"
+							? "border-blue-600 font-bold"
+							: "border-transparent"
+							}`}
 						onClick={() => setActiveTab("all")}
 					>
 						All Screenings
@@ -275,47 +177,47 @@ export default function Screenings() {
 				{/* Search and Filters */}
 				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
 					<div className="relative flex-1 sm:flex-none sm:w-64">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
 						<input
 							type="text"
 							placeholder="Search screenings..."
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							className="w-full rounded-full border border-slate-700 bg-slate-800 px-10 py-2 text-white"
+							className="w-full rounded-full border border-gray-800 bg-gray-900 px-10 py-2 text-white"
 						/>
 					</div>
-
-					<div className="flex items-center gap-2">
-						<Filter className="w-4 h-4 text-slate-400" />
-						<select
-							value={selectedTheater}
-							onChange={(e) => setSelectedTheater(e.target.value)}
-							className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
-						>
-							<option value="all">All Theaters</option>
-							{theaters.map((theater) => (
-								<option key={theater} value={theater}>
-									{theater}
-								</option>
-							))}
-						</select>
-
-						<select
-							value={selectedStatus}
-							onChange={(e) => setSelectedStatus(e.target.value)}
-							className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white text-sm"
-						>
-							<option value="all">All Status</option>
-							<option value="upcoming">Upcoming</option>
-							<option value="ongoing">Ongoing</option>
-							<option value="completed">Completed</option>
-						</select>
-					</div>
+					{/*
+                    <div className="flex items-center gap-2">
+                        <Filter className="w-4 h-4 text-gray-400" />
+                        <select
+                            value={selectedTheater}
+                            onChange={(e) => setSelectedTheater(e.target.value)}
+                            className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
+                        >
+                            <option value="all">All Theaters</option>
+                            {theaters.map((theater) => (
+                                <option key={theater} value={theater}>
+                                    {theater}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            className="rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-white text-sm"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    */}
 				</div>
 			</div>
 
 			{/* Results count */}
-			<div className="text-sm text-slate-400">
+			<div className="text-sm text-gray-400">
 				{Object.keys(screeningsByMovie).length} movie
 				{Object.keys(screeningsByMovie).length !== 1 ? "s" : ""} with{" "}
 				{filteredScreenings.length} screening
@@ -335,7 +237,7 @@ export default function Screenings() {
 					))
 				) : (
 					<div className="text-center py-8">
-						<p className="text-slate-400">
+						<p className="text-gray-400">
 							No screenings found matching your criteria.
 						</p>
 					</div>
