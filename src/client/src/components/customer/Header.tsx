@@ -1,6 +1,6 @@
 import { useContext, useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Clapperboard } from "lucide-react";
+import { User, Clapperboard, LogIn } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Header() {
@@ -13,9 +13,10 @@ export default function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isLoggedIn = !!auth;
-  const userName = auth?.name || "User";
-  const userEmail = auth?.email || "";
+  const isLoggedIn = auth;
+  console.log(auth);
+  const userName = auth?.name;
+  const userEmail = auth?.email;
 
   //get initials from name
   const getInitials = (name: string) => {
@@ -43,7 +44,7 @@ export default function Header() {
 
   const handleUserClick = () => {
     if (!isLoggedIn) {
-      navigate("/signin");
+      navigate("/auth");
     } else {
       setDropdownOpen(!dropdownOpen);
     }
@@ -54,7 +55,7 @@ export default function Header() {
     localStorage.removeItem("user");
     setAuth(null);
     setDropdownOpen(false);
-    navigate("/signin");
+    navigate("/auth");
   };
 
   return (
@@ -67,16 +68,15 @@ export default function Header() {
         </Link>
 
         {/* Right side */}
-        <div ref={dropdownRef} className="relative group flex items-center gap-4 border border-blue-800 p-2 rounded-md cursor-pointer"
+        <div ref={dropdownRef} className="relative group flex items-center gap-4 border border-blue-800 p-2 rounded-xl cursor-pointer"
           onClick={handleUserClick}>
           <div className="flex items-center justify-center bg-blue-800 p-2 rounded-md w-8 h-8 text-xs font-semibold text-white select-none">
-            {isLoggedIn ? getInitials(userName) : <User className="w-4 h-4" />}
+            {isLoggedIn ? getInitials(userName || "") : <LogIn className="w-4 h-4" />}
           </div>
 
           {!isLoggedIn ? (
             <div className="hidden sm:flex group-hover:flex flex-col leading-tight transition-all duration-300 ease-in-out">
-              <p className="text-white text-xs font-semibold">Log in account</p>
-              <p className="text-white/50 text-[10px] mt-0.5">Right here</p>
+              <p className="text-white text-xs font-semibold">Sign In</p>
             </div>
           ) : (
             <div className="hidden sm:flex group-hover:flex flex-col transition-all duration-300 ease-in-out">

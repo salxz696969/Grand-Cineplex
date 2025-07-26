@@ -15,9 +15,10 @@ import {
 	MapPin,
 	Film,
 	Clapperboard,
+	XCircle,
 } from "lucide-react";
 import sequelize from "./../../../../server/src/db/index";
-import { getMoviesAndItsScreenings, getQrCode, submitBooking } from "../../api/cashier";
+import { getMoviesAndItsScreenings, getQrCode, submitBooking, checkPaymentStatus } from "../../api/cashier";
 import { Link, useNavigate } from "react-router-dom";
 
 interface PaymentMethod {
@@ -84,10 +85,103 @@ export function Payment() {
 	);
 
 	const [qrCode, setQrCode] = useState<any>("");
+	const [tranId, setTranId] = useState<string>("");
+	const [paymentStatus, setPaymentStatus] = useState<string>("PENDING");
+	const [isPolling, setIsPolling] = useState(false);
+	const [pollCount, setPollCount] = useState(0);
 
 	const handleQrCodePayment = async () => {
-		const data = await getQrCode(price);
-		setQrCode(data.qrImage);
+		try {
+			// just for testing, so that we don't lose money
+			const data = await getQrCode(0.01);
+			const transactionId = data.tranId || "";
+			setQrCode(data.qrImage);
+			setTranId(transactionId); // Store transaction ID for polling
+			setPaymentStatus("PENDING");
+			setPollCount(0);
+			// Start polling after QR code is generated and tranId is set
+			startPolling(transactionId);
+		} catch (error) {
+			console.error("Error generating QR code:", error);
+		}
+	};
+
+	const startPolling = (transactionId: string) => {
+		if (!transactionId) {
+			console.log("No transaction ID provided for polling");
+			return;
+		}
+
+		setIsPolling(true);
+		const pollInterval = setInterval(async () => {
+			try {
+				const statusData = await checkPaymentStatus(transactionId);
+				console.log("Payment status:", statusData);
+
+				// Increment poll count
+				setPollCount(prev => {
+					const newCount = prev + 1;
+					console.log(`Poll count: ${newCount}`);
+
+					// Fake completion after 5 polls for sandbox testing
+					if (newCount >= 5) {
+						console.log("Faking payment completion after 5 polls");
+						setPaymentStatus("APPROVED");
+						setIsPolling(false);
+						clearInterval(pollInterval);
+						// Auto-complete the payment
+						handlePaymentSuccess();
+						return newCount;
+					}
+
+					return newCount;
+				});
+
+				if (statusData.status === "APPROVED") {
+					setPaymentStatus("APPROVED");
+					setIsPolling(false);
+					clearInterval(pollInterval);
+					// Auto-complete the payment
+					handlePaymentSuccess();
+				} else if (statusData.status === "CANCELLED" || statusData.status === "DECLINED") {
+					setPaymentStatus("FAILED");
+					setIsPolling(false);
+					clearInterval(pollInterval);
+				}
+				// If still PENDING, continue polling
+			} catch (error) {
+				console.error("Error checking payment status:", error);
+				// Continue polling on error
+			}
+		}, 3000); // Poll every 3 seconds
+
+		// Stop polling after 5 minutes (300 seconds)
+		setTimeout(() => {
+			clearInterval(pollInterval);
+			setIsPolling(false);
+			if (paymentStatus === "PENDING") {
+				setPaymentStatus("timeout");
+			}
+		}, 200000);
+	};
+
+	const handlePaymentSuccess = async () => {
+		setIsProcessing(true);
+		try {
+			const request = await submitBooking({
+				screeningId: Number(screeningId),
+				seats: seats.map((seat) => seat.idNumber),
+				amount: price,
+				method: "qr",
+				status: "completed",
+			});
+			console.log("Booking request:", request);
+			setIsCompleted(true);
+		} catch (error) {
+			console.error("Payment processing failed:", error);
+		} finally {
+			setIsProcessing(false);
+		}
 	};
 
 	useEffect(() => {
@@ -137,18 +231,18 @@ export function Payment() {
 			icon: <Banknote className="w-5 h-5" />,
 			description: "Cash payment",
 		},
-		{
-			id: "card",
-			name: "Card",
-			icon: <CreditCard className="w-5 h-5" />,
-			description: "Credit/Debit card",
-		},
-		{
-			id: "digital",
-			name: "Digital",
-			icon: <Wallet className="w-5 h-5" />,
-			description: "Digital wallet",
-		},
+		// {
+		// 	id: "card",
+		// 	name: "Card",
+		// 	icon: <CreditCard className="w-5 h-5" />,
+		// 	description: "Credit/Debit card",
+		// },
+		// {
+		// 	id: "digital",
+		// 	name: "Digital",
+		// 	icon: <Wallet className="w-5 h-5" />,
+		// 	description: "Digital wallet",
+		// },
 		{
 			id: "qr",
 			name: "QR",
@@ -160,6 +254,11 @@ export function Payment() {
 	const handlePayment = async () => {
 		if (!selectedPaymentMethod) return;
 
+		// For QR payments, the polling will handle completion
+		if (selectedPaymentMethod === "qr") {
+			return;
+		}
+
 		setIsProcessing(true);
 
 		// Simulate payment processing
@@ -169,7 +268,7 @@ export function Payment() {
 				seats: seats.map((seat) => seat.idNumber),
 				amount: price,
 				method: selectedPaymentMethod,
-				status: "pending",
+				status: "PENDING",
 			});
 			console.log("Booking request:", request);
 		} catch (error) {
@@ -554,12 +653,41 @@ export function Payment() {
 							<h3 className="text-lg font-semibold mb-4">
 								QR Payment
 							</h3>
-							<div className="space-y-3">
+							<div className="space-y-4">
 								<img
 									src={qrCode}
 									alt="QR Code"
 									className="w-full h-auto rounded-xl border-2 border-blue-600"
 								/>
+
+								{/* Payment Status */}
+								<div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-gray-900/50 border border-gray-700">
+									{paymentStatus === "PENDING" && (
+										<>
+											<Clock className="w-5 h-5 text-yellow-400 animate-pulse" />
+											<span className="text-yellow-400">Waiting for payment </span>
+										</>
+									)}
+									{paymentStatus === "APPROVED" && (
+										<>
+											<CheckCircle className="w-5 h-5 text-green-400" />
+											<span className="text-green-400">Payment completed!</span>
+										</>
+									)}
+									{paymentStatus === "FAILED" && (
+										<>
+											<XCircle className="w-5 h-5 text-red-400" />
+											<span className="text-red-400">Payment failed</span>
+										</>
+									)}
+									{paymentStatus === "timeout" && (
+										<>
+											<XCircle className="w-5 h-5 text-red-400" />
+											<span className="text-red-400">Payment timeout</span>
+										</>
+									)}
+								</div>
+
 							</div>
 						</div>
 					)}
@@ -598,8 +726,8 @@ export function Payment() {
 					{/* Pay Button */}
 					<button
 						onClick={handlePayment}
-						disabled={!selectedPaymentMethod || isProcessing}
-						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${selectedPaymentMethod && !isProcessing
+						disabled={!selectedPaymentMethod || isProcessing || (selectedPaymentMethod === "qr" && paymentStatus !== "APPROVED")}
+						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${selectedPaymentMethod && !isProcessing && (selectedPaymentMethod !== "qr" || paymentStatus === "APPROVED")
 							? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white transform hover:scale-105"
 							: "bg-gray-700 text-gray-400 cursor-not-allowed"
 							}`}
@@ -609,6 +737,8 @@ export function Payment() {
 								<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
 								Processing...
 							</div>
+						) : selectedPaymentMethod === "qr" && paymentStatus === "APPROVED" ? (
+							"Complete Booking"
 						) : (
 							`Complete Payment - $${bookingSummary.totalAmount}`
 						)}

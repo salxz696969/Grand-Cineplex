@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Seat } from "../../../../../shared/types/type";
+import { AuthContext } from "../../context/AuthContext";
+import AuthModal from "../useraccess/PopupLogSign";
 
 
 interface SelectedSeatsProps {
@@ -13,8 +15,15 @@ interface SelectedSeatsProps {
 
 const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: SelectedSeatsProps) => {
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const { auth, setAuth, loading } = useContext(AuthContext)!;
 
   const handleContinue = () => {
+    if (!auth) {
+      setShowAuthModal(true);
+      return;
+    }
     if (!screeningId) {
       alert("Screening information is missing.");
       return;
@@ -29,7 +38,7 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
   };
 
   return (
-    <div className="bg-gray-950 rounded-xl p-6 border border-gray-700 max-w-7xl mx-auto">
+    <div className="bg-gray-950 rounded-xl p-6 border border-gray-700 max-w-7xl mx-auto relative">
       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
         <Sofa className="w-5 h-5" /> Selected Seats
       </h2>
@@ -60,6 +69,7 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
       ) : (
         <p className="text-gray-400 text-center py-4">No seats selected. Click on seats to make your selection.</p>
       )}
+      {showAuthModal && <AuthModal onSuccess={() => setShowAuthModal(false)} onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 };

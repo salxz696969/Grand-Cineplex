@@ -170,7 +170,7 @@ export async function fetchUserInfo(): Promise<{
 
   if (!token) throw new Error("User not logged in");
 
-  const response = await fetch("http://localhost:3000/customer/users", {
+  const response = await fetch("http://localhost:6900/customer/users", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -187,4 +187,34 @@ export async function fetchUserInfo(): Promise<{
   const data = await response.json();
   console.log("[Frontend] Fetched user data:", data);
   return data;
+}
+
+// Payment functions
+export async function getQrCode(amount: number) {
+  try {
+    const response = await fetch(
+      "http://localhost:6900/customer/payment/qr-code",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      }
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error getting QR code:", error);
+    throw error;
+  }
+}
+
+export async function checkPaymentStatus(tranId: string) {
+  try {
+    const response = await fetch(
+      `http://localhost:6900/customer/payment/status/${tranId}`
+    );
+    return await response.json();
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    throw error;
+  }
 }

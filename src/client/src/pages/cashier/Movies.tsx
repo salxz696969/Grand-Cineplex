@@ -117,7 +117,7 @@ export default function Movies() {
 			<div className="relative">
 				<Header />
 			</div>
-			<div className="min-h-screen content flex flex-col justify-start items-center bg-black pt-24">
+			<div className="min-h-screen content flex flex-col justify-start items-center bg-gray-950 pt-24">
 				<div className="flex flex-col max-w-7xl w-full justify-center items-center">
 					{/* Horizontally scrollable parent on mobile, normal on desktop */}
 					<div className="w-full lg:hidden p-4 ">

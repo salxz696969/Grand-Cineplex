@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, ReactNode } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import { getToken } from "../../utils/auth";
 import { useNavigate } from "react-router-dom";
@@ -54,19 +54,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             setAuth(null);
-            navigate("/signin");
+            navigate("/auth");
           }, timeout);
         } else {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           setAuth(null);
-          navigate("/signin");
+          navigate("/auth");
         }
       } catch (err) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setAuth(null);
-        navigate("/signin");
+        navigate("/auth");
       }
     } else {
       setAuth(null);

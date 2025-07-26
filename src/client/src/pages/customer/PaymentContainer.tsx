@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PaymentSummary from "../../components/customer/payment/PaymentSummary";
 import PaymentForm from "../../components/customer/payment/PaymentForm";
@@ -10,6 +10,7 @@ import { bookSeats, fetchSeatsByScreening } from "../../api/customer";
 import { BookingSummary, ApiSeat } from "../../../../shared/types/type";
 import { jwtDecode } from "jwt-decode";
 import { fetchUserInfo } from "../../api/customer";
+import Header from "../../components/customer/Header";
 
 export default function PaymentContainer() {
   const navigate = useNavigate();
@@ -25,30 +26,9 @@ export default function PaymentContainer() {
 
   const [bookingSummary, setBookingSummary] = useState<BookingSummary | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
-  const [pageLoading, setPageLoading] = useState<boolean>(true);
   const [processing, setProcessing] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [isAuthRequired, setIsAuthRequired] = useState<boolean>(true);
-  const [timeLeft, setTimeLeft] = useState<number>(120); // ⏳ 2 minutes timer
-
-
-  useEffect(() => {
-    if (isAuthRequired) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          alert("Your session has expired. Please start over.");
-          navigate(-1);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [navigate, isAuthRequired]);
 
   // Check token on load and set auth requirement + customer info
   useEffect(() => {
@@ -97,8 +77,6 @@ export default function PaymentContainer() {
       return;
     }
 
-    setPageLoading(true);
-
     fetchSeatsByScreening(screeningId)
       .then((data) => {
         if (!data || !data.seats) throw new Error("Invalid data format from API");
@@ -121,12 +99,10 @@ export default function PaymentContainer() {
           screeningId,
         });
 
-        setTimeout(() => setPageLoading(false), 500);
       })
       .catch((error) => {
         console.error("Failed to load seat info:", error);
         alert("Failed to load seat info.");
-        setPageLoading(false);
         navigate(-1);
       });
   }, [screeningId, seatIds, navigate]);
@@ -171,58 +147,54 @@ export default function PaymentContainer() {
     }
   };
 
-  const formatTime = (seconds: number): string => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
+  // Handle QR payment success
+  const handlePaymentSuccess = async () => {
+    if (!bookingSummary) return;
+
+    setProcessing(true);
+
+    try {
+      await new Promise((res) => setTimeout(res, 1000)); // Brief delay for UX
+      await bookSeats(bookingSummary.screeningId!, seatIds, "confirmed");
+      setIsCompleted(true);
+    } catch (error: any) {
+      alert("Booking failed: " + (error.message || "Unknown error"));
+    } finally {
+      setProcessing(false);
+    }
   };
 
-  if (pageLoading || processing) return <LoadingSpinner />;
-  if (!bookingSummary) return <div className="text-white">Booking data not found</div>;
-  if (isCompleted) return <PaymentSuccess bookingSummary={bookingSummary} />;
+  if (isCompleted) return <PaymentSuccess bookingSummary={bookingSummary!} />;
 
   return (
     <>
-      {/* Modal if not logged in */}
-      {isAuthRequired && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto"
-          style={{
-            backgroundColor: "transparent",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-          }}
-        >
-          <AuthModal onSuccess={handleAuthSuccess} />
-        </div>
-      )}
 
-      <div className={`min-h-screen bg-gray-950 text-white p-4 lg:p-8 transition-filter duration-300 ${isAuthRequired ? "blur-sm pointer-events-none overflow-hidden h-screen" : ""
-        }`}
+      <div className={`min-h-screen bg-gray-950 text-white transition-filter duration-300`}
       >
-        <div className="max-w-7xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-300 hover:text-white" >
-              <ArrowLeft className="w-5 h-5" />
-              Back to Seats
-            </button>
-            <div className="flex items-center gap-2 text-gray-300 whitespace-nowrap">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm">{formatTime(timeLeft)} remaining</span>
+        <Header />
+        <div className="pb-6">
+          <div className="max-w-7xl mx-auto  pb-6">
+            <div className="flex items-center justify-between mb-6">
+              <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-300 hover:text-white" >
+                <ArrowLeft className="w-5 h-5" />
+                Back to Seats
+              </button>
             </div>
+            <h1 className="text-3xl font-bold text-center mb-2">Complete Booking</h1>
+            <p className="text-gray-400 text-center">Confirm your seats and pay</p>
           </div>
-          <h1 className="text-3xl font-bold text-center mb-2">Complete Booking</h1>
-          <p className="text-gray-400 text-center">Confirm your seats and pay</p>
-        </div>
 
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
-          <PaymentSummary bookingSummary={bookingSummary} />
-          <PaymentForm
-            selectedPaymentMethod={selectedPaymentMethod}
-            setSelectedPaymentMethod={setSelectedPaymentMethod}
-            handlePayment={handlePayment}
-            isProcessing={processing}
-            totalAmount={bookingSummary.totalAmount}
-          />
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
+            <PaymentSummary bookingSummary={bookingSummary!} />
+            <PaymentForm
+              selectedPaymentMethod={selectedPaymentMethod}
+              setSelectedPaymentMethod={setSelectedPaymentMethod}
+              handlePayment={handlePayment}
+              isProcessing={processing}
+              totalAmount={bookingSummary!.totalAmount}
+              onPaymentSuccess={handlePaymentSuccess}
+            />
+          </div>
         </div>
       </div>
     </>
