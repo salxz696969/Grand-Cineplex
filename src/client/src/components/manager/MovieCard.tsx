@@ -32,20 +32,9 @@ type MovieData = {
 	language: string;
 };
 
-export default function MovieCard({ movie }: { movie: MovieData }) {
-	const [editMovie, setEditMovie] = useState(false);
+export default function MovieCard({ movie, onEdit }: { movie: MovieData, onEdit: () => void }) {
 
-	const handleBackToMovies = () => {
-		setEditMovie(false);
-	};
 
-	const handleEditMovie = () => {
-		setEditMovie(true);
-	};
-
-	if (editMovie) {
-		return <EditMovie onBack={handleBackToMovies} movie={movie} />;
-	}
 
 	return (
 		<div className="overflow-hidden shadow-lg flex flex-col group bg-gray-950 border border-gray-800 rounded-xl hover:border-blue-500 hover:shadow-blue-500/30 transition-all duration-200">
@@ -67,7 +56,7 @@ export default function MovieCard({ movie }: { movie: MovieData }) {
 			</div>
 			<div className="flex gap-2 mt-1 items-end px-3 pb-3">
 				<button
-					onClick={handleEditMovie}
+					onClick={onEdit}
 					className="flex w-[80%] items-center gap-1 px-2 py-2 text-xs rounded bg-blue-800 hover:bg-blue-700 text-white font-semibold transition  justify-center h-10 shadow-sm"
 				>
 					<Pencil className="w-4 h-4 text-blue-200" /> Edit

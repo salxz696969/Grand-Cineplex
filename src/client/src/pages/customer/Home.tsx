@@ -26,15 +26,6 @@ export default function Home() {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) return <LoadingSpinner />;
-
   return (
     <div className="min-h-screen bg-gray-950 text-white flex justify-center items-center flex-col">
       <Header />

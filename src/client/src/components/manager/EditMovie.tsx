@@ -3,7 +3,7 @@ import { ArrowLeft, Upload, Play, Film } from "lucide-react";
 import { updateMovie } from "../../api/manager";
 
 type MovieData = {
-    id: number;
+	id: number;
 	title: string;
 	description: string;
 	posterUrl: string;
@@ -18,11 +18,11 @@ type MovieData = {
 };
 
 type EditMovieProps = {
-    onBack: () => void;
-    movie: MovieData;
+	onBack: () => void;
+	movie: MovieData;
 };
 export default function EditMovie({ onBack, movie }: EditMovieProps) {
-    const [formData, setFormData] = useState<MovieData>({ ...movie });
+	const [formData, setFormData] = useState<MovieData>({ ...movie });
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,28 +33,28 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 		}));
 	};
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsSubmitting(true);
 
-        // Check if formData is exactly the same as movie
-        if (JSON.stringify(formData) === JSON.stringify(movie)) {
-            alert("Please change at least one field to edit the movie.");
-            setIsSubmitting(false);
-            return;
-        }
+		// Check if formData is exactly the same as movie
+		if (JSON.stringify(formData) === JSON.stringify(movie)) {
+			alert("Please change at least one field to edit the movie.");
+			setIsSubmitting(false);
+			return;
+		}
 
-        try {
-            console.log("Movie updated successfully:", formData);
-            await updateMovie(formData);
-        } catch (error) {
-            console.error("Error adding movie:", error);
-        } finally {
-            setIsSubmitting(false);
-        }
+		try {
+			console.log("Movie updated successfully:", formData);
+			await updateMovie(formData);
+		} catch (error) {
+			console.error("Error adding movie:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
 
-        onBack();
-    };
+		onBack();
+	};
 
 	const genres = [
 		"Action",
@@ -70,9 +70,9 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 	];
 
 	return (
-		<div className="fixed inset-0 z-50 bg-slate-900 overflow-y-auto p-6 flex flex-col gap-6">
+		<div className="flex flex-col gap-6 w-full">
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col">
 				<div className="flex items-center gap-4">
 					<button
 						onClick={onBack}
@@ -82,17 +82,12 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 						Back to Movies
 					</button>
 				</div>
-				<div className="flex flex-col items-end">
-					<div className="text-slate-50 text-3xl mb-1">
-						Fill At Least One To Edit
-					</div>
-				</div>
-				<div className="flex flex-col items-end">
-					<h2 className="text-2xl font-bold tracking-tight text-white">
-						Add New Movie
-					</h2>
-					<p className="text-slate-400">Create a new movie entry</p>
-				</div>
+			</div>
+			<div className="flex flex-col">
+				<h2 className="text-2xl font-bold tracking-tight text-white">
+					Edit Movie
+				</h2>
+				<p className="text-slate-400">Update movie information</p>
 			</div>
 
 			{/* Form */}
@@ -100,7 +95,8 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 					{/* Left Column */}
 					<div className="space-y-6">
-						<div className="bg-slate-800 rounded-lg p-6">
+						{/* Basic Info */}
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Film className="w-5 h-5" />
 								Basic Information
@@ -120,7 +116,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter movie title"
 									/>
 								</div>
@@ -138,7 +134,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="Enter movie description"
 									/>
 								</div>
@@ -156,7 +152,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="e.g., 120"
 									/>
 								</div>
@@ -166,7 +162,8 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 
 					{/* Right Column */}
 					<div className="space-y-6">
-						<div className="bg-slate-800 rounded-lg p-6">
+						{/* Media */}
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4">
 								Media
 							</h3>
@@ -186,7 +183,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="https://example.com/poster.jpg"
 										/>
 										<Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -207,19 +204,20 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 													e.target.value
 												)
 											}
-											className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 											placeholder="https://youtube.com/watch?v=..."
 										/>
 										<Play className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
 									</div>
 								</div>
 
+								{/* Poster Preview */}
 								{formData.posterUrl && (
 									<div className="mt-4">
 										<label className="block text-sm font-medium text-slate-300 mb-2">
 											Poster Preview
 										</label>
-										<div className="w-32 h-48 bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+										<div className="w-32 h-48 bg-gray-900/50 rounded-lg overflow-hidden border border-slate-700">
 											<img
 												src={formData.posterUrl}
 												alt="Poster preview"
@@ -235,7 +233,8 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 							</div>
 						</div>
 
-						<div className="bg-slate-800 rounded-lg p-6">
+						{/* Details */}
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4">
 								Details
 							</h3>
@@ -253,7 +252,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									>
 										<option value="">Select genre</option>
 										{genres.map((genre) => (
@@ -280,7 +279,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 										placeholder="e.g., 7.5"
 									/>
 								</div>
@@ -298,7 +297,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 												e.target.value
 											)
 										}
-										className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
 									/>
 								</div>
 							</div>
@@ -311,7 +310,7 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 					<button
 						type="button"
 						onClick={onBack}
-						className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-900/50 text-white font-semibold rounded-lg transition"
 					>
 						Cancel
 					</button>
@@ -323,12 +322,12 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 						{isSubmitting ? (
 							<>
 								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-								Adding...
+								Updating...
 							</>
 						) : (
 							<>
 								<Film className="w-4 h-4" />
-								Edit Movie
+								Update Movie
 							</>
 						)}
 					</button>

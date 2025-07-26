@@ -10,6 +10,7 @@ import { ApiSeat } from "../../../../shared/types/type";
 import LegendBox from "../../components/customer/seats/LegendBox";
 import { Seat } from "../../../../shared/types/type";
 import { formatTime12h } from "../../utils/Function";
+import { Sofa } from "lucide-react";
 
 function toSeatType(type: string): "regular" | "premium" | "vip" {
   switch (type.toLowerCase()) {
@@ -22,6 +23,47 @@ function toSeatType(type: string): "regular" | "premium" | "vip" {
   }
 }
 
+// Skeleton for seat grid and summary (matches SeatSelection.tsx)
+const SeatGridAndSummarySkeleton = () => (
+  <>
+    {/* Seat Grid Skeleton */}
+    <div className="flex flex-col items-center gap-3 mb-12 animate-pulse">
+      {[...Array(6)].map((_, rowIdx) => (
+        <div key={rowIdx} className="flex gap-3 items-center">
+          <div className="w-8 h-5 bg-gray-800 rounded" />
+          <div className="flex gap-1">
+            {[...Array(10)].map((_, seatIdx) => (
+              <div key={seatIdx} className="w-10 h-10 rounded-full bg-gray-800" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+    {/* Seat Legend Skeleton */}
+    <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm animate-pulse">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-gray-800 rounded" />
+          <div className="h-4 w-16 bg-gray-800 rounded" />
+        </div>
+      ))}
+    </div>
+    {/* Selected Seats Summary Skeleton */}
+    <div className="bg-gray-950 rounded-xl p-6 border border-gray-700 animate-pulse">
+      <div className="h-6 w-40 bg-gray-800 rounded mb-4" />
+      <div className="flex flex-wrap gap-2 mb-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-blue-900/20 border border-blue-800/30 px-3 py-1 rounded-full text-blue-300 text-sm h-6 w-20" />
+        ))}
+      </div>
+      <div className="flex items-center justify-between pt-3 border-t border-gray-700 mb-4">
+        <div className="h-4 w-32 bg-gray-800 rounded" />
+        <div className="h-6 w-16 bg-gray-800 rounded" />
+      </div>
+      <div className="h-10 w-full bg-gray-800 rounded" />
+    </div>
+  </>
+);
 
 export default function SeatContainer() {
 
@@ -107,7 +149,48 @@ export default function SeatContainer() {
   const getTotalPrice = () =>
     selectedSeats.reduce((total, id) => total + (seats.find((s) => s.id === id)?.price || 0), 0);
 
-  if (loading) return <LoadingSpinner />;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white p-4 lg:p-8">
+        <div className="max-w-7xl mx-auto mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-5 h-5" />
+              Back to Movies
+            </button>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 text-gray-300 whitespace-nowrap">
+                <Clock className="w-4 h-4" /> <span>{formatCountdown(timeLeft)} remaining</span>
+              </div>
+              <div className="flex items-center gap-2 bg-blue-600 px-3 py-1 rounded-full">
+                <ShoppingCart className="w-4 h-4" />
+                <span className="text-sm font-medium">$0.00</span>
+              </div>
+            </div>
+          </div>
+          <h1 className="text-3xl lg:text-4xl font-bold text-center mb-2">Select Your Seats</h1>
+          <p className="text-gray-400 text-center mb-4">
+            {movieTitle} - {theaterName} - {screeningDate} {formatTime12h(screeningTime)}
+          </p>
+          <p className="text-gray-400 text-center">
+            Choose the perfect seats for your movie experience
+          </p>
+        </div>
+        <div className="max-w-7xl mx-auto">
+          {/* Screen Skeleton */}
+          <div className="relative mb-16">
+            <div className="w-full h-12 bg-gradient-to-b from-gray-300 to-gray-500 mx-auto rounded-lg flex items-center justify-center text-gray-700 font-semibold shadow-lg">
+              <Monitor className="w-6 h-6 mr-2" />
+              SCREEN
+            </div>
+            <div className="absolute inset-x-0 top-12 h-4 bg-gradient-to-b from-gray-300/20 to-transparent"></div>
+          </div>
+          <SeatGridAndSummarySkeleton />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-4 lg:p-8">

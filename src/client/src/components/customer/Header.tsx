@@ -58,8 +58,8 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full h-20 mb-4 flex items-center bg-gray-950/50 backdrop-blur-md sticky top-0 z-50 justify-center px-4">
-      <div className="flex items-center justify-between font-bold text-white w-full max-w-7xl">
+    <header className="w-full h-20 mb-4 flex items-center bg-gray-950/50 backdrop-blur-md sticky top-0 z-50 justify-center ">
+      <div className="flex items-center justify-between font-bold text-white w-full max-w-7xl px-4">
 
         {/* Left side */}
         <Link className="sm:text-xl text-x flex gap-2" to="/">

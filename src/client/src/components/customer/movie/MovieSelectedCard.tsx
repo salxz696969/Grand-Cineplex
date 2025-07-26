@@ -100,7 +100,7 @@ export default function MovieSelectedCard({ movie, isUpcoming = false }: MovieSe
           <div className="relative">
             <img src={movie.posterUrl} alt={movie.title} className="lg:w-full w-[150px] lg:h-auto object-cover rounded-md flex-shrink-0" />
             <button onClick={handlePlayClick} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-             bg-red-600 hover:bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition">
+             bg-blue-600 hover:bg-blue-500 text-white w-10 h-10 flex items-center justify-center rounded-full transition">
               <Play size={18} />
             </button>
           </div>

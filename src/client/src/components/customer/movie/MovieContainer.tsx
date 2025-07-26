@@ -26,6 +26,19 @@ function toLocalDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+// Skeleton component for loading state
+const SkeletonCard = () => (
+  <div className="overflow-hidden shadow-lg flex flex-col group bg-gray-900/50 border border-gray-800 rounded-xl">
+    <div className="aspect-[9/14] w-full bg-gray-900/50 overflow-hidden">
+      <div className="w-full h-full bg-gray-800 animate-pulse" />
+    </div>
+    <div className="pt-3 px-3 pb-2 flex flex-col gap-1 flex-1">
+      <div className="h-6 w-3/4 bg-gray-800 rounded animate-pulse" />
+      <div className="h-4 w-1/2 bg-gray-800 rounded animate-pulse" />
+    </div>
+  </div>
+);
+
 const MovieContainer: React.FC<MovieContainerProps> = ({
   searchTerm,
   activeTab,
@@ -120,13 +133,10 @@ const MovieContainer: React.FC<MovieContainerProps> = ({
 
   if (isLoading || isSearching) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-white text-sm">
-            {isSearching ? "Searching movies..." : "Loading movies..."}
-          </p>
-        </div>
+      <div className="grid gap-5 custom-cols">
+        {[...Array(6)].map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
       </div>
     );
   }

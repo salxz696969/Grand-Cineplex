@@ -4,6 +4,7 @@ import MovieCard from "./MovieCard";
 import { PlusCircle, Search } from "lucide-react";
 import AddMovie from "./AddMovie";
 import { getAllMovies, getRecentlyAddedMovies } from "../../api/manager";
+import EditMovie from "./EditMovie";
 
 type MovieData = {
     id: number;
@@ -26,6 +27,7 @@ export default function Movies() {
     const [activeTab, setActiveTab] = useState<string>("recent");
     const [addingMovie, setAddingMovie] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [editMovie, setEditMovie] = useState<MovieData | null>(null);
 
     useEffect(() => {
         const fetchMovies = async () => {
@@ -96,6 +98,12 @@ export default function Movies() {
         );
     }
 
+    if (editMovie) {
+        return (
+            <EditMovie onBack={() => setEditMovie(null)} movie={editMovie} />
+        )
+    }
+
     return (
         <div className="flex flex-col gap-4  w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
             <div className="flex flex-row items-center justify-between">
@@ -124,12 +132,13 @@ export default function Movies() {
             </div>
             <div className="grid w-full gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-6">
                 {activeTab === "recent"
-                    ? movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)
+                    ? movies.map((movie) => <MovieCard key={movie.id} movie={movie} onEdit={() => setEditMovie(movie)} />)
                     : allMovies.length > 0
-                        ? allMovies.map((movie) => <MovieCard key={movie.id} movie={movie} />)
+                        ? allMovies.map((movie) => <MovieCard key={movie.id} movie={movie} onEdit={() => setEditMovie(movie)} />)
                         : <div className="col-span-full text-center text-slate-400">No movies available.</div>
                 }
             </div>
+
         </div>
     );
 } 

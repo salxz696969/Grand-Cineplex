@@ -129,7 +129,7 @@ export default function ScheduleHeader({
               })}
           </div>
         </div>
-        <div className="w-full max-w-xs flex-shrink-0 lg:justify-end flex justify-center lg:ml-4 hidden lg:block">
+        <div className="w-full max-w-xs flex-shrink-0 lg:justify-end  justify-center lg:ml-4 hidden lg:block">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
       </div>
