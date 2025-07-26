@@ -1,8 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/customer/Home";
-import SignUp from "../pages/customer/SignUp";
-import SignIn from "../pages/customer/SignIn";
+import SignIn from "../pages/customer/Auth";
 import SeatContainer from "../pages/customer/SeatContainer";
 import PaymentContainer from "../pages/customer/PaymentContainer";
 import MovieSelectedContainer from "../pages/customer/MovieSelectedContainer";
@@ -15,8 +14,7 @@ const CustomerRoutes = () => {
       <Route path="/seats/:screeningId" element={<SeatContainer />} />
       {/* <Route path="/payment/:bookingId" element={<PaymentContainer />} /> */}
       <Route path="/payment" element={<PaymentContainer />} />
-      <Route path="/SignUp" element={<SignUp />} />
-      <Route path="/SignIn" element={<SignIn />} />
+      <Route path="/auth" element={<SignIn />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/movie/:id" element={<MovieSelectedContainer />} />
     </Routes>
