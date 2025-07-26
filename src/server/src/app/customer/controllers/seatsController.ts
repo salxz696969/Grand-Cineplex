@@ -43,13 +43,7 @@ export const getAllSeatsBasedOnShowTime = async (
           include: [
             {
               association: "seats",
-              attributes: [
-                "id",
-                "rowNumber",
-                "seatNumber",
-                "seatType",
-                "price",
-              ],
+              attributes: ["id", "rowNumber", "seatNumber", "seatType"],
             },
           ],
         },

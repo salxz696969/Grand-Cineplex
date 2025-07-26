@@ -6,6 +6,7 @@ import seatsRoute from "./seatsRoute";
 import usersRoute from "./usersRoute";
 import staffRoute from "./staffsRoute";
 import ticketsRoute from "./ticketsRoute";
+import paymentRoute from "./paymentRoute";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/seats", seatsRoute); // customer can see all seats
 router.use("/users", usersRoute); // customer can see all users
 router.use("/staff", staffRoute); // customer can see all staff
 router.use("/tickets", ticketsRoute); // customer can see all tickets
+router.use("/payment", paymentRoute); // customer can see all tickets
 
 export default router;

@@ -68,3 +68,16 @@ export const submitBooking = async (bookingData: BookingSummary) => {
     throw error;
   }
 };
+
+export const getQrCode = async (amount: number) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/cashier/payment/qr-code`,
+      { amount }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error getting QR code:", error);
+    throw error;
+  }
+};

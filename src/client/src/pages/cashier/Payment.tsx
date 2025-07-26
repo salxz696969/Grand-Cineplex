@@ -17,8 +17,8 @@ import {
 	Clapperboard,
 } from "lucide-react";
 import sequelize from "./../../../../server/src/db/index";
-import { getMoviesAndItsScreenings, submitBooking } from "../../api/cashier";
-import { Link } from "react-router-dom";
+import { getMoviesAndItsScreenings, getQrCode, submitBooking } from "../../api/cashier";
+import { Link, useNavigate } from "react-router-dom";
 
 interface PaymentMethod {
 	id: string;
@@ -71,6 +71,7 @@ interface Screening {
 }
 
 export function Payment() {
+	const navigate = useNavigate();
 	const [selectedPaymentMethod, setSelectedPaymentMethod] =
 		useState<string>("");
 	const [isProcessing, setIsProcessing] = useState(false);
@@ -81,6 +82,13 @@ export function Payment() {
 	const [screeningDetails, setScreeningDetails] = useState<Screening | null>(
 		null
 	);
+
+	const [qrCode, setQrCode] = useState<any>("");
+
+	const handleQrCodePayment = async () => {
+		const data = await getQrCode(price);
+		setQrCode(data.qrImage);
+	};
 
 	useEffect(() => {
 		const getDataFromLocalStorage = () => {
@@ -361,7 +369,7 @@ export function Payment() {
 			{/* Header */}
 			<div className="max-w-7xl mx-auto mb-8">
 				<div className="flex items-center justify-between mb-6">
-					<button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+					<button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors" onClick={() => navigate(-1)}>
 						<ArrowLeft className="w-5 h-5" />
 						Back to Seat Selection
 					</button>
@@ -404,31 +412,7 @@ export function Payment() {
 						</div>
 
 						{/* Customer Info */}
-						<div className="grid md:grid-cols-2 gap-6 mb-6">
-							<div className="bg-gray-900/50 rounded-lg p-4">
-								<h4 className="font-semibold mb-3 flex items-center gap-2">
-									<User className="w-4 h-4" />
-									Customer Information
-								</h4>
-								<div className="space-y-2 text-sm">
-									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Name:
-										</span>
-										<span>
-											{bookingSummary.customerName}
-										</span>
-									</div>
-									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Phone:
-										</span>
-										<span>
-											{bookingSummary.customerPhone}
-										</span>
-									</div>
-								</div>
-							</div>
+						<div className="grid md:grid-cols-1 gap-6 mb-6">
 
 							<div className="bg-gray-900/50 rounded-lg p-4">
 								<h4 className="font-semibold mb-3 flex items-center gap-2">
@@ -510,9 +494,12 @@ export function Payment() {
 										? "border-blue-800 bg-blue-500/10"
 										: "border-slate-800 bg-gray-900/50 hover:border-gray-500"
 										}`}
-									onClick={() =>
-										setSelectedPaymentMethod(method.id)
-									}
+									onClick={() => {
+										setSelectedPaymentMethod(method.id);
+										if (method.id === "qr") {
+											handleQrCodePayment();
+										}
+									}}
 								>
 									<div className="text-center">
 										<div
@@ -562,16 +549,16 @@ export function Payment() {
 					)}
 
 					{/* Quick Payment Form */}
-					{selectedPaymentMethod === "qr" && (
+					{selectedPaymentMethod === "qr" && qrCode && (
 						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 							<h3 className="text-lg font-semibold mb-4">
 								QR Payment
 							</h3>
 							<div className="space-y-3">
 								<img
-									src={"/qr.png"}
+									src={qrCode}
 									alt="QR Code"
-									className="w-full h-auto"
+									className="w-full h-auto rounded-xl border-2 border-blue-600"
 								/>
 							</div>
 						</div>

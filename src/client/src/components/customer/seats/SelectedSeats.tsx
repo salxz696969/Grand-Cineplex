@@ -51,7 +51,7 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
           </div>
           <div className="flex items-center justify-between pt-3 border-t border-gray-700">
             <span className="text-gray-300">Total ({selectedSeats.length} seats):</span>
-            <span className="text-2xl font-bold text-green-400">${totalPrice.toFixed(2)}</span>
+            <span className="text-2xl font-bold text-blue-600">${totalPrice.toFixed(2)}</span>
           </div>
           <button onClick={handleContinue} className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform">
             Continue to Payment
