@@ -15,7 +15,7 @@ route.get("/", getAllMovies);
 // route.get("/:id", getMovieBasedOnId);
 route.post("/", addMovie);
 route.patch("/", updateMovie);
-route.delete("/movies/:id", verifyToken, deleteMovie);
+route.delete("/:id", deleteMovie);
 route.get("/recently-added", getRecentlyAddedMovies); // Assuming you want to use the same route for recently added movies
 
 export default route;

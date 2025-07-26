@@ -1,0 +1,190 @@
+import React, { useState } from "react";
+import { ArrowLeft, Calendar, Clock, MapPin, Film } from "lucide-react";
+import { updateScreening } from "../../api/manager";
+
+type ScreeningData = {
+	id: number;
+	movieId: number;
+	theaterId: number;
+	screeningDate: string;
+	screeningTime: string;
+	price: number;
+};
+
+type Movie = { id: number; title: string };
+type Theater = { id: number; name: string };
+
+type EditScreeningProps = {
+	onBack: () => void;
+	screening: ScreeningData;
+	movies: Movie[];
+	theaters: Theater[];
+};
+
+export default function EditScreening({ onBack, screening, movies, theaters }: EditScreeningProps) {
+	const [formData, setFormData] = useState<ScreeningData>({ ...screening });
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const handleInputChange = (field: keyof ScreeningData, value: string | number) => {
+		setFormData((prev) => ({
+			...prev,
+			[field]: value,
+		}));
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsSubmitting(true);
+
+		if (JSON.stringify(formData) === JSON.stringify(screening)) {
+			alert("Please change at least one field to edit the screening.");
+			setIsSubmitting(false);
+			return;
+		}
+
+		try {
+			await updateScreening(formData);
+			onBack();
+		} catch (error) {
+			console.error("Error updating screening:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	return (
+		<div className="flex flex-col gap-6 w-full">
+			{/* Header */}
+			<div className="flex flex-col">
+				<div className="flex items-center gap-4">
+					<button
+						onClick={onBack}
+						className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+					>
+						<ArrowLeft className="w-5 h-5" />
+						Back to Screenings
+					</button>
+				</div>
+			</div>
+			<div className="flex flex-col">
+				<h2 className="text-2xl font-bold tracking-tight text-white">Edit Screening</h2>
+				<p className="text-slate-400">Update screening information</p>
+			</div>
+
+			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					{/* Left Column */}
+					<div className="space-y-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
+							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+								<Film className="w-5 h-5" />
+								Screening Details
+							</h3>
+							<div className="space-y-4">
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Movie</label>
+									<select
+										value={formData.movieId}
+										onChange={(e) => handleInputChange("movieId", Number(e.target.value))}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+									>
+										<option value="">Select movie</option>
+										{movies.map((movie) => (
+											<option key={movie.id} value={movie.id}>
+												{movie.title}
+											</option>
+										))}
+									</select>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Theater</label>
+									<select
+										value={formData.theaterId}
+										onChange={(e) => handleInputChange("theaterId", Number(e.target.value))}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+									>
+										<option value="">Select theater</option>
+										{theaters.map((theater) => (
+											<option key={theater.id} value={theater.id}>
+												{theater.name}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					{/* Right Column */}
+					<div className="space-y-6">
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
+							<h3 className="text-lg font-semibold text-white mb-4">Date & Time</h3>
+							<div className="space-y-4">
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Date</label>
+									<div className="relative">
+										<input
+											type="date"
+											value={formData.screeningDate}
+											onChange={(e) => handleInputChange("screeningDate", e.target.value)}
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+										/>
+										<Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+									</div>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Time</label>
+									<div className="relative">
+										<input
+											type="time"
+											value={formData.screeningTime}
+											onChange={(e) => handleInputChange("screeningTime", e.target.value)}
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+										/>
+										<Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+									</div>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Price</label>
+									<input
+										type="number"
+										value={formData.price}
+										onChange={(e) => handleInputChange("price", Number(e.target.value))}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+										placeholder="e.g., 12.50"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{/* Action Buttons */}
+				<div className="flex gap-3 justify-end pt-6 border-t border-slate-800">
+					<button
+						type="button"
+						onClick={onBack}
+						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-900/50 text-white font-semibold rounded-lg transition"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						disabled={isSubmitting}
+						className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold rounded-lg transition flex items-center gap-2"
+					>
+						{isSubmitting ? (
+							<>
+								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+								Updating...
+							</>
+						) : (
+							<>
+								<Film className="w-4 h-4" />
+								Update Screening
+							</>
+						)}
+					</button>
+				</div>
+			</form>
+		</div>
+	);
+}

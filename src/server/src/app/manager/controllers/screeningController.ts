@@ -3,6 +3,8 @@ import Screening from "../../../db/models/Screening";
 import Booking from "../../../db/models/Booking";
 import Ticket from "../../../db/models/Ticket";
 import Seat from "../../../db/models/Seat";
+import Movie from "../../../db/models/Movie";
+import Theater from "../../../db/models/Theater";
 import { Op, Sequelize } from "sequelize";
 
 export const get7DaysShowTimes = async (req: Request, res: Response) => {
@@ -120,104 +122,89 @@ export const getTodayShowTimes = async (req: Request, res: Response) => {
 
 export const getAllShowTimes = async (req: Request, res: Response) => {
   try {
-    // Get all screenings with movie and theater info
-    const allShowTimes = await Screening.findAll({
+    const now = new Date();
+
+    const screenings = await Screening.findAll({
+      attributes: [
+        "id",
+        "screeningDate",   // <-- make sure your model defines field: 'screening_date'
+        "screeningTime",   // <-- field: 'screening_time'
+        "price",
+        // totalSeats in this theater
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM seats s
+            WHERE s.theater_id = "Screening"."theater_id"
+          )`),
+          "totalSeats",
+        ],
+        // booked seats for this screening
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM tickets t
+            JOIN bookings b ON b.id = t.booking_id
+            WHERE b.screening_id = "Screening"."id"
+          )`),
+          "bookedSeats",
+        ],
+      ],
       include: [
         {
-          association: "movie",
-          attributes: ["id", "title", "duration", "genre", "posterUrl"],
+          model: Movie,
+          as: "movie",
+          attributes: ["id", "title", "duration", "genre", "posterUrl"], // field: 'poster_url'
         },
         {
-          association: "theater",
-          attributes: {
-            include: [
-              [
-                Sequelize.literal(`(
-                  SELECT COUNT(*)
-                  FROM seats AS seat
-                  WHERE seat.theater_id = theater.id
-                )`),
-                "seatCount",
-              ],
-            ],
-            exclude: [],
-          },
+          model: Theater,
+          as: "theater",
+          attributes: ["id", "name"],
         },
       ],
       order: [
-        ["screening_date", "ASC"],
-        ["screening_time", "ASC"],
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
       ],
+      raw: true,   // flatten so we can read aliases directly
+      nest: true,  // keep included models nested under 'movie'/'theater'
     });
 
-    // For each screening, get booked seats
-    const result = [];
-    for (const screening of allShowTimes) {
-      // Find all bookings for this screening, including tickets and seats
-      const bookings = await Booking.findAll({
-        where: { screeningId: screening.id },
-        include: [
-          {
-            association: "tickets",
-            include: [
-              {
-                association: "seat",
-                attributes: ["id"],
-              },
-            ],
-          },
-        ],
-      });
-
-      // Collect all booked seats for this screening
-      const bookedSeats = (bookings as any[])
-        .flatMap((booking) =>
-          (booking.tickets || []).map((ticket: any) => ticket.seat)
-        )
-        .filter(Boolean);
-
-      // Extract seatCount from theater
-      const seatCount =
-        ((screening as any).theater?.dataValues &&
-          (screening as any).theater.dataValues.seatCount) ||
-        (screening as any).theater?.seatCount ||
-        0;
-
-      const screeningDate = screening.screeningDate;
-      const screeningTime = screening.screeningTime;
-      const now = new Date();
+    const result = screenings.map((s: any) => {
+      const screeningDate = s.screeningDate; // YYYY-MM-DD
+      const screeningTime = s.screeningTime; // HH:MM:SS
       const screeningDateTime = new Date(`${screeningDate}T${screeningTime}`);
-      let status: "upcoming" | "ongoing" | "completed" = "upcoming";
-      const durationMinutes = (screening as any).movie?.duration || 0;
+      const durationMinutes = s.movie?.duration || 0;
       const endDateTime = new Date(
-        screeningDateTime.getTime() + durationMinutes * 60000
+        screeningDateTime.getTime() + durationMinutes * 60_000
       );
 
-      if (now < screeningDateTime) {
-        status = "upcoming";
-      } else if (now >= screeningDateTime && now <= endDateTime) {
-        status = "ongoing";
-      } else {
-        status = "completed";
-      }
+      let status: "upcoming" | "ongoing" | "completed";
+      if (now < screeningDateTime) status = "upcoming";
+      else if (now <= endDateTime) status = "ongoing";
+      else status = "completed";
 
-      result.push({
-        id: screening.id,
-        movieTitle: (screening as any).movie?.title,
-        movieImage: (screening as any).movie?.posterUrl,
-        theater: (screening as any).theater?.name,
+      const totalSeats = Number(s.totalSeats) || 0;
+      const bookedSeats = Number(s.bookedSeats) || 0;
+
+      return {
+        id: s.id,
+        movieTitle: s.movie?.title,
+        movieImage: s.movie?.posterUrl,
+        theater: s.theater?.name,
         date: screeningDate,
         time: screeningTime.slice(0, 5),
-        duration: String((screening as any).movie?.duration) + " min",
-        availableSeats: seatCount - bookedSeats.length,
-        totalSeats: seatCount,
-        price: Number(screening.price),
+        duration: `${durationMinutes} min`,
+        availableSeats: totalSeats - bookedSeats,
+        totalSeats,
+        price: Number(s.price),
         status,
-      });
-    }
+      };
+    });
 
     res.json(result);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
