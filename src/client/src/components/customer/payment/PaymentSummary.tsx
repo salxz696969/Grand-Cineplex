@@ -1,5 +1,5 @@
 import React from "react";
-import { Receipt, Monitor, MapPin, Calendar, Clock, User, Sofa,} from "lucide-react";
+import { Receipt, Monitor, MapPin, Calendar, Clock, User, Sofa, } from "lucide-react";
 import { BookingSummary } from "../../../../../shared/types/type";
 import { convertTo12HourFormat } from "../../../utils/Function";
 
@@ -7,7 +7,7 @@ interface PaymentSummaryProps {
   bookingSummary: BookingSummary;
 }
 
-export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
+export default function PaymentSummary({ bookingSummary, }: PaymentSummaryProps) {
 
   return (
     <div className="lg:col-span-2 space-y-6">
@@ -17,8 +17,8 @@ export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
         Booking Summary
       </h2>
 
-      <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-      
+      <div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
+
         <div className="flex items-start gap-4 mb-6">
           <div className="p-3 bg-sky-600/20 rounded-lg">
             <Monitor className="w-8 h-8 text-sky-400" />
@@ -42,9 +42,9 @@ export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="grid md:grid-cols-1 gap-6 mb-6">
 
-          <div className="bg-gray-700/50 rounded-lg p-4">
+          {/* <div className="bg-gray-700/50 rounded-lg p-4">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <User className="w-4 h-4" />
               Customer Information
@@ -59,9 +59,9 @@ export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
                 <span>{bookingSummary.customerPhone}</span>
               </div>
             </div>
-          </div>
+          </div> */}
 
-          <div className="bg-gray-700/50 rounded-lg p-4">
+          <div className="bg-gray-900/50 rounded-lg p-4">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
               <Sofa className="w-4 h-4" />
               Seat Details
@@ -85,7 +85,7 @@ export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
         </div>
       </div>
 
-      <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+      <div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
         <h3 className="text-xl font-semibold mb-4">Price Breakdown</h3>
         <div className="space-y-3">
 
@@ -97,7 +97,7 @@ export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
                 </div>
                 <span>Seat {seat.seat_number}</span>
               </div>
-              <span className="font-medium">${seat.price.toFixed(2)}</span>
+              <span className="font-medium">${seat.price || 0}</span>
             </div>
           ))}
 
@@ -105,7 +105,7 @@ export default function PaymentSummary({bookingSummary,}: PaymentSummaryProps) {
             <div className="flex justify-between items-center">
               <span className="text-lg font-semibold">Total Amount:</span>
               <span className="text-2xl font-bold text-green-400">
-                ${bookingSummary.totalAmount.toFixed(2)}
+                ${bookingSummary.totalAmount || 0}
               </span>
             </div>
           </div>

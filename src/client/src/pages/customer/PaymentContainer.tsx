@@ -25,7 +25,6 @@ export default function PaymentContainer() {
 
   const [bookingSummary, setBookingSummary] = useState<BookingSummary | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
-  const [pageLoading, setPageLoading] = useState<boolean>(true);
   const [processing, setProcessing] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [isAuthRequired, setIsAuthRequired] = useState<boolean>(true);
@@ -97,8 +96,6 @@ export default function PaymentContainer() {
       return;
     }
 
-    setPageLoading(true);
-
     fetchSeatsByScreening(screeningId)
       .then((data) => {
         if (!data || !data.seats) throw new Error("Invalid data format from API");
@@ -121,12 +118,10 @@ export default function PaymentContainer() {
           screeningId,
         });
 
-        setTimeout(() => setPageLoading(false), 500);
       })
       .catch((error) => {
         console.error("Failed to load seat info:", error);
         alert("Failed to load seat info.");
-        setPageLoading(false);
         navigate(-1);
       });
   }, [screeningId, seatIds, navigate]);
@@ -171,13 +166,30 @@ export default function PaymentContainer() {
     }
   };
 
+  // Handle QR payment success
+  const handlePaymentSuccess = async () => {
+    if (!bookingSummary) return;
+
+    setProcessing(true);
+
+    try {
+      await new Promise((res) => setTimeout(res, 1000)); // Brief delay for UX
+      await bookSeats(bookingSummary.screeningId!, seatIds, "confirmed");
+      setIsCompleted(true);
+    } catch (error: any) {
+      alert("Booking failed: " + (error.message || "Unknown error"));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const formatTime = (seconds: number): string => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
     const s = (seconds % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
   };
 
-  if (pageLoading || processing) return <LoadingSpinner />;
+  if (processing) return <LoadingSpinner />;
   if (!bookingSummary) return <div className="text-white">Booking data not found</div>;
   if (isCompleted) return <PaymentSuccess bookingSummary={bookingSummary} />;
 
@@ -222,6 +234,7 @@ export default function PaymentContainer() {
             handlePayment={handlePayment}
             isProcessing={processing}
             totalAmount={bookingSummary.totalAmount}
+            onPaymentSuccess={handlePaymentSuccess}
           />
         </div>
       </div>
