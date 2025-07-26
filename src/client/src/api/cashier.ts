@@ -81,3 +81,15 @@ export const getQrCode = async (amount: number) => {
     throw error;
   }
 };
+
+export const checkPaymentStatus = async (tranId: string) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/cashier/payment/status/${tranId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    throw error;
+  }
+};

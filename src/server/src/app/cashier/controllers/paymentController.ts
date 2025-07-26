@@ -176,6 +176,7 @@ export async function createKhqrPayment(req: Request, res: Response) {
       qrImage,
       qrString,
       abapay_deeplink,
+      tranId, // Add transaction ID for polling
     });
   } catch (err: any) {
     console.log("=== PAYWAY ERROR DEBUG ===");
@@ -195,6 +196,82 @@ export async function createKhqrPayment(req: Request, res: Response) {
 
     return res.status(500).json({
       error: "Failed to generate QR code",
+      message: err.response?.data || err.message,
+      debug: {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+      },
+    });
+  }
+}
+
+export async function checkPaymentStatus(req: Request, res: Response) {
+  const { tranId } = req.params;
+
+  if (!tranId) {
+    return res.status(400).json({ error: "Transaction ID is required" });
+  }
+
+  const reqTime = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14);
+
+  // Use the correct PayWay Check Transaction API parameters
+  const payload = {
+    req_time: reqTime,
+    merchant_id: merchantId,
+    tran_id: tranId,
+  };
+
+  // Generate hash for status check
+  const hashString = [
+    payload.req_time,
+    payload.merchant_id,
+    payload.tran_id,
+  ].join("");
+
+  const hash = generateHash(hashString);
+
+  const finalPayload = {
+    ...payload,
+    hash,
+  };
+
+  const statusApiUrl =
+    "https://checkout-sandbox.payway.com.kh/api/payment-gateway/v1/payments/check-transaction";
+
+  try {
+    console.log("=== PAYMENT STATUS CHECK DEBUG ===");
+    console.log("Using Check Transaction API:", statusApiUrl);
+    console.log("Checking status for tranId:", tranId);
+    console.log("Payload:", JSON.stringify(finalPayload, null, 2));
+
+    const response = await axios.post(statusApiUrl, finalPayload, {
+      headers: { "Content-Type": "application/json" },
+      timeout: 10000,
+    });
+
+    console.log("Status Response Status:", response.status);
+    console.log("Status Response Data:", response.data);
+
+    // Extract status from the response
+    const { payment_status, amount, currency, tran_id } = response.data;
+
+    return res.status(200).json({
+      success: true,
+      status: payment_status, // Use payment_status from PayWay response
+      amount,
+      currency,
+      tranId: tran_id || tranId,
+    });
+  } catch (err: any) {
+    console.log("=== PAYMENT STATUS ERROR DEBUG ===");
+    console.log("Error Status:", err.response?.status);
+    console.log("Error Status Text:", err.response?.statusText);
+    console.log("Error Data:", err.response?.data);
+    console.log("Error Message:", err.message);
+
+    return res.status(500).json({
+      error: "Failed to check payment status",
       message: err.response?.data || err.message,
       debug: {
         status: err.response?.status,
