@@ -5,6 +5,7 @@ import Screening from "../../../db/models/Screening";
 import Movie from "../../../db/models/Movie";
 import Theater from "../../../db/models/Theater";
 import Payment from "../../../db/models/Payment";
+import Staff from "../../../db/models/Staff";
 
 const getAllBookingSinceLastWeek = async () => {
   try {
@@ -74,35 +75,47 @@ const getAllBookingSinceLastWeek = async () => {
 
 const getMoneyFromThisMonthAndLastMonth = async () => {
   try {
-    const thisMonth = new Date();
-    thisMonth.setDate(1);
-    thisMonth.setHours(0, 0, 0, 0);
+    const now = new Date();
 
-    const lastMonth = new Date(thisMonth);
-    lastMonth.setMonth(thisMonth.getMonth() - 1);
-    const thisMonthMoney = await Payment.sum("amount", {
-      where: {
-        createdAt: {
-          [Op.gte]: thisMonth,
-        },
-      },
-    });
+    // Start of this month
+    const startThisMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    // Start of next month
+    const startNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0);
+    // Start of last month
+    const startLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
 
-    const lastMonthMoney = await Payment.sum("amount", {
-      where: {
-        createdAt: {
-          [Op.gte]: lastMonth,
-          [Op.lt]: thisMonth,
+    const [thisMonthRaw, lastMonthRaw] = await Promise.all([
+      Payment.sum("amount", {
+        where: {
+          createdAt: {
+            [Op.gte]: startThisMonth,
+            [Op.lt]: startNextMonth,
+          },
         },
-      },
-    });
+      }),
+      Payment.sum("amount", {
+        where: {
+          createdAt: {
+            [Op.gte]: startLastMonth,
+            [Op.lt]: startThisMonth,
+          },
+        },
+      }),
+    ]);
+
+    const thisMonth = Number(thisMonthRaw) || 0;
+    const lastMonth = Number(lastMonthRaw) || 0;
+
+    const percentageFromLastMonth =
+      lastMonth === 0 ? null : ((thisMonth - lastMonth) / lastMonth) * 100;
 
     return {
-      revenue: thisMonthMoney,
-      percentageFromLastMonth: thisMonthMoney / lastMonthMoney,
+      revenue: thisMonth,
+      percentageFromLastMonth, // e.g. 25 means +25%
     };
   } catch (error) {
-    console.error("Error fetching money from this week and last week:", error);
+    console.error("Error fetching money from this month and last month:", error);
+    throw error;
   }
 };
 
@@ -172,7 +185,7 @@ const getActiveTheatersCount = async () => {
 
 const getTotalStaffCount = async () => {
   try {
-    const totalStaffCount = await Booking.count();
+    const totalStaffCount = await Staff.count();
     return totalStaffCount;
   } catch (error) {
     console.error("Error fetching total staff count:", error);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Pencil, Trash, Trash2 } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import EditMovie from "./EditMovie";
+import { deleteMovie } from "../../api/manager";
 
 // export interface ManagerMovie {
 // 	id: number;
@@ -32,9 +33,22 @@ type MovieData = {
 	language: string;
 };
 
-export default function MovieCard({ movie, onEdit }: { movie: MovieData, onEdit: () => void }) {
+export default function MovieCard({ movie, onEdit }: { movie: MovieData; onEdit: () => void }) {
+	const [showConfirm, setShowConfirm] = useState(false);
+	const [deleting, setDeleting] = useState(false);
 
+	const deleteMovieHandler = () => {
+		setShowConfirm(true);
+	};
 
+	const confirmDelete = async () => {
+		setDeleting(true);
+		await deleteMovie(movie.id);
+		setDeleting(false);
+		setShowConfirm(false);
+	};
+
+	const cancelDelete = () => setShowConfirm(false);
 
 	return (
 		<div className="overflow-hidden shadow-lg flex flex-col group bg-gray-950 border border-gray-800 rounded-xl hover:border-blue-500 hover:shadow-blue-500/30 transition-all duration-200">
@@ -61,10 +75,43 @@ export default function MovieCard({ movie, onEdit }: { movie: MovieData, onEdit:
 				>
 					<Pencil className="w-4 h-4 text-blue-200" /> Edit
 				</button>
-				<button className="flex  flex-1 items-center gap-1 px-2 py-2 text-xs rounded bg-red-800 hover:bg-red-700 text-white font-semibold transition  justify-center h-10 shadow-sm">
+				<button
+					onClick={deleteMovieHandler}
+					className="flex  flex-1 items-center gap-1 px-2 py-2 text-xs rounded bg-red-800 hover:bg-red-700 text-white font-semibold transition  justify-center h-10 shadow-sm"
+				>
 					<Trash className="w-4 h-4 text-white" />
 				</button>
 			</div>
+
+			{/* Confirmation Modal */}
+			{showConfirm && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+					<div className="bg-gray-900 border border-slate-700 rounded-lg p-6 shadow-lg w-[320px] flex flex-col items-center">
+						<h3 className="text-lg font-semibold text-white mb-2">Confirm Deletion</h3>
+						<p className="text-slate-400 mb-6 text-center">
+							Are you sure you want to delete this movie?
+							<br />
+							This action cannot be undone.
+						</p>
+						<div className="flex gap-3 w-full justify-center">
+							<button
+								onClick={cancelDelete}
+								className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-white font-semibold transition"
+								disabled={deleting}
+							>
+								No, Keep
+							</button>
+							<button
+								onClick={confirmDelete}
+								className="px-4 py-2 rounded bg-red-700 hover:bg-red-600 text-white font-semibold transition"
+								disabled={deleting}
+							>
+								{deleting ? "Deleting..." : "Yes, Delete"}
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

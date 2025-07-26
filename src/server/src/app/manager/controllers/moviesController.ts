@@ -138,7 +138,6 @@ export const updateMovie = async (req: Request, res: Response) => {
 export const deleteMovie = async (req: Request, res: Response) => {
 	try {
 		const movieId = parseInt(req.params.id);
-
 		const movie = await Movie.findByPk(movieId);
 
 		if (!movie) {
