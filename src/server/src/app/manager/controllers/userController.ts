@@ -1,6 +1,8 @@
 import { Response, Request } from "express";
 import Customer from "../../../db/models/Customer";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import Staff from "../../../db/models/Staff";
 
 declare global {
   namespace Express {
@@ -9,6 +11,8 @@ declare global {
     }
   }
 }
+
+const JWT_SECRET = process.env.JWT_SECRET || "GrandCineplix_CADT";
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
@@ -133,5 +137,46 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+export const logInUser = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required." });
+    }
+
+    const user = await Staff.findByEmail(email);
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    return res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      token,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
