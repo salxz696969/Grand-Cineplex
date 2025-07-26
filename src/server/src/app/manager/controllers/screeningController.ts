@@ -127,10 +127,11 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
     const screenings = await Screening.findAll({
       attributes: [
         "id",
-        "screeningDate",   // <-- make sure your model defines field: 'screening_date'
-        "screeningTime",   // <-- field: 'screening_time'
+        "screeningDate",
+        "screeningTime",
         "price",
-        // totalSeats in this theater
+        "movieId",
+        "theaterId",
         [
           Sequelize.literal(`(
             SELECT COUNT(*)
@@ -139,7 +140,6 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
           )`),
           "totalSeats",
         ],
-        // booked seats for this screening
         [
           Sequelize.literal(`(
             SELECT COUNT(*)
@@ -154,7 +154,7 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
         {
           model: Movie,
           as: "movie",
-          attributes: ["id", "title", "duration", "genre", "posterUrl"], // field: 'poster_url'
+          attributes: ["id", "title", "duration", "genre", "posterUrl"],
         },
         {
           model: Theater,
@@ -166,13 +166,13 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
         ["screeningDate", "ASC"],
         ["screeningTime", "ASC"],
       ],
-      raw: true,   // flatten so we can read aliases directly
-      nest: true,  // keep included models nested under 'movie'/'theater'
+      raw: true,
+      nest: true,
     });
 
     const result = screenings.map((s: any) => {
-      const screeningDate = s.screeningDate; // YYYY-MM-DD
-      const screeningTime = s.screeningTime; // HH:MM:SS
+      const screeningDate = s.screeningDate;
+      const screeningTime = s.screeningTime;
       const screeningDateTime = new Date(`${screeningDate}T${screeningTime}`);
       const durationMinutes = s.movie?.duration || 0;
       const endDateTime = new Date(
@@ -189,6 +189,8 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
 
       return {
         id: s.id,
+        movieId: s.movieId,
+        theaterId: s.theaterId,
         movieTitle: s.movie?.title,
         movieImage: s.movie?.posterUrl,
         theater: s.theater?.name,

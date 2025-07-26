@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { ArrowLeft, Calendar, Clock, MapPin, Film } from "lucide-react";
-import { updateScreening } from "../../api/manager";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, Calendar, Clock, Film } from "lucide-react";
+import { updateScreening, getAllMovies, getTheaters } from "../../api/manager";
 
 type ScreeningData = {
 	id: number;
@@ -17,13 +17,26 @@ type Theater = { id: number; name: string };
 type EditScreeningProps = {
 	onBack: () => void;
 	screening: ScreeningData;
-	movies: Movie[];
-	theaters: Theater[];
 };
 
-export default function EditScreening({ onBack, screening, movies, theaters }: EditScreeningProps) {
+export default function EditScreening({ onBack, screening }: EditScreeningProps) {
 	const [formData, setFormData] = useState<ScreeningData>({ ...screening });
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [movies, setMovies] = useState<Movie[]>([]);
+	const [theaters, setTheaters] = useState<Theater[]>([]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const [moviesRes, theatersRes] = await Promise.all([getAllMovies(), getTheaters()]);
+				setMovies(moviesRes);
+				setTheaters(theatersRes);
+			} catch (error) {
+				console.error("Error fetching movies or theaters:", error);
+			}
+		};
+		fetchData();
+	}, []);
 
 	const handleInputChange = (field: keyof ScreeningData, value: string | number) => {
 		setFormData((prev) => ({
@@ -44,12 +57,12 @@ export default function EditScreening({ onBack, screening, movies, theaters }: E
 
 		try {
 			await updateScreening(formData);
-			onBack();
 		} catch (error) {
 			console.error("Error updating screening:", error);
 		} finally {
 			setIsSubmitting(false);
 		}
+		onBack();
 	};
 
 	return (

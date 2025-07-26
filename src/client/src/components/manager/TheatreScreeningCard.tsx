@@ -3,7 +3,7 @@ import { Screening } from "./Screenings";
 import { MapPin, Clock, Users } from "lucide-react";
 import { deleteScreening } from "../../api/manager";
 
-export default function TheaterScreeningCard({ screening }: { screening: Screening }) {
+export default function TheaterScreeningCard({ screening, onEdit }: { screening: Screening; onEdit: () => void }) {
 	const getStatusColor = (status: string) => {
 		switch (status) {
 			case "upcoming":
@@ -84,7 +84,10 @@ export default function TheaterScreeningCard({ screening }: { screening: Screeni
 				<div className="flex items-center justify-between">
 					<span className="text-sm font-semibold text-green-400">${screening.price}</span>
 					<div className="flex gap-2">
-						<button className="px-2 py-1 text-xs rounded bg-blue-800 hover:bg-blue-700 text-white font-semibold transition">
+						<button
+							className="px-2 py-1 text-xs rounded bg-blue-800 hover:bg-blue-700 text-white font-semibold transition"
+							onClick={onEdit}
+						>
 							Edit
 						</button>
 						<button

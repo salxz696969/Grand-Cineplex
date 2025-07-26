@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-	PlusCircle,
-	Search,
-	Calendar,
-	Clock,
-	MapPin,
-	Users,
-	Filter,
-	Film,
-} from "lucide-react";
+import { PlusCircle, Search, Calendar, Clock, MapPin, Users, Filter, Film } from "lucide-react";
 import MovieScreeningCard from "./MovieScreeningCard";
 import AddScreening from "./AddScreening";
+import EditScreening from "./EditScreening";
 import { getTodayShowTimes } from "../../api/manager";
 
 export interface Screening {
 	id: number;
+	movieId: number; // <-- add this
+	theaterId: number; // <-- add this
 	movieTitle: string;
 	movieImage: string;
 	theater: string;
@@ -27,7 +21,6 @@ export interface Screening {
 	status: "upcoming" | "ongoing" | "completed";
 }
 
-
 export default function Screenings() {
 	const [screenings, setScreenings] = useState<Screening[]>([]);
 	const [activeTab, setActiveTab] = useState<string>("today");
@@ -36,6 +29,7 @@ export default function Screenings() {
 	const [selectedStatus, setSelectedStatus] = useState<string>("all");
 	const [addingScreening, setAddingScreening] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [editScreening, setEditScreening] = useState<Screening | null>(null);
 
 	// Use today's date for filtering
 	const today = new Date().toISOString().split("T")[0];
@@ -53,17 +47,12 @@ export default function Screenings() {
 		fetchScreenings();
 	}, []);
 	const filteredScreenings = screenings.filter((screening) => {
-		const matchesTab =
-			activeTab === "today" ? screening.date === today : true;
+		const matchesTab = activeTab === "today" ? screening.date === today : true;
 		const matchesSearch =
-			screening.movieTitle
-				.toLowerCase()
-				.includes(searchTerm.toLowerCase()) ||
+			screening.movieTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
 			screening.theater.toLowerCase().includes(searchTerm.toLowerCase());
-		const matchesTheater =
-			selectedTheater === "all" || screening.theater === selectedTheater;
-		const matchesStatus =
-			selectedStatus === "all" || screening.status === selectedStatus;
+		const matchesTheater = selectedTheater === "all" || screening.theater === selectedTheater;
+		const matchesStatus = selectedStatus === "all" || screening.status === selectedStatus;
 
 		return matchesTab && matchesSearch && matchesTheater && matchesStatus;
 	});
@@ -96,6 +85,24 @@ export default function Screenings() {
 		return <AddScreening onBack={handleBackToScreenings} />;
 	}
 
+	// If editing, show EditScreening
+	if (editScreening) {
+		// You need to fetch all movies and theaters here, or pass them from parent
+		// For demo, use empty arrays:
+		return (
+			<EditScreening
+				onBack={() => setEditScreening(null)}
+				screening={{
+					...editScreening,
+					movieId: (editScreening as any).movieId ?? 0,
+					theaterId: (editScreening as any).theaterId ?? 0,
+					screeningDate: editScreening.date,
+					screeningTime: editScreening.time,
+				}}
+			/>
+		);
+	}
+
 	if (loading) {
 		// Subtle skeleton loader
 		return (
@@ -117,7 +124,10 @@ export default function Screenings() {
 				</div>
 				<div className="grid gap-6 mt-4">
 					{[...Array(4)].map((_, i) => (
-						<div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg animate-pulse">
+						<div
+							key={i}
+							className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg animate-pulse"
+						>
 							<div className="h-6 w-32 bg-gray-800 rounded mb-2" />
 							<div className="h-4 w-24 bg-gray-800 rounded mb-1" />
 							<div className="h-4 w-40 bg-gray-800 rounded mb-1" />
@@ -134,12 +144,8 @@ export default function Screenings() {
 			{/* Header */}
 			<div className="flex flex-row items-center justify-between">
 				<div className="flex flex-col">
-					<h2 className="text-2xl font-bold tracking-tight text-white">
-						Screenings
-					</h2>
-					<p className="text-gray-400">
-						Manage movie screenings and showtimes.
-					</p>
+					<h2 className="text-2xl font-bold tracking-tight text-white">Screenings</h2>
+					<p className="text-gray-400">Manage movie screenings and showtimes.</p>
 				</div>
 				<button
 					onClick={handleAddScreening}
@@ -155,19 +161,17 @@ export default function Screenings() {
 				{/* Tabs */}
 				<div className="flex flex-row items-center gap-4">
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "today"
-							? "border-blue-600 font-bold"
-							: "border-transparent"
-							}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${
+							activeTab === "today" ? "border-blue-600 font-bold" : "border-transparent"
+						}`}
 						onClick={() => setActiveTab("today")}
 					>
 						Today's Screenings
 					</button>
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "all"
-							? "border-blue-600 font-bold"
-							: "border-transparent"
-							}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${
+							activeTab === "all" ? "border-blue-600 font-bold" : "border-transparent"
+						}`}
 						onClick={() => setActiveTab("all")}
 					>
 						All Screenings
@@ -219,8 +223,7 @@ export default function Screenings() {
 			{/* Results count */}
 			<div className="text-sm text-gray-400">
 				{Object.keys(screeningsByMovie).length} movie
-				{Object.keys(screeningsByMovie).length !== 1 ? "s" : ""} with{" "}
-				{filteredScreenings.length} screening
+				{Object.keys(screeningsByMovie).length !== 1 ? "s" : ""} with {filteredScreenings.length} screening
 				{filteredScreenings.length !== 1 ? "s" : ""} found
 			</div>
 
@@ -233,13 +236,12 @@ export default function Screenings() {
 							movieTitle={movieData.movieTitle}
 							movieImage={movieData.movieImage}
 							screenings={movieData.screenings}
+							onEditScreening={setEditScreening} // <-- pass handler
 						/>
 					))
 				) : (
 					<div className="text-center py-8">
-						<p className="text-gray-400">
-							No screenings found matching your criteria.
-						</p>
+						<p className="text-gray-400">No screenings found matching your criteria.</p>
 					</div>
 				)}
 			</div>

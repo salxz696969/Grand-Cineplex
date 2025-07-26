@@ -45,7 +45,6 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 		}
 
 		try {
-			console.log("Movie updated successfully:", formData);
 			await updateMovie(formData);
 		} catch (error) {
 			console.error("Error adding movie:", error);
