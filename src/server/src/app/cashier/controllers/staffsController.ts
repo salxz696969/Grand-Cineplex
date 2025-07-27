@@ -5,8 +5,7 @@ import Staff from "../../../db/models/Staff";
 export const addStaff = async (req: Request, res: Response) => {
   const { name, email, phone, password, role, hiredDate } = req.body;
   try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const createdAt = new Date();
     const newStaff = await Staff.create({

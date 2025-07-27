@@ -67,7 +67,6 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 
 		setIsSubmitting(true);
 
-		// TODO: Implement API call to add staff
 		try {
 			const dataToSend = {
 				name: formData.firstName + " " + formData.lastName,
@@ -80,7 +79,6 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 					: new Date(),
 				isActive: true,
 				createdAt: new Date(),
-				department: formData.department,
 			};
 			await addStaff(dataToSend);
 			// console.log("Adding staff:", dataToSend);
@@ -167,12 +165,12 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 					</button>
 				</div>
 			</div>
-				<div className="flex flex-col ">
-					<h2 className="text-2xl font-bold tracking-tight text-white">
-						Add New Staff Member
-					</h2>
-					<p className="text-slate-400">Create a new staff account</p>
-				</div>
+			<div className="flex flex-col ">
+				<h2 className="text-2xl font-bold tracking-tight text-white">
+					Add New Staff Member
+				</h2>
+				<p className="text-slate-400">Create a new staff account</p>
+			</div>
 
 			{/* Form */}
 			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -369,9 +367,9 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 									formData.confirmPassword && (
 										<div
 											className={`text-sm ${formData.password ===
-													formData.confirmPassword
-													? "text-green-400"
-													: "text-red-400"
+												formData.confirmPassword
+												? "text-green-400"
+												: "text-red-400"
 												}`}
 										>
 											{formData.password ===
@@ -390,7 +388,7 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<Shield className="w-5 h-5" />
-								Role & Department
+								Role
 							</h3>
 
 							<div className="space-y-4">
@@ -420,94 +418,40 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
 										))}
 									</select>
 								</div>
-
-								{/* Role Description */}
-								{formData.role && (
-									<div className="bg-gray-900/50 rounded-lg p-3 border border-slate-800">
-										<div
-											className={`font-medium ${getRoleColor(
-												formData.role
-											)}`}
-										>
-											{
-												roles.find(
-													(r) =>
-														r.value ===
-														formData.role
-												)?.label
-											}
-										</div>
-										<div className="text-slate-400 text-sm mt-1">
-											{
-												roles.find(
-													(r) =>
-														r.value ===
-														formData.role
-												)?.description
-											}
-										</div>
-									</div>
-								)}
-
-								<div>
-									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Department
-									</label>
-									<select
-										value={formData.department}
-										onChange={(e) =>
-											handleInputChange(
-												"department",
-												e.target.value
-											)
-										}
-										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-									>
-										<option value="">
-											Select department
-										</option>
-										{departments.map((dept) => (
-											<option key={dept} value={dept}>
-												{dept}
-											</option>
-										))}
-									</select>
-								</div>
 							</div>
-						</div>
 
-						{/* Employment Details */}
-						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
-							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-								<Building className="w-5 h-5" />
-								Employment Details
-							</h3>
+							{/* Employment Details */}
+							<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
+								<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+									<Building className="w-5 h-5" />
+									Employment Details
+								</h3>
 
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Hire Date *
-									</label>
-									<input
-										type="date"
-										required
-										value={formData.hireDate}
-										onChange={(e) =>
-											handleInputChange(
-												"hireDate",
-												e.target.value
-											)
-										}
-										max={
-											new Date()
-												.toISOString()
-												.split("T")[0]
-										}
-										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-									/>
-								</div>
+								<div className="space-y-4">
+									<div>
+										<label className="block text-sm font-medium text-slate-300 mb-2">
+											Hire Date *
+										</label>
+										<input
+											type="date"
+											required
+											value={formData.hireDate}
+											onChange={(e) =>
+												handleInputChange(
+													"hireDate",
+													e.target.value
+												)
+											}
+											max={
+												new Date()
+													.toISOString()
+													.split("T")[0]
+											}
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										/>
+									</div>
 
-								{/* <div>
+									{/* <div>
                                     <label className="block text-sm font-medium text-slate-300 mb-2">
                                         Salary (Annual)
                                     </label>
@@ -525,71 +469,74 @@ export default function AddStaff({ onBack }: { onBack: () => void }) {
                                     </div>
                                 </div> */}
 
-								{/* Staff Preview */}
-								{formData.firstName && formData.lastName && (
-									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-800">
-										<div className="flex items-center gap-3">
-											<div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
-												<User className="w-6 h-6 text-slate-400" />
-											</div>
-											<div>
-												<h4 className="text-white font-semibold">
-													{formData.firstName}{" "}
-													{formData.lastName}
-												</h4>
-												<p className="text-slate-400 text-sm">
-													{formData.email}
-												</p>
-												{formData.role && (
-													<span
-														className={`text-xs font-medium ${getRoleColor(
-															formData.role
-														)}`}
-													>
-														{
-															roles.find(
-																(r) =>
-																	r.value ===
-																	formData.role
-															)?.label
-														}
-													</span>
-												)}
+									{/* Staff Preview */}
+									{formData.firstName && formData.lastName && (
+										<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-800">
+											<div className="flex items-center gap-3">
+												<div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
+													<User className="w-6 h-6 text-slate-400" />
+												</div>
+												<div>
+													<h4 className="text-white font-semibold">
+														{formData.firstName}{" "}
+														{formData.lastName}
+													</h4>
+													<p className="text-slate-400 text-sm">
+														{formData.email}
+													</p>
+													{formData.role && (
+														<span
+															className={`text-xs font-medium ${getRoleColor(
+																formData.role
+															)}`}
+														>
+															{
+																roles.find(
+																	(r) =>
+																		r.value ===
+																		formData.role
+																)?.label
+															}
+														</span>
+													)}
+												</div>
 											</div>
 										</div>
-									</div>
-								)}
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				{/* Action Buttons */}
-				<div className="flex gap-3 justify-end pt-6 border-t border-slate-800">
-					<button
-						type="button"
-						onClick={onBack}
-						className="px-6 py-2 bg-gray-900/50 hover:bg-gray-800 text-white font-semibold rounded-lg transition"
-					>
-						Cancel
-					</button>
-					<button
-						type="submit"
-						disabled={isSubmitting}
-						className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold rounded-lg transition flex items-center gap-2"
-					>
-						{isSubmitting ? (
-							<>
-								<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-								Adding...
-							</>
-						) : (
-							<>
-								<User className="w-4 h-4" />
-								Add Staff Member
-							</>
-						)}
-					</button>
+					<div></div>
+
+					{/* Action Buttons */}
+					<div className="flex gap-3 justify-end pt-6 ">
+						<button
+							type="button"
+							onClick={onBack}
+							className="px-6 py-2 bg-gray-900/50 hover:bg-gray-800 text-white font-semibold rounded-lg transition"
+						>
+							Cancel
+						</button>
+						<button
+							type="submit"
+							disabled={isSubmitting}
+							className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold rounded-lg transition flex items-center gap-2"
+						>
+							{isSubmitting ? (
+								<>
+									<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+									Adding...
+								</>
+							) : (
+								<>
+									<User className="w-4 h-4" />
+									Add Staff Member
+								</>
+							)}
+						</button>
+					</div>
 				</div>
 			</form>
 		</div>

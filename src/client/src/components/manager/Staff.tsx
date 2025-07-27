@@ -11,7 +11,7 @@ export interface StaffMember {
     phone: string;
     role: "manager" | "cashier" | "usher" | "cleaner" | "technician";
     department: string;
-    hireDate: string;
+    hiredDate: string;
     status: "active" | "inactive" | "on-leave";
     avatar?: string;
 }
@@ -183,7 +183,7 @@ function StaffCard({ member }: { member: StaffMember }) {
 
             {/* Hire Date */}
             <div className="text-sm text-slate-400 mb-4">
-                Hired: {new Date(member.hireDate).toLocaleDateString()}
+                Hired: {new Date(member.hiredDate).toLocaleDateString()}
             </div>
 
             {/* Action Buttons */}
@@ -436,15 +436,14 @@ export default function Staff() {
             </div>
 
             {/* Desktop Table View (lg and above) */}
-            <div className="hidden lg:block rounded-xl border bg-gray-900 border-gray-800 shadow-lg overflow-hidden">
+            <div className="hidden lg:block rounded-xl border bg-gray-950 border-gray-800 shadow-lg overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left text-gray-300">
-                        <thead className="text-xs text-gray-400 uppercase bg-gray-900">
+                        <thead className="text-xs text-gray-400 uppercase bg-gray-900/50">
                             <tr>
                                 <th scope="col" className="px-6 py-4">Staff Member</th>
                                 <th scope="col" className="px-6 py-4">Contact</th>
                                 <th scope="col" className="px-6 py-4">Role</th>
-                                <th scope="col" className="px-6 py-4">Department</th>
                                 <th scope="col" className="px-6 py-4">Hire Date</th>
                                 <th scope="col" className="px-6 py-4">Status</th>
                                 <th scope="col" className="px-6 py-4">Actions</th>
@@ -483,10 +482,7 @@ export default function Staff() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-gray-300">
-                                        {member.department}
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-300">
-                                        {new Date(member.hireDate).toLocaleDateString()}
+                                        {new Date(member.hiredDate).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(member.status)}`}>
@@ -500,9 +496,6 @@ export default function Staff() {
                                             </button>
                                             <button className="p-1 rounded hover:bg-gray-800 transition-colors">
                                                 <Trash2 className="w-4 h-4 text-red-400" />
-                                            </button>
-                                            <button className="p-1 rounded hover:bg-gray-800 transition-colors">
-                                                <MoreHorizontal className="w-4 h-4 text-gray-400" />
                                             </button>
                                         </div>
                                     </td>
