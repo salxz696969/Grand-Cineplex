@@ -59,7 +59,7 @@ export default function SeatManagementPopup({ theater, onBack }: {
     const rows = Array.from({ length: theater.rows }, (_, i) => String.fromCharCode(65 + i));
 
     return (
-        <div className="flex flex-col gap-6 p-4 w-full">
+        <div className="flex flex-col gap-6 w-full bg-gray-950 min-h-screen overflow-y-auto overflow-x-hidden">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -150,14 +150,14 @@ export default function SeatManagementPopup({ theater, onBack }: {
                             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
                                 <Sofa className="w-5 h-5 text-white" />
                             </div>
-                            
+
                         </div>
 
                         <div className="flex items-center justify-center gap-3 p-3 bg-slate-800 rounded-lg cursor-move">
                             <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
                                 <Sofa className="w-5 h-5 text-black" />
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>

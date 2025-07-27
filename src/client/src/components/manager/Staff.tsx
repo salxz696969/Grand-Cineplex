@@ -3,6 +3,7 @@ import { Search, Filter, PlusCircle, User, Mail, Phone, Shield, Edit, Trash2, Mo
 import AddStaff from "./AddStaff";
 import { getAllStaff } from "../../api/manager";
 import { get } from "http";
+import EditStaff from "./EditStaff";
 
 export interface StaffMember {
     id: number;
@@ -10,7 +11,6 @@ export interface StaffMember {
     email: string;
     phone: string;
     role: "manager" | "cashier" | "usher" | "cleaner" | "technician";
-    department: string;
     hiredDate: string;
     status: "active" | "inactive" | "on-leave";
     avatar?: string;
@@ -178,7 +178,6 @@ function StaffCard({ member }: { member: StaffMember }) {
                     {getRoleIcon(member.role)}
                     {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                 </span>
-                <span className="text-sm text-slate-400">{member.department}</span>
             </div>
 
             {/* Hire Date */}
@@ -207,9 +206,10 @@ export default function Staff() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedRole, setSelectedRole] = useState<string>("all");
     const [selectedStatus, setSelectedStatus] = useState<string>("all");
-    const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
     const [addingStaff, setAddingStaff] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingStaff, setEditingStaff] = useState<StaffMember | undefined>(undefined);
 
     useEffect(() => {
         const getStaff = async () => {
@@ -231,9 +231,8 @@ export default function Staff() {
             member.phone.includes(searchTerm);
         const matchesRole = selectedRole === "all" || member.role === selectedRole;
         const matchesStatus = selectedStatus === "all" || member.status === selectedStatus;
-        const matchesDepartment = selectedDepartment === "all" || member.department === selectedDepartment;
 
-        return matchesSearch && matchesRole && matchesStatus && matchesDepartment;
+        return matchesSearch && matchesRole && matchesStatus;
     });
 
     const getRoleColor = (role: string) => {
@@ -276,20 +275,39 @@ export default function Staff() {
         }
     };
 
-    const departments = Array.from(new Set(staff.map(s => s.department)));
-
     const handleBackToStaff = () => {
         setAddingStaff(false);
+        setIsEditing(false);
     };
 
     const handleAddStaff = () => {
         setAddingStaff(true);
     };
 
+    const handleEditStaff = (staff: StaffMember) => {
+        setIsEditing(true);
+        setEditingStaff(staff);
+    }
+
     // If adding staff, show the AddStaff component
     if (addingStaff) {
         return (
             <AddStaff onBack={handleBackToStaff} />
+        );
+    }
+
+    if (isEditing) {
+        return (
+            <EditStaff onBack={handleBackToStaff} staff={{
+                id: editingStaff!.id,
+                firstName: editingStaff!.name.split(" ")[0],
+                lastName: editingStaff!.name.split(" ")[1],
+                email: editingStaff!.email,
+                phone: editingStaff!.phone,
+                role: editingStaff!.role,
+                hiredDate: editingStaff!.hiredDate,
+                isActive: editingStaff!.status === "active",
+            }} />
         );
     }
 
@@ -491,7 +509,7 @@ export default function Staff() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <button className="p-1 rounded hover:bg-gray-800 transition-colors">
+                                            <button className="p-1 rounded hover:bg-gray-800 transition-colors" onClick={() => handleEditStaff(member)}>
                                                 <Edit className="w-4 h-4 text-blue-400" />
                                             </button>
                                             <button className="p-1 rounded hover:bg-gray-800 transition-colors">
