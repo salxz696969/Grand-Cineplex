@@ -23,6 +23,7 @@ export default function EditStaff({ onBack, staff }: EditStaffProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+
     const handleInputChange = (field: keyof StaffData, value: string | boolean) => {
         setFormData((prev) => ({
             ...prev,

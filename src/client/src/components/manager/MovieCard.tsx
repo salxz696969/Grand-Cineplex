@@ -33,7 +33,13 @@ type MovieData = {
 	language: string;
 };
 
-export default function MovieCard({ movie, onEdit }: { movie: MovieData; onEdit: () => void }) {
+interface MovieCardProps {
+	movie: MovieData;
+	onEdit: () => void;
+	onDelete?: () => void;
+}
+
+export default function MovieCard({ movie, onEdit, onDelete }: MovieCardProps) {
 	const [showConfirm, setShowConfirm] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 
@@ -46,6 +52,9 @@ export default function MovieCard({ movie, onEdit }: { movie: MovieData; onEdit:
 		await deleteMovie(movie.id);
 		setDeleting(false);
 		setShowConfirm(false);
+		if (onDelete) {
+			await onDelete();
+		}
 	};
 
 	const cancelDelete = () => setShowConfirm(false);
