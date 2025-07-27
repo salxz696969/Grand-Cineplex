@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const SECRET = process.env.JWT_SECRET || "GrandCineplix_CADT";
 
@@ -7,7 +9,7 @@ interface AuthRequest extends Request {
 	user?: any;
 }
 
-const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+const authMiddlewareManager = (req: AuthRequest, res: Response, next: NextFunction) => {
 	const authHeader = req.headers.authorization;
 
 	console.log("Authorization Header:", authHeader);
@@ -28,14 +30,18 @@ const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => 
 	console.log("Token received:", token);
 
 	try {
-		const decoded = jwt.verify(token, SECRET);
+		const decoded = jwt.verify(token, SECRET) as any;
 		console.log("Token decoded:", decoded);
-		req.user = decoded;
-		return next();
+		if (decoded && decoded.role === "manager") {
+			return next();
+		} else {
+			console.error("User is not a manager");
+			return res.status(403).json({ message: "Forbidden: Not a manager" });
+		}
 	} catch (err: any) {
 		console.error("JWT verification error:", err.message);
 		return res.status(401).json({ message: "Invalid or expired token" });
 	}
 };
 
-export default authMiddleware;
+export default authMiddlewareManager;

@@ -1,23 +1,23 @@
 import express from "express";
 import {
-  addMovie,
-  deleteMovie,
-  getAllMovies,
-  getMovieAndScreeningBasedOnId,
-  getMoviesAndItsScreenings,
-  getMoviesFor7Days,
-  updateMovie,
+	addMovie,
+	deleteMovie,
+	getAllMovies,
+	getMovieAndScreeningBasedOnId,
+	getMoviesAndItsScreenings,
+	getMoviesFor7Days,
+	updateMovie,
 } from "../controllers/moviesController";
-import verifyToken from "../../../middleware/verifyToken";
-import { get } from "http";
+import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
 const route = express.Router();
+route.use(authMiddlewareCashier);
 
 route.get("/", getMoviesFor7Days);
-route.get("/:id", getMovieAndScreeningBasedOnId)
+route.get("/:id", getMovieAndScreeningBasedOnId);
 route.get("/details", getMoviesAndItsScreenings);
-route.post("/movies", verifyToken, addMovie);
-route.patch("/movies/:id", verifyToken, updateMovie);
-route.delete("/movies/:id", verifyToken, deleteMovie);
+route.post("/movies",  addMovie);
+route.patch("/movies/:id",  updateMovie);
+route.delete("/movies/:id",  deleteMovie);
 
 export default route;

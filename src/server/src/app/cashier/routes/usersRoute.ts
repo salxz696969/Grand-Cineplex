@@ -1,10 +1,11 @@
 import express from "express";
 import { getUserInfo, logInUser } from "../controllers/userController";
-import verifyToken from "../../../middleware/verifyToken";
+import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
 const route = express.Router();
+route.use(authMiddlewareCashier)
 
-route.get("/", verifyToken, getUserInfo);
+route.get("/", getUserInfo);
 route.post("/login", logInUser);
 
 export default route;

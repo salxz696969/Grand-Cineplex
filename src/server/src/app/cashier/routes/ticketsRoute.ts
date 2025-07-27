@@ -1,18 +1,20 @@
 import express from "express";
 import {
-  addTicket,
-  deleteTicket,
-  getAllTickets,
-  getTicketBasedOnId,
-  updateTicket,
+	addTicket,
+	deleteTicket,
+	getAllTickets,
+	getTicketBasedOnId,
+	updateTicket,
 } from "../controllers/ticketsController";
-import verifyToken from "../../../middleware/verifyToken";
-const route = express.Router();
+import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
-route.get("/", verifyToken, getAllTickets);
-route.get("/:id", verifyToken, getTicketBasedOnId);
-route.post("/", verifyToken, addTicket);
-route.patch("/:id", verifyToken, updateTicket);
-route.delete("/:id", verifyToken, deleteTicket);
+const route = express.Router();
+route.use(authMiddlewareCashier)
+
+route.get("/",  getAllTickets);
+route.get("/:id",  getTicketBasedOnId);
+route.post("/",  addTicket);
+route.patch("/:id",  updateTicket);
+route.delete("/:id",  deleteTicket);
 
 export default route;

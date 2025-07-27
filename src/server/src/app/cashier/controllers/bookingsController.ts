@@ -101,7 +101,7 @@ export const addBookingByStaff = async (req: Request, res: Response) => {
 		}
 		const booking = await Booking.create({
 			screeningId,
-			status,
+			status: status.toLowerCase(),
 			createdByStaffId,
 		});
 		const tickets = [];
@@ -116,7 +116,7 @@ export const addBookingByStaff = async (req: Request, res: Response) => {
 			bookingId: booking?.id,
 			method,
 			amount,
-			status,
+			status: status.toLowerCase(),
 		});
 
 		res.status(201).json({ booking, tickets, payment });

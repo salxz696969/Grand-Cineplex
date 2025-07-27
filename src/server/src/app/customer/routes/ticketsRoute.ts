@@ -1,15 +1,14 @@
-// I have not did this , just put it default 
-
+// I have not did this , just put it default
 
 import express from "express";
 import {
-  addTicket,
-  deleteTicket,
-  getAllTickets,
-  getTicketBasedOnId,
-  updateTicket,
+	addTicket,
+	deleteTicket,
+	getAllTickets,
+	getTicketBasedOnId,
+	updateTicket,
 } from "../controllers/ticketsController";
-import verifyToken from "../../../middleware/verifyToken";
+import verifyToken from "../../../middleware/authMiddlewareManager";
 const route = express.Router();
 
 route.get("/", verifyToken, getAllTickets);
