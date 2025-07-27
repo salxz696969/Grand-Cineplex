@@ -10,7 +10,6 @@ import homePageRoute from "./homePageRoute";
 import theatersRoute from "./theatersRoute";import authMiddleware from "../../../middleware/authMiddleware";
 
 const router = Router();
-router.use(authMiddleware);
 
 router.use("/movies", moviesRoute); // customer can see all movies
 router.use("/bookings", bookingsRoute); // customer can see all bookings

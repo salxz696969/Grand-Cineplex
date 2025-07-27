@@ -6,14 +6,14 @@ import {
   deleteUser,
   logInUser,
 } from "../controllers/userController";
-import verifyToken from "../../../middleware/verifyToken";
+import authMiddleware from "../../../middleware/authMiddleware";
 
 const route = express.Router();
 
-route.get("/", verifyToken, getUserInfo);
-route.patch("/", verifyToken, updateUserInfo);
+route.get("/", authMiddleware, getUserInfo);
+route.patch("/", authMiddleware, updateUserInfo);
 route.post("/", addUser);
-route.delete("/:id", verifyToken, deleteUser);
+route.delete("/:id", authMiddleware, deleteUser);
 route.post("/login", logInUser);
 
 export default route;

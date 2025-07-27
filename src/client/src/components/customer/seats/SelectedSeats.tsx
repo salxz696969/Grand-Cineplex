@@ -1,23 +1,40 @@
 import React, { useContext, useState } from "react";
 import { Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Seat } from "../../../../../shared/types/type";
+import { ApiSeat, Seat } from "../../../../../shared/types/type";
 import { AuthContext } from "../../context/AuthContext";
 import AuthModal from "../useraccess/PopupLogSign";
 
 
 interface SelectedSeatsProps {
   selectedSeats: string[];
-  seats: Seat[];
+  seats: ApiSeat[];
   totalPrice: number;
   screeningId?: string | null;
+  pricing: {
+    regularSeatPrice: number;
+    premiumSeatPrice: number;
+    vipSeatPrice: number;
+  };
 }
 
-const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: SelectedSeatsProps) => {
+const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId, pricing }: SelectedSeatsProps) => {
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const { auth, setAuth, loading } = useContext(AuthContext)!;
+
+  const calculateSeatPrice = (seatType: string): number => {
+    switch (seatType) {
+      case "vip":
+        return pricing.vipSeatPrice;
+      case "premium":
+        return pricing.premiumSeatPrice;
+      case "regular":
+      default:
+        return pricing.regularSeatPrice;
+    }
+  };
 
   const handleContinue = () => {
     if (!auth) {
@@ -49,11 +66,12 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId }: Select
               .slice()
               .sort()
               .map((id) => {
-                const seat = seats.find((s) => s.id === id);
-                const seatLabel = seat ? `${seat.row}${seat.number}` : id;
+                const seat = seats.find((s) => s.id === Number(id));
+                const seatLabel = seat ? `${seat.rowNumber}${seat.seatNumber}` : id;
+                const seatPrice = seat ? calculateSeatPrice(seat.seatType) : 0;
                 return (
                   <span key={id} className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm">
-                    {seatLabel} - ${seat?.price}
+                    {seatLabel} - ${seatPrice}
                   </span>
                 );
               })}

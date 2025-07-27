@@ -82,7 +82,7 @@ export default function PaymentContainer() {
         if (!data || !data.seats) throw new Error("Invalid data format from API");
 
         const selectedSeats = data.seats.filter((seat: ApiSeat) => seatIds.includes(seat.id));
-        const totalAmount = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+        const totalAmount = selectedSeats.reduce((sum, s) => sum + s.seatType === "regular" ? data.regularSeatPrice : s.seatType === "premium" ? data.premiumSeatPrice : data.vipSeatPrice, 0);
 
         setBookingSummary({
           movieTitle: data.movieTitle,
@@ -93,7 +93,7 @@ export default function PaymentContainer() {
           customerPhone: "-",
           seats: selectedSeats.map((s) => ({
             seatNumber: s.rowNumber + s.seatNumber,
-            price: s.price,
+            price: s.seatType === "regular" ? data.regularSeatPrice : s.seatType === "premium" ? data.premiumSeatPrice : data.vipSeatPrice,
           })),
           totalAmount,
           screeningId,
@@ -191,7 +191,7 @@ export default function PaymentContainer() {
               setSelectedPaymentMethod={setSelectedPaymentMethod}
               handlePayment={handlePayment}
               isProcessing={processing}
-              totalAmount={bookingSummary!.totalAmount}
+              totalAmount={bookingSummary!.totalAmount || 0}
               onPaymentSuccess={handlePaymentSuccess}
             />
           </div>

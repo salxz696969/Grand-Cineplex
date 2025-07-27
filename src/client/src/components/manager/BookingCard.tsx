@@ -61,7 +61,7 @@ export default function BookingCard({ booking }: BookingCardProps) {
     };
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 hover:border-blue-500/50 transition-colors duration-300">
+        <div className="bg-gray-950 border border-slate-800 rounded-lg p-4 hover:border-blue-500/50 transition-colors duration-300">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">

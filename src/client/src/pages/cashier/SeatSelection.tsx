@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Sofa, Monitor, ArrowLeft, ShoppingCart, Clock } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getSeatsBasedOnScreeningId } from "../../api/cashier";
-import sequelize from "./../../../../server/src/db/index";
+import { ApiSeat, ScreeningSeatData } from "../../../../shared/types/type";
 
 interface Seat {
 	id: string;
@@ -11,25 +11,29 @@ interface Seat {
 	type: "regular" | "premium" | "vip";
 	price: number;
 	isBooked: boolean;
-	idNumber: number; // Added to store the id from the API
+	idNumber: number;
 }
-
-type SeatFromApi = {
-	id: number;
-	rowNumber: string;
-	seatNumber: number;
-	seatType: "regular" | "premium" | "vip";
-};
-
-type DataFromApi = {
-	price: number;
-	availableSeats: SeatFromApi[];
-	bookedSeatsInfo: SeatFromApi[];
-};
 
 type SelectedSeats = {
 	seatId: string;
 	idNumber: number;
+};
+
+// Helper function to calculate seat price based on type
+const calculateSeatPrice = (seatType: string, pricing: {
+	regularSeatPrice: number;
+	premiumSeatPrice: number;
+	vipSeatPrice: number;
+}): number => {
+	switch (seatType) {
+		case "vip":
+			return pricing.vipSeatPrice;
+		case "premium":
+			return pricing.premiumSeatPrice;
+		case "regular":
+		default:
+			return pricing.regularSeatPrice;
+	}
 };
 
 // Skeleton for seat grid and summary only
@@ -107,54 +111,63 @@ export function SeatSelection() {
 		"Z",
 	]);
 	const seatsPerRow = 10;
-	const router = useNavigate()
+	const router = useNavigate();
+
+	const [seatPrices, setSeatPrices] = useState<{
+		regularSeatPrice: number;
+		premiumSeatPrice: number;
+		vipSeatPrice: number;
+	}>({
+		regularSeatPrice: 0,
+		premiumSeatPrice: 0,
+		vipSeatPrice: 0,
+	});
 
 	useEffect(() => {
 		try {
 			const generateSeats = (
-				seatsFromApi: DataFromApi,
-				seatType: string
-			): Seat[] => {
-				if (seatType === "availableSeats") {
-					return seatsFromApi.availableSeats.map((seat) => ({
-						id: `${seat.rowNumber}${seat.seatNumber}`,
-						row: seat.rowNumber,
-						number: seat.seatNumber,
-						type: seat.seatType,
-						price: Number(seatsFromApi.price),
-						isBooked: false,
-						idNumber: seat.id, // Assigning a unique id number
-					}));
-				} else if (seatType === "bookedSeats") {
-					return seatsFromApi.bookedSeatsInfo.map((seat) => ({
-						id: `${seat.rowNumber}${seat.seatNumber}`,
-						row: seat.rowNumber,
-						number: seat.seatNumber,
-						type: seat.seatType,
-						price: Number(seatsFromApi.price),
-						isBooked: true,
-						idNumber: seat.id, // Assigning a unique id number
-					}));
+				seatsFromApi: ApiSeat[],
+				pricing: {
+					regularSeatPrice: number;
+					premiumSeatPrice: number;
+					vipSeatPrice: number;
 				}
-				return [];
+			): Seat[] => {
+				return seatsFromApi.map((seat) => ({
+					id: `${seat.rowNumber}${seat.seatNumber}`,
+					row: seat.rowNumber,
+					number: seat.seatNumber,
+					type: seat.seatType,
+					price: calculateSeatPrice(seat.seatType, pricing),
+					isBooked: seat.isBooked,
+					idNumber: seat.id,
+				}));
 			};
+
 			const fetchSeats = async () => {
-				const response = await getSeatsBasedOnScreeningId(
+				const response: ScreeningSeatData = await getSeatsBasedOnScreeningId(
 					parseInt(id!)
 				);
+
+				setSeatPrices({
+					regularSeatPrice: response.regularSeatPrice,
+					premiumSeatPrice: response.premiumSeatPrice,
+					vipSeatPrice: response.vipSeatPrice,
+				});
+
 				const tempRow = rows;
-				// console.log("Response from API:", response);
 				setRows(
 					tempRow.slice(
 						0,
-						response.availableSeats.length / seatsPerRow
+						response.seats.length / seatsPerRow
 					)
 				);
 				setSeats(
-					[
-						...generateSeats(response, "availableSeats"),
-						...generateSeats(response, "bookedSeats"),
-					].sort((a, b) => {
+					generateSeats(response.seats, {
+						regularSeatPrice: response.regularSeatPrice,
+						premiumSeatPrice: response.premiumSeatPrice,
+						vipSeatPrice: response.vipSeatPrice,
+					}).sort((a, b) => {
 						// First sort by row (A-Z)
 						if (a.row !== b.row) {
 							return a.row.localeCompare(b.row);
@@ -336,15 +349,15 @@ export function SeatSelection() {
 						<div className="flex flex-wrap justify-center gap-6 mb-8 text-sm">
 							<div className="flex items-center gap-2">
 								<div className="w-6 h-6 bg-gradient-to-br from-gray-600 to-gray-700 rounded"></div>
-								<span>Regular - $12.50</span>
+								<span>Regular - ${seatPrices.regularSeatPrice}</span>
 							</div>
 							<div className="flex items-center gap-2">
 								<div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded"></div>
-								<span>Premium - $15.00</span>
+								<span>Premium - ${seatPrices.premiumSeatPrice}</span>
 							</div>
 							<div className="flex items-center gap-2">
 								<div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded"></div>
-								<span>VIP - $18.00</span>
+								<span>VIP - ${seatPrices.vipSeatPrice}</span>
 							</div>
 							<div className="flex items-center gap-2">
 								<div className="w-6 h-6 bg-red-600 rounded opacity-60"></div>

@@ -70,7 +70,9 @@ export interface Screening {
   theaterId: number;
   screeningDate: string; // YYYY-MM-DD
   screeningTime: string; // HH:mm:ss
-  price: number;
+  regularSeatPrice: number;
+  premiumSeatPrice: number;
+  vipSeatPrice: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -123,7 +125,6 @@ export interface ApiSeat {
   rowNumber: string;
   seatNumber: number;
   seatType: SeatType;
-  price: number;
   isBooked: boolean;
 }
 
@@ -147,7 +148,9 @@ export interface ScreeningSeatData {
   theaterName: string;
   screeningDate: string;
   screeningTime: string;
-  price: number;
+  regularSeatPrice: number;
+  premiumSeatPrice: number;
+  vipSeatPrice: number;
   seats: ApiSeat[];
 }
 

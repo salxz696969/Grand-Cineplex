@@ -207,10 +207,10 @@ export default function Dashboard() {
                     description="Screenings scheduled for the upcoming week."
                 />
                 <StatCard
-                    title="Pending Bookings"
+                    title="Total Bookings"
                     value={pendingBookingsCount.toString()}
                     icon={<Ticket />}
-                    description="Bookings awaiting confirmation or payment."
+                    description="Bookings confirmed."
                 />
                 <StatCard
                     title="Total Movies"

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ScreeningSeatData } from "../../../shared/types/type";
 
 const API_BASE_URL = "http://localhost:6900";
 type BookingSummary = {
@@ -32,7 +33,9 @@ export const getMovieAndScreeningBasedOnId = async (id: number) => {
   }
 };
 
-export const getSeatsBasedOnScreeningId = async (screeningId: number) => {
+export const getSeatsBasedOnScreeningId = async (
+  screeningId: number
+): Promise<ScreeningSeatData> => {
   try {
     const response = await axios.get(
       `${API_BASE_URL}/cashier/seats/available-seats/${screeningId}`

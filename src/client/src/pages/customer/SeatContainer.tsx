@@ -6,7 +6,7 @@ import SelectedSeats from "../../components/customer/seats/SelectedSeats";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import TimeoutPopup from "../../components/customer/TimeoutPopup";
 import { fetchSeatsByScreening } from "../../api/customer";
-import { ApiSeat } from "../../../../shared/types/type";
+import { ApiSeat, ScreeningSeatData } from "../../../../shared/types/type";
 import LegendBox from "../../components/customer/seats/LegendBox";
 import { Seat } from "../../../../shared/types/type";
 import { formatTime12h } from "../../utils/Function";
@@ -24,6 +24,23 @@ function toSeatType(type: string): "regular" | "premium" | "vip" {
       return "regular";
   }
 }
+
+// Helper function to calculate seat price based on type
+const calculateSeatPrice = (seatType: string, pricing: {
+  regularSeatPrice: number;
+  premiumSeatPrice: number;
+  vipSeatPrice: number;
+}): number => {
+  switch (seatType) {
+    case "vip":
+      return pricing.vipSeatPrice;
+    case "premium":
+      return pricing.premiumSeatPrice;
+    case "regular":
+    default:
+      return pricing.regularSeatPrice;
+  }
+};
 
 // Skeleton for seat grid and summary (matches SeatSelection.tsx)
 const SeatGridAndSummarySkeleton = () => (
@@ -69,7 +86,7 @@ const SeatGridAndSummarySkeleton = () => (
 
 export default function SeatContainer() {
 
-  const [seats, setSeats] = useState<Seat[]>([]);
+  const [seats, setSeats] = useState<ApiSeat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   // const [timeLeft, setTimeLeft] = useState(120);
@@ -78,19 +95,28 @@ export default function SeatContainer() {
   const [theaterName, setTheaterName] = useState<string>("");
   const [screeningDate, setScreeningDate] = useState<string>("");
   const [screeningTime, setScreeningTime] = useState<string>("");
-  const { auth, setAuth, loading } = useContext(AuthContext)!;
-  const isAuthenticated = !!auth;
+  // const { auth, setAuth, loading } = useContext(AuthContext)!;
+  // const isAuthenticated = !!auth;
+
+  const [seatPrices, setSeatPrices] = useState<{
+    regularSeatPrice: number;
+    premiumSeatPrice: number;
+    vipSeatPrice: number;
+  }>({
+    regularSeatPrice: 0,
+    premiumSeatPrice: 0,
+    vipSeatPrice: 0,
+  });
 
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
 
-  const mapApiSeatsToUiSeats = (apiSeats: ApiSeat[]): Seat[] =>
+  const mapApiSeatsToUiSeats = (apiSeats: ApiSeat[]): ApiSeat[] =>
     apiSeats.map((s) => ({
-      id: s.id.toString(),
-      row: s.rowNumber,
-      number: s.seatNumber,
-      type: toSeatType(s.seatType),
-      price: Number(s.price),
+      id: s.id,
+      rowNumber: s.rowNumber,
+      seatNumber: s.seatNumber,
+      seatType: toSeatType(s.seatType),
       isBooked: s.isBooked,
     }));
 
@@ -99,13 +125,17 @@ export default function SeatContainer() {
       try {
         if (!screeningId) return;
 
-        const result = await fetchSeatsByScreening(parseInt(screeningId));
+        const result: ScreeningSeatData = await fetchSeatsByScreening(parseInt(screeningId));
 
         setMovieTitle(result.movieTitle);
         setTheaterName(result.theaterName);
         setScreeningDate(result.screeningDate);
         setScreeningTime(result.screeningTime);
-
+        setSeatPrices({
+          regularSeatPrice: result.regularSeatPrice,
+          premiumSeatPrice: result.premiumSeatPrice,
+          vipSeatPrice: result.vipSeatPrice,
+        });
         const allSeats = mapApiSeatsToUiSeats(result.seats);
         setSeats(allSeats);
 
@@ -142,7 +172,7 @@ export default function SeatContainer() {
   // };
 
   const toggleSeat = (seatId: string) => {
-    const seat = seats.find((s) => s.id === seatId);
+    const seat = seats.find((s) => s.id === Number(seatId));
     if (seat?.isBooked) return;
 
     setSelectedSeats((prev) =>
@@ -151,7 +181,12 @@ export default function SeatContainer() {
   };
 
   const getTotalPrice = () =>
-    selectedSeats.reduce((total, id) => total + (seats.find((s) => s.id === id)?.price || 0), 0);
+    selectedSeats.reduce((total, id) => {
+      const seat = seats.find((s) => s.id === Number(id));
+      if (!seat) return total;
+      const price = calculateSeatPrice(seat.seatType, seatPrices);
+      return total + price;
+    }, 0);
 
 
   if (isLoading) {
@@ -239,12 +274,12 @@ export default function SeatContainer() {
           </div>
           {/* Seat Grid */}
           <div className="flex flex-col items-center gap-3 mb-12">
-            {Array.from(new Set(seats.map((s) => s.row)))
+            {Array.from(new Set(seats.map((s) => s.rowNumber)))
               .sort()
               .map((row) => {
                 const rowSeats = seats
-                  .filter((s) => s.row === row)
-                  .sort((a, b) => a.number - b.number);
+                  .filter((s) => s.rowNumber === row)
+                  .sort((a, b) => a.seatNumber - b.seatNumber);
                 const firstHalf = rowSeats.slice(0, 6);
                 const secondHalf = rowSeats.slice(6, 12);
                 return (
@@ -253,12 +288,24 @@ export default function SeatContainer() {
                     <div className="flex flex-col sm:flex-row gap-1">
                       <div className="flex gap-1 justify-center">
                         {firstHalf.map((seat) => (
-                          <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat} />
+                          <SeatCard
+                            key={seat.id}
+                            seat={seat}
+                            isSelected={selectedSeats.includes(seat.id.toString())}
+                            onToggle={toggleSeat}
+                            pricing={seatPrices}
+                          />
                         ))}
                       </div>
                       <div className="flex gap-1 justify-center sm:ml-2 mt-1 sm:mt-0">
                         {secondHalf.map((seat) => (
-                          <SeatCard key={seat.id} seat={seat} isSelected={selectedSeats.includes(seat.id)} onToggle={toggleSeat} />
+                          <SeatCard
+                            key={seat.id}
+                            seat={seat}
+                            isSelected={selectedSeats.includes(seat.id.toString())}
+                            onToggle={toggleSeat}
+                            pricing={seatPrices}
+                          />
                         ))}
                       </div>
                     </div>
@@ -268,13 +315,19 @@ export default function SeatContainer() {
           </div>
           {/* Seat Legend */}
           <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm">
-            <LegendBox colorFrom="#4b5563" colorTo="#374151" label="Regular - $4.00" />
-            <LegendBox colorFrom="#8b5cf6" colorTo="#7c3aed" label="Premium - $7.00" />
-            <LegendBox colorFrom="#fbbf24" colorTo="#d97706" label="VIP - $10.00" />
+            <LegendBox colorFrom="#4b5563" colorTo="#374151" label={`Regular - $${seatPrices.regularSeatPrice}`} />
+            <LegendBox colorFrom="#8b5cf6" colorTo="#7c3aed" label={`Premium - $${seatPrices.premiumSeatPrice}`} />
+            <LegendBox colorFrom="#fbbf24" colorTo="#d97706" label={`VIP - $${seatPrices.vipSeatPrice}`} />
             <LegendBox colorFrom="#dc2626" colorTo="#dc2626" label="Booked" opacity />
           </div>
           {/* Selected Seats Summary */}
-          <SelectedSeats selectedSeats={selectedSeats} seats={seats} totalPrice={getTotalPrice()} screeningId={screeningId} />
+          <SelectedSeats
+            selectedSeats={selectedSeats}
+            seats={seats}
+            totalPrice={getTotalPrice()}
+            screeningId={screeningId}
+            pricing={seatPrices}
+          />
         </div>
       </div>
     </div>

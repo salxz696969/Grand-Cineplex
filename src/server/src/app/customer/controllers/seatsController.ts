@@ -73,7 +73,6 @@ export const getAllSeatsBasedOnShowTime = async (
       rowNumber: seat.rowNumber,
       seatNumber: seat.seatNumber,
       seatType: seat.seatType,
-      price: seat.price,
       isBooked: bookedSeatIds.includes(seat.id),
     }));
 
@@ -82,7 +81,9 @@ export const getAllSeatsBasedOnShowTime = async (
       theaterName: screening.theater.name,
       screeningDate: screening.screeningDate,
       screeningTime: screening.screeningTime,
-      price: screening.price,
+      regularSeatPrice: screening.regularSeatPrice,
+      premiumSeatPrice: screening.premiumSeatPrice,
+      vipSeatPrice: screening.vipSeatPrice,
       seats: seatsWithStatus,
     });
   } catch (error: unknown) {
