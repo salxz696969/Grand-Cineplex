@@ -196,7 +196,6 @@ export default function Dashboard() {
                     title="Total Revenue"
                     value={`$${totalRevenue.revenue}`}
                     icon={<DollarSign />}
-                    change={totalRevenue.percentageFromLastMonth ? `+${totalRevenue.percentageFromLastMonth}% from last month` : `No records for last month`}
                     changeType="increase"
                     description="Total income from all bookings."
                 />
@@ -204,7 +203,6 @@ export default function Dashboard() {
                     title="Upcoming Screenings"
                     value={upcomingScreeningCount.thisWeekScreeningsCount.toString()}
                     icon={<CalendarClock />}
-                    change={upcomingScreeningCount.percentageFromLastWeek ? `+${upcomingScreeningCount.percentageFromLastWeek}% from last week` : `No records for last week`}
                     changeType="increase"
                     description="Screenings scheduled for the upcoming week."
                 />

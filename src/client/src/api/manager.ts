@@ -17,20 +17,28 @@ type MovieData = {
 
 const API_BASE_URL = "http://localhost:6900";
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export const getHomePageInfo = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/manager/home`);
+    const response = await axios.get(`${API_BASE_URL}/manager/home`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching home page info:", error);
     throw error;
   }
 };
+
 export const getRecentlyAddedMovies = async () => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/manager/movies/recently-added`
-    );
+    const response = await axios.get(`${API_BASE_URL}/manager/movies/recently-added`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching upcoming screening count:", error);
@@ -40,8 +48,10 @@ export const getRecentlyAddedMovies = async () => {
 
 export const getAllMovies = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/manager/movies`);
-    return response.data;
+    const res = await axios.get(`${API_BASE_URL}/manager/movies`, {
+      headers: getAuthHeaders(),
+    });
+    return res.data;
   } catch (error) {
     console.error("Error fetching all movies:", error);
     throw error;
@@ -50,10 +60,9 @@ export const getAllMovies = async () => {
 
 export const addMovie = async (movieData: MovieData) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/manager/movies`,
-      movieData
-    );
+    const response = await axios.post(`${API_BASE_URL}/manager/movies`, movieData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding movie:", error);
@@ -64,10 +73,9 @@ export const addMovie = async (movieData: MovieData) => {
 export const updateMovie = async (movieData: MovieData) => {
   try {
     console.log("Updating movie with data:", movieData);
-    const response = await axios.patch(
-      `${API_BASE_URL}/manager/movies`,
-      movieData
-    );
+    const response = await axios.patch(`${API_BASE_URL}/manager/movies`, movieData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error updating movie:", error);
@@ -77,7 +85,9 @@ export const updateMovie = async (movieData: MovieData) => {
 
 export const getTodayShowTimes = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/manager/showtimes`);
+    const response = await axios.get(`${API_BASE_URL}/manager/showtimes`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching today's showtimes:", error);
@@ -87,7 +97,9 @@ export const getTodayShowTimes = async () => {
 
 export const getAllStaff = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/manager/staff`);
+    const response = await axios.get(`${API_BASE_URL}/manager/staff`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching staff data:", error);
@@ -97,10 +109,9 @@ export const getAllStaff = async () => {
 
 export const addStaff = async (staffData: any) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/manager/staff`,
-      staffData
-    );
+    const response = await axios.post(`${API_BASE_URL}/manager/staff`, staffData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding staff:", error);
@@ -110,7 +121,9 @@ export const addStaff = async (staffData: any) => {
 
 export const getTheaters = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/manager/theaters`);
+    const response = await axios.get(`${API_BASE_URL}/manager/theaters`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching theaters:", error);
@@ -120,10 +133,9 @@ export const getTheaters = async () => {
 
 export const addTheater = async (theaterData: any) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/manager/theaters`,
-      theaterData
-    );
+    const response = await axios.post(`${API_BASE_URL}/manager/theaters`, theaterData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding theater:", error);
@@ -133,7 +145,9 @@ export const addTheater = async (theaterData: any) => {
 
 export const getBookings = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/manager/bookings`);
+    const response = await axios.get(`${API_BASE_URL}/manager/bookings`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching bookings:", error);
@@ -143,10 +157,9 @@ export const getBookings = async () => {
 
 export const addScreening = async (screeningData: any) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/manager/showtimes`,
-      screeningData
-    );
+    const response = await axios.post(`${API_BASE_URL}/manager/showtimes`, screeningData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error adding screening:", error);
@@ -156,7 +169,9 @@ export const addScreening = async (screeningData: any) => {
 
 export const deleteMovie = async (id: number) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/manager/movies/${id}`);
+    const response = await axios.delete(`${API_BASE_URL}/manager/movies/${id}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error deleting movie:", error);
@@ -166,9 +181,9 @@ export const deleteMovie = async (id: number) => {
 
 export const deleteScreening = async (id: number) => {
   try {
-    const response = await axios.delete(
-      `${API_BASE_URL}/manager/showtimes/${id}`
-    );
+    const response = await axios.delete(`${API_BASE_URL}/manager/showtimes/${id}`, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error deleting screening:", error);
@@ -178,10 +193,9 @@ export const deleteScreening = async (id: number) => {
 
 export const updateScreening = async (screeningData: any) => {
   try {
-    const response = await axios.patch(
-      `${API_BASE_URL}/manager/showtimes/${screeningData.id}`,
-      screeningData
-    );
+    const response = await axios.patch(`${API_BASE_URL}/manager/showtimes/${screeningData.id}`, screeningData, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
     console.error("Error updating screening:", error);
@@ -189,14 +203,24 @@ export const updateScreening = async (screeningData: any) => {
   }
 };
 
+export const deleteStaff = async (id: number) => {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/manager/staff/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting staff:", error);
+    throw error;
+  }
+};
+
 export const updateStaff = async (staffData: any) => {
   try {
-    // TODO: implement this
-    // const response = await axios.patch(
-    //   `${API_BASE_URL}/manager/staff/${staffData.id}`,
-    //   staffData
-    // );
-    // return response.data;
+    const response = await axios.patch(`${API_BASE_URL}/manager/staff/${staffData.id}`, staffData, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
   } catch (error) {
     console.error("Error updating staff:", error);
     throw error;

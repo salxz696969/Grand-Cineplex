@@ -17,7 +17,7 @@ router.get("/", getAllStaff)
 router.get("/:id", getStaffInfo);
 
 // Update staff info by ID
-router.put("/:id", updateStaffInfo);
+router.patch("/:id", updateStaffInfo);
 
 // Delete staff by ID
 router.delete("/:id", deleteStaff);

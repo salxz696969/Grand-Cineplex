@@ -7,11 +7,11 @@ import {
   getRecentlyAddedMovies,
   updateMovie,
 } from "../controllers/moviesController";
-import verifyToken from "../../../middleware/verifyToken";
+
 
 const route = express.Router();
 
-route.get("/", getAllMovies);
+route.get("/",getAllMovies);
 // route.get("/:id", getMovieBasedOnId);
 route.post("/", addMovie);
 route.patch("/", updateMovie);
