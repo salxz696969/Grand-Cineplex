@@ -40,7 +40,7 @@ export default function Auth() {
     setSubmitting(true);
 
     try {
-      const res = await TokenAPI.post("/login", {
+      const res = await TokenAPI.TokenAPICustomer.post("/login", {
         email,
         password,
       });
@@ -52,7 +52,7 @@ export default function Auth() {
       localStorage.setItem("user", JSON.stringify(userData));
 
       setToken(token);
-      TokenAPI.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      TokenAPI.TokenAPICustomer.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setAuth(userData);
 
       navigate("/");
@@ -91,7 +91,7 @@ export default function Auth() {
     setSubmitting(true);
 
     try {
-      await TokenAPI.post("/signup", {
+      await TokenAPI.TokenAPICustomer.post("/signup", {
         email: email.toLowerCase(),
         name: name.trim(),
         phone,

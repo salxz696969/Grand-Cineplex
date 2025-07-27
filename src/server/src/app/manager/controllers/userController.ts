@@ -160,6 +160,10 @@ export const logInUser = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
+    if (user.role !== "manager") {
+      return res.status(401).json({ message: "Incorrect role." });
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,

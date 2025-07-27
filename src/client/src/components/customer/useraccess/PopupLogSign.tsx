@@ -40,11 +40,11 @@ const AuthModal = ({ onSuccess, onClose }: AuthModalProps) => {
     setSubmitting(true);
 
     try {
-      const res = await TokenAPI.post("/login", { email, password });
+      const res = await TokenAPI.TokenAPICustomer.post("/login", { email, password });
       const { token, ...userData } = res.data;
 
       setToken(token);
-      TokenAPI.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      TokenAPI.TokenAPICustomer.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -86,7 +86,7 @@ const AuthModal = ({ onSuccess, onClose }: AuthModalProps) => {
     setSubmitting(true);
 
     try {
-      await TokenAPI.post("/signup", {
+      await TokenAPI.TokenAPICustomer.post("/signup", {
         email: email.toLowerCase(),
         name: name.trim(),
         phone,

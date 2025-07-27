@@ -47,11 +47,15 @@ export const StaffAuthProvider = ({ children }: AuthProviderProps) => {
     return auth.role === requiredRole || auth.role === "manager";
   };
 
-  useEffect(() => {
+  // Function to check and set authentication
+  const checkAuth = () => {
+    console.log("StaffAuthContext: checkAuth called");
     const token = getToken();
+    console.log("StaffAuthContext: Checking token:", token ? "exists" : "not found");
 
     if (token) {
       try {
+        // 1. Decode JWT Token
         const decoded = jwtDecode(token) as {
           exp: number;
           role?: "cashier" | "manager";
@@ -59,57 +63,126 @@ export const StaffAuthProvider = ({ children }: AuthProviderProps) => {
           name?: string;
           email?: string;
         };
+        console.log("StaffAuthContext: Decoded token:", decoded);
+
+        // 2. Check Token Expiration
         const now = Date.now() / 1000;
+        console.log("StaffAuthContext: Token expiration check:", { exp: decoded.exp, now, isValid: decoded.exp > now });
 
         if (decoded.exp > now) {
+
+          // 3. Extract User Data
           const userInfoString = localStorage.getItem("user");
+          console.log("StaffAuthContext: User info from localStorage:", userInfoString);
 
           if (userInfoString) {
             const userInfo = JSON.parse(userInfoString);
-            setAuth({
+            const userData = {
               ...userInfo,
               role: decoded.role || userInfo.role || "cashier", // Default to cashier if no role
               exp: decoded.exp,
               token
-            });
+            };
+            console.log("StaffAuthContext: Setting auth with user data:", userData);
+            setAuth(userData);
+
+            // 4. Set Auto-Logout Timer
+            const timeout = (decoded.exp - now) * 1000;
+            setTimeout(() => {
+              console.log("StaffAuthContext: Token expired, logging out");
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              setAuth(null);
+              // Redirect based on current path
+              const currentPath = window.location.pathname;
+              if (currentPath.startsWith("/cashier")) {
+                navigate("/cashier/auth");
+              } else if (currentPath.startsWith("/manager")) {
+                navigate("/manager/auth");
+              }
+            }, timeout);
           } else {
-            setAuth({
+            const userData = {
               id: decoded.id || 0,
               name: decoded.name || "Staff User",
               email: decoded.email || "",
               role: decoded.role || "cashier",
               exp: decoded.exp,
               token
-            });
-          }
+            };
+            console.log("StaffAuthContext: Setting auth with decoded data:", userData);
+            setAuth(userData);
 
-          // Auto logout timer
-          const timeout = (decoded.exp - now) * 1000;
-          setTimeout(() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            setAuth(null);
-            navigate(`${isCashier ? "/cashier" : "/manager"}/auth`);
-          }, timeout);
+            // Auto logout timer
+            const timeout = (decoded.exp - now) * 1000;
+            setTimeout(() => {
+              console.log("StaffAuthContext: Token expired, logging out");
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              setAuth(null);
+              // Redirect based on current path
+              const currentPath = window.location.pathname;
+              if (currentPath.startsWith("/cashier")) {
+                navigate("/cashier/auth");
+              } else if (currentPath.startsWith("/manager")) {
+                navigate("/manager/auth");
+              }
+            }, timeout);
+          }
         } else {
+          console.log("StaffAuthContext: Token expired, clearing auth");
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           setAuth(null);
-          navigate(`${isCashier ? "/cashier" : "/manager"}/auth`);
+          // Redirect based on current path
+          const currentPath = window.location.pathname;
+          if (currentPath.startsWith("/cashier")) {
+            navigate("/cashier/auth");
+          } else if (currentPath.startsWith("/manager")) {
+            navigate("/manager/auth");
+          }
         }
       } catch (err) {
-        console.error("Error decoding token:", err);
+        console.error("StaffAuthContext: Error decoding token:", err);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setAuth(null);
-        navigate(`${isCashier ? "/cashier" : "/manager"}/auth`);
+        // Redirect based on current path
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith("/cashier")) {
+          navigate("/cashier/auth");
+        } else if (currentPath.startsWith("/manager")) {
+          navigate("/manager/auth");
+        }
       }
     } else {
+      console.log("StaffAuthContext: No token found, setting auth to null");
       setAuth(null);
     }
 
     setLoading(false);
+  };
+
+  useEffect(() => {
+    console.log("StaffAuthContext: useEffect triggered");
+    checkAuth();
+
+    // Listen for storage changes (when token is set/removed)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "token" || e.key === "user") {
+        console.log("StaffAuthContext: Storage changed, re-checking auth");
+        checkAuth();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, [navigate]);
+
+  console.log("StaffAuthContext: Current state:", { auth, loading, isCashier, isManager });
 
   return (
     <StaffAuthContext.Provider value={{

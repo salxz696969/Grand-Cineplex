@@ -5,7 +5,7 @@ import { ValidateEmail } from "../../utils/validation";
 import { FaUserAlt } from "react-icons/fa";
 import TokenAPI from "../../api/tokenApi";
 import { setToken } from "../../utils/auth";
-import { AuthContext } from "../../components/context/AuthContext";
+import { StaffAuthContext } from "../../components/context/StaffAuthContext";
 import { Clapperboard } from "lucide-react";
 
 export default function Auth() {
@@ -15,7 +15,7 @@ export default function Auth() {
     const [submitting, setSubmitting] = useState<boolean>(false);
 
     const navigate = useNavigate();
-    const { setAuth } = useContext(AuthContext)!;
+    const { setAuth } = useContext(StaffAuthContext)!;
 
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -34,7 +34,7 @@ export default function Auth() {
         setSubmitting(true);
 
         try {
-            const res = await TokenAPI.post("/manager/login", {
+            const res = await TokenAPI.TokenAPIManager.post("/login", {
                 email,
                 password,
             });
@@ -45,10 +45,20 @@ export default function Auth() {
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(userData));
 
+            // Set token in TokenAPI instance
             setToken(token);
-            TokenAPI.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            TokenAPI.TokenAPIManager.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+            // Update auth context
             setAuth(userData);
 
+            // Force a storage event to trigger context re-check
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'token',
+                newValue: token
+            }));
+
+            console.log("Auth: Login successful, navigating to /manager");
             navigate("/manager");
         } catch (err: any) {
             console.error("Login error:", err);
@@ -81,28 +91,26 @@ export default function Auth() {
                         <p className="text-gray-400 text-sm">Sign in to your staff account</p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-6">
+                    <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label htmlFor="email" className="block text-gray-300 font-medium mb-2">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Email Address
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <FaUserAlt className="text-blue-300 w-4 h-4" />
-                                </div>
                                 <input
-                                    id="email"
                                     type="email"
-                                    className="w-full bg-gray-800/70 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-400 transition-all duration-200"
-                                    placeholder="Enter your email"
                                     value={email}
                                     onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                                    className="w-full pl-12 rounded-xl border border-gray-700 bg-gray-900/50 px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    placeholder="Enter your email"
+                                    required
                                 />
+                                <FaUserAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-gray-300 font-medium mb-2">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Password
                             </label>
                             <Password
@@ -111,33 +119,27 @@ export default function Auth() {
                             />
                         </div>
 
-                        {/* <div className="flex items-center justify-between">
-                            <Link to="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200">
-                                Forgot Password?
-                            </Link>
-                        </div> */}
-
                         {error && (
                             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                                <span className="text-red-400 text-sm font-medium">{error}</span>
+                                <p className="text-red-400 text-sm">{error}</p>
                             </div>
                         )}
 
                         <button
                             type="submit"
                             disabled={!isLoginFormValid() || submitting}
-                            className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all duration-200 ${!isLoginFormValid() || submitting
-                                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700 hover:scale-[1.02] shadow-lg"
-                                }`}
+                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 hover:scale-[1.02] disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {submitting ? (
-                                <div className="flex items-center justify-center gap-2">
+                                <>
                                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     Signing In...
-                                </div>
+                                </>
                             ) : (
-                                "Sign In"
+                                <>
+                                    <FaUserAlt className="w-4 h-4" />
+                                    Sign In
+                                </>
                             )}
                         </button>
                     </form>
