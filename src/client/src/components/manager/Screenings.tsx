@@ -17,7 +17,9 @@ export interface Screening {
 	duration: string;
 	availableSeats: number;
 	totalSeats: number;
-	price: number;
+	regularSeatPrice: number;
+	premiumSeatPrice: number;
+	vipSeatPrice: number;
 	status: "upcoming" | "ongoing" | "completed";
 }
 
@@ -98,6 +100,9 @@ export default function Screenings() {
 					theaterId: (editScreening as any).theaterId ?? 0,
 					screeningDate: editScreening.date,
 					screeningTime: editScreening.time,
+					regularSeatPrice: editScreening.regularSeatPrice,
+					premiumSeatPrice: editScreening.premiumSeatPrice,
+					vipSeatPrice: editScreening.vipSeatPrice,
 				}}
 			/>
 		);
@@ -161,17 +166,15 @@ export default function Screenings() {
 				{/* Tabs */}
 				<div className="flex flex-row items-center gap-4">
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${
-							activeTab === "today" ? "border-blue-600 font-bold" : "border-transparent"
-						}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "today" ? "border-blue-600 font-bold" : "border-transparent"
+							}`}
 						onClick={() => setActiveTab("today")}
 					>
 						Today's Screenings
 					</button>
 					<button
-						className={`text-white py-2 px-1 flex items-center border-b ${
-							activeTab === "all" ? "border-blue-600 font-bold" : "border-transparent"
-						}`}
+						className={`text-white py-2 px-1 flex items-center border-b ${activeTab === "all" ? "border-blue-600 font-bold" : "border-transparent"
+							}`}
 						onClick={() => setActiveTab("all")}
 					>
 						All Screenings

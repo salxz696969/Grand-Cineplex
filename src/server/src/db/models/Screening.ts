@@ -7,7 +7,9 @@ class Screening extends Model {
   declare theaterId: number;
   declare screeningDate: Date;
   declare screeningTime: string;
-  declare price: number;
+  declare regularSeatPrice: number;
+  declare premiumSeatPrice: number;
+  declare vipSeatPrice: number;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -119,9 +121,20 @@ export const initScreening = (sequelize: Sequelize) => {
         allowNull: false,
         field: "screening_time",
       },
-      price: {
+      regularSeatPrice: {
         type: DataTypes.DECIMAL(8, 2),
         allowNull: false,
+        field: "regular_seat_price",
+      },
+      premiumSeatPrice: {
+        type: DataTypes.DECIMAL(8, 2),
+        allowNull: false,
+        field: "premium_seat_price",
+      },
+      vipSeatPrice: {
+        type: DataTypes.DECIMAL(8, 2),
+        allowNull: false,
+        field: "vip_seat_price",
       },
     },
     {

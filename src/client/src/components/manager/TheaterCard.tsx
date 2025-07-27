@@ -52,7 +52,7 @@ export default function TheaterCard({ theater, onEdit }: {
                     <Sofa className="w-4 h-4 text-slate-400" />
                     <span className="text-gray-300">Layout: {theater.rows} rows × {theater.seatsPerRow} seats</span>
                 </div>
-                {/* Action Button */}
+                Action Button
                 <div className="flex items-center justify-start pt-4 border-t border-slate-800">
                     <button
                         onClick={() => onEdit(theater)}

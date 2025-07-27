@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Search, Filter, PlusCircle, MapPin } from "lucide-react";
-import SeatManagementPopup from "./SeatManagement";
+import SeatManagementPopup from "./EditTheater";
 import TheaterCard from "./TheaterCard";
 import AddTheater from "./AddTheater";
 import { getTheaters } from "../../api/manager";

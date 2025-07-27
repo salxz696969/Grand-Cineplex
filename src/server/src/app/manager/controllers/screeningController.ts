@@ -129,7 +129,9 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
         "id",
         "screeningDate",
         "screeningTime",
-        "price",
+        "regularSeatPrice",
+        "premiumSeatPrice",
+        "vipSeatPrice",
         "movieId",
         "theaterId",
         [
@@ -199,7 +201,9 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
         duration: `${durationMinutes} min`,
         availableSeats: totalSeats - bookedSeats,
         totalSeats,
-        price: Number(s.price),
+        regularSeatPrice: Number(s.regularSeatPrice),
+        premiumSeatPrice: Number(s.premiumSeatPrice),
+        vipSeatPrice: Number(s.vipSeatPrice),
         status,
       };
     });
@@ -227,10 +231,10 @@ export const getShowTimesBasedOnMovieId = async (
 
 export const addShowTime = async (req: Request, res: Response) => {
   try {
-    const { movieId, theaterId, screeningDate, screeningTime, price } =
+    const { movieId, theaterId, screeningDate, screeningTime, regularSeatPrice, premiumSeatPrice, vipSeatPrice } =
       req.body;
 
-    if (!movieId || !theaterId || !screeningDate || !screeningTime || !price) {
+    if (!movieId || !theaterId || !screeningDate || !screeningTime || !regularSeatPrice || !premiumSeatPrice || !vipSeatPrice) {
       return res.status(400).json({
         message: "All fields are required",
       });
@@ -241,7 +245,9 @@ export const addShowTime = async (req: Request, res: Response) => {
       theaterId,
       screeningDate,
       screeningTime,
-      price,
+      regularSeatPrice,
+      premiumSeatPrice,
+      vipSeatPrice,
     });
 
     res.status(201).json(newShowTime);
@@ -253,10 +259,10 @@ export const addShowTime = async (req: Request, res: Response) => {
 export const updateShowTime = async (req: Request, res: Response) => {
   try {
     const screeningId = parseInt(req.params.id);
-    const { movieId, theaterId, screeningDate, screeningTime, price } =
+    const { movieId, theaterId, screeningDate, screeningTime, regularSeatPrice, premiumSeatPrice, vipSeatPrice } =
       req.body;
 
-    if (!movieId || !theaterId || !screeningDate || !screeningTime || !price) {
+    if (!movieId || !theaterId || !screeningDate || !screeningTime || !regularSeatPrice || !premiumSeatPrice || !vipSeatPrice) {
       return res.status(400).json({
         message: "All fields are required",
       });
@@ -273,7 +279,9 @@ export const updateShowTime = async (req: Request, res: Response) => {
       theaterId,
       screeningDate,
       screeningTime,
-      price,
+      regularSeatPrice,
+      premiumSeatPrice,
+      vipSeatPrice,
     });
 
     res.status(200).json(screening);

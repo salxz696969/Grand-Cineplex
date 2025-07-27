@@ -11,20 +11,17 @@ import { addTheater } from "../../api/manager";
 
 interface TheaterFormData {
 	name: string;
-	location?: string;
-	description: string;
 	rows: number;
 	seatsPerRow: number;
 	status: string;
-	cinemaId: number; // Optional, for existing theaters
+	cinemaId: number;
 }
 
 export default function AddTheater({ onBack }: { onBack: () => void }) {
 	const [formData, setFormData] = useState<TheaterFormData>({
 		name: "",
-		description: "",
 		rows: 10,
-		seatsPerRow: 10,
+		seatsPerRow: 12,
 		status: "active",
 		cinemaId: 1,
 	});
@@ -45,21 +42,24 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 		e.preventDefault();
 		setIsSubmitting(true);
 
-		// TODO: Implement API call to add theater
 		try {
-			await addTheater({
+			const response = await addTheater({
 				name: formData.name,
 				status: formData.status,
 				cinemaId: formData.cinemaId,
+				rows: formData.rows,
+				seatsPerRow: formData.seatsPerRow,
 			});
+
+			// Show success message with seat count
+			alert(`Theater "${formData.name}" created successfully with ${response.totalSeats} seats!`);
 		} catch (error) {
 			console.error("Error adding theater:", error);
+			alert("Failed to create theater. Please try again.");
 		} finally {
 			setIsSubmitting(false);
 			onBack();
 		}
-
-		// Simulate API call
 	};
 
 	const statusOptions = [
@@ -74,70 +74,74 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 
 	// Calculate capacity
 	const capacity = formData.rows * formData.seatsPerRow;
-
 	// Generate seat preview
 	const generateSeatPreview = () => {
 		const seats: React.ReactElement[] = [];
 		const rows = Array.from(
-			{ length: Math.min(formData.rows, 6) },
+			{ length: formData.rows },
 			(_, i) => String.fromCharCode(65 + i)
-		); // Show max 6 rows for preview
+		);
 
 		rows.forEach((row, rowIndex) => {
-			const rowSeats: React.ReactElement[] = [];
-			const seatsToShow = Math.min(formData.seatsPerRow, 12); // Show max 12 seats per row for preview
+			let seatNumber = 1;
 
-			for (let i = 1; i <= seatsToShow; i++) {
-				let type: "regular" | "premium" | "vip" = "regular";
-
-				// Premium seats (middle rows)
-				if (
-					rowIndex >= Math.floor(formData.rows / 3) &&
-					rowIndex <= Math.floor((2 * formData.rows) / 3)
-				) {
-					type = "premium";
-				}
-
-				// VIP seats (front row)
-				if (rowIndex === 0) {
-					type = "vip";
-				}
-
-				rowSeats.push(
-					<div
-						key={`${row}${i}`}
-						className={`w-3 h-3 rounded-full flex items-center justify-center text-xs ${getSeatStyle(
-							type
-						)}`}
-						title={`${row}${i} - ${type}`}
-					>
-						<Sofa className="w-2 h-2" />
-					</div>
-				);
+			// Determine seat type based on row position (matching backend logic)
+			let seatType: 'vip' | 'premium' | 'regular';
+			if (rowIndex >= formData.rows - 2) {
+				// Last 2 rows are VIP
+				seatType = 'vip';
+			} else if (rowIndex >= formData.rows - 4 && rowIndex < formData.rows - 2) {
+				// 2 rows before the last 2 are Premium
+				seatType = 'premium';
+			} else {
+				// All other rows are Regular
+				seatType = 'regular';
 			}
 
+			const rowSeats = Array(formData.seatsPerRow).fill(null).map(() => (
+				<div
+					key={`${row}${seatNumber}`}
+					className={`w-full aspect-square ${seatType === 'vip' ? 'bg-yellow-900/50 hover:bg-yellow-800' :
+						seatType === 'premium' ? 'bg-purple-900/50 hover:bg-purple-800' :
+							'bg-gray-900/50 hover:bg-gray-700'
+						} rounded flex items-center justify-center max-w-[300px] max-h-[300px]`}
+					title={`${row}${seatNumber++} (${seatType})`}
+				>
+					<Sofa className={`w-1/2 h-1/2 ${seatType === 'vip' ? 'text-yellow-300' :
+						seatType === 'premium' ? 'text-purple-300' :
+							'text-slate-300'
+						}`} />
+				</div>
+			));
+
 			seats.push(
-				<div key={row} className="flex gap-1 items-center">
-					<span className="w-4 text-center font-semibold text-slate-400 text-xs">
+				<div key={row} className="flex gap-1 items-center w-full">
+					<span className="w-8 text-center font-semibold text-slate-400 text-sm">
 						{row}
 					</span>
-					<div className="flex gap-0.5">{rowSeats}</div>
+					<div className="flex gap-1 flex-1">
+						{rowSeats}
+					</div>
 				</div>
 			);
 		});
 
-		return seats;
-	};
+		// Add seat numbers at the bottom
+		const seatNumbers = (
+			<div key="numbers" className="flex gap-1 items-center w-full">
+				<span className="w-8" />
+				<div className="flex gap-1 flex-1">
+					{Array(formData.seatsPerRow).fill(null).map((_, i) => (
+						<div key={i} className="w-full flex justify-center">
+							<span className="text-[10px] text-slate-400">{i + 1}</span>
+						</div>
+					))}
+				</div>
+			</div>
+		);
 
-	const getSeatStyle = (type: "regular" | "premium" | "vip") => {
-		switch (type) {
-			case "vip":
-				return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-black";
-			case "premium":
-				return "bg-gradient-to-br from-purple-500 to-purple-600 text-white";
-			default:
-				return "bg-gradient-to-br from-gray-600 to-gray-700 text-white";
-		}
+		seats.push(seatNumbers);
+		return seats;
 	};
 
 	return (
@@ -197,43 +201,6 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Location *
-									</label>
-									<input
-										type="text"
-										required
-										value={formData.location}
-										onChange={(e) =>
-											handleInputChange(
-												"location",
-												e.target.value
-											)
-										}
-										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-										placeholder="e.g., Ground Floor, First Floor"
-									/>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Description
-									</label>
-									<textarea
-										rows={3}
-										value={formData.description}
-										onChange={(e) =>
-											handleInputChange(
-												"description",
-												e.target.value
-											)
-										}
-										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-										placeholder="Enter theater description"
-									/>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-slate-300 mb-2">
 										Status *
 									</label>
 									<select
@@ -280,7 +247,10 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 								</div>
 							</div>
 						</div>
+					</div>
 
+					{/* Right Column */}
+					<div className="space-y-6">
 						{/* Seating Configuration */}
 						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -298,7 +268,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 											type="number"
 											required
 											min="1"
-											max="20"
+											max="26"
 											value={formData.rows}
 											onChange={(e) =>
 												handleInputChange(
@@ -317,7 +287,7 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 											type="number"
 											required
 											min="1"
-											max="30"
+											max="20"
 											value={formData.seatsPerRow}
 											onChange={(e) =>
 												handleInputChange(
@@ -347,151 +317,45 @@ export default function AddTheater({ onBack }: { onBack: () => void }) {
 							</div>
 						</div>
 					</div>
+				</div>
 
-					{/* Right Column */}
+				{/* Seat Preview - Full Width */}
+				<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
+					<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+						<Monitor className="w-5 h-5" />
+						Seating Layout Preview
+					</h3>
+
 					<div className="space-y-6">
-						{/* Layout Preview */}
-						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
-							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-								<Monitor className="w-5 h-5" />
-								Layout Preview
-							</h3>
-
-							<div className="space-y-4">
-								{/* Screen */}
-								<div className="relative">
-									<div className="w-full h-8 bg-gradient-to-b from-gray-300 to-gray-500 mx-auto rounded-lg flex items-center justify-center text-gray-700 font-semibold shadow-lg">
-										<Monitor className="w-4 h-4 mr-2" />
-										SCREEN
-									</div>
-									<div className="absolute inset-x-0 top-8 h-2 bg-gradient-to-b from-gray-300/20 to-transparent"></div>
-								</div>
-
-								{/* Seat Grid Preview */}
-								<div className="flex flex-col items-center gap-2">
-									{generateSeatPreview()}
-								</div>
-
-								{/* Preview Info */}
-								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
-									<div className="grid grid-cols-2 gap-4 text-sm">
-										<div>
-											<span className="text-slate-400">
-												Rows:
-											</span>
-											<span className="text-white ml-2">
-												{formData.rows}
-											</span>
-										</div>
-										<div>
-											<span className="text-slate-400">
-												Seats/Row:
-											</span>
-											<span className="text-white ml-2">
-												{formData.seatsPerRow}
-											</span>
-										</div>
-										<div>
-											<span className="text-slate-400">
-												Capacity:
-											</span>
-											<span className="text-white ml-2">
-												{capacity}
-											</span>
-										</div>
-										<div>
-											<span className="text-slate-400">
-												Status:
-											</span>
-											<span
-												className={`ml-2 ${statusOptions.find(
-													(s) =>
-														s.value ===
-														formData.status
-												)?.color
-													}`}
-											>
-												{
-													statusOptions.find(
-														(s) =>
-															s.value ===
-															formData.status
-													)?.label
-												}
-											</span>
-										</div>
-									</div>
-								</div>
-
-								{/* Seat Legend */}
-								<div className="flex flex-wrap justify-center gap-4 text-xs">
-									<div className="flex items-center gap-1">
-										<div className="w-3 h-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded"></div>
-										<span className="text-slate-300">
-											Regular
-										</span>
-									</div>
-									<div className="flex items-center gap-1">
-										<div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded"></div>
-										<span className="text-slate-300">
-											Premium
-										</span>
-									</div>
-									<div className="flex items-center gap-1">
-										<div className="w-3 h-3 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded"></div>
-										<span className="text-slate-300">
-											VIP
-										</span>
-									</div>
-								</div>
+						{/* Screen */}
+						<div className="relative">
+							<div className="w-2/3 h-12 bg-gradient-to-b from-gray-300 to-gray-500 mx-auto rounded-lg flex items-center justify-center text-gray-700 font-semibold shadow-lg text-sm">
+								<Monitor className="w-3 h-3 mr-1" />
+								SCREEN
 							</div>
+							<div className="absolute inset-x-0 top-6 h-2 bg-gradient-to-b from-gray-300/20 to-transparent"></div>
 						</div>
 
-						{/* Theater Preview */}
-						{formData.name && (
-							<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
-								<h3 className="text-lg font-semibold text-white mb-4">
-									Theater Preview
-								</h3>
+						{/* Seat Grid Preview */}
+						<div className="flex flex-col items-center gap-1 overflow-x-auto py-8 w-full max-w-[95%] mx-auto">
+							{generateSeatPreview()}
+						</div>
 
-								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
-									<div className="flex items-center gap-3 mb-3">
-										<div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
-											<MapPin className="w-6 h-6 text-slate-400" />
-										</div>
-										<div>
-											<h4 className="text-white font-semibold">
-												{formData.name}
-											</h4>
-											<p className="text-slate-400 text-sm">
-												{formData.location}
-											</p>
-										</div>
-									</div>
-
-									<div className="space-y-2 text-sm">
-										<div className="flex items-center gap-2 text-slate-300">
-											<Users className="w-4 h-4 text-slate-400" />
-											<span>
-												Capacity: {capacity} seats
-											</span>
-										</div>
-										<div className="flex items-center gap-2 text-slate-300">
-											<Sofa className="w-4 h-4 text-slate-400" />
-											<span>
-												Layout: {formData.rows} rows ×{" "}
-												{formData.seatsPerRow} seats
-											</span>
-										</div>
-										{formData.description && (
-											<p className="text-slate-400 text-sm">
-												{formData.description}
-											</p>
-										)}
-									</div>
-								</div>
+						{/* Seat Type Legend */}
+						<div className="flex justify-center gap-6 mt-4">
+							<div className="flex items-center gap-2">
+								<div className="w-4 h-4 bg-gray-900/50 rounded"></div>
+								<span className="text-sm text-slate-400">Regular</span>
 							</div>
-						)}
+							<div className="flex items-center gap-2">
+								<div className="w-4 h-4 bg-purple-900/50 rounded"></div>
+								<span className="text-sm text-slate-400">Premium</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<div className="w-4 h-4 bg-yellow-900/50 rounded"></div>
+								<span className="text-sm text-slate-400">VIP</span>
+							</div>
+						</div>
 					</div>
 				</div>
 

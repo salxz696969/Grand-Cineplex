@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Calendar, Clock, Film } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Film, DollarSign } from "lucide-react";
 import { updateScreening, getAllMovies, getTheaters } from "../../api/manager";
 
 type ScreeningData = {
@@ -8,7 +8,9 @@ type ScreeningData = {
 	theaterId: number;
 	screeningDate: string;
 	screeningTime: string;
-	price: number;
+	regularSeatPrice: number;
+	premiumSeatPrice: number;
+	vipSeatPrice: number;
 };
 
 type Movie = { id: number; title: string };
@@ -130,7 +132,10 @@ export default function EditScreening({ onBack, screening }: EditScreeningProps)
 					{/* Right Column */}
 					<div className="space-y-6">
 						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
-							<h3 className="text-lg font-semibold text-white mb-4">Date & Time</h3>
+							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+								<Calendar className="w-5 h-5" />
+								Date & Time
+							</h3>
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">Date</label>
@@ -156,15 +161,69 @@ export default function EditScreening({ onBack, screening }: EditScreeningProps)
 										<Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
 									</div>
 								</div>
+							</div>
+						</div>
+
+						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
+							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+								<DollarSign className="w-5 h-5" />
+								Pricing
+							</h3>
+							<div className="space-y-4">
 								<div>
-									<label className="block text-sm font-medium text-slate-300 mb-2">Price</label>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Regular Seat Price</label>
 									<input
 										type="number"
-										value={formData.price}
-										onChange={(e) => handleInputChange("price", Number(e.target.value))}
+										step="0.01"
+										min="0"
+										value={formData.regularSeatPrice}
+										onChange={(e) => handleInputChange("regularSeatPrice", Number(e.target.value))}
 										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
 										placeholder="e.g., 12.50"
 									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">Premium Seat Price</label>
+									<input
+										type="number"
+										step="0.01"
+										min="0"
+										value={formData.premiumSeatPrice}
+										onChange={(e) => handleInputChange("premiumSeatPrice", Number(e.target.value))}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+										placeholder="e.g., 15.00"
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">VIP Seat Price</label>
+									<input
+										type="number"
+										step="0.01"
+										min="0"
+										value={formData.vipSeatPrice}
+										onChange={(e) => handleInputChange("vipSeatPrice", Number(e.target.value))}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white"
+										placeholder="e.g., 25.00"
+									/>
+								</div>
+
+								{/* Price Preview */}
+								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
+									<h4 className="text-white font-semibold mb-3">Price Summary</h4>
+									<div className="space-y-2">
+										<div className="flex items-center justify-between">
+											<span className="text-slate-300 text-sm">Regular Seats:</span>
+											<span className="text-white font-semibold">${formData.regularSeatPrice}</span>
+										</div>
+										<div className="flex items-center justify-between">
+											<span className="text-slate-300 text-sm">Premium Seats:</span>
+											<span className="text-white font-semibold">${formData.premiumSeatPrice}</span>
+										</div>
+										<div className="flex items-center justify-between">
+											<span className="text-slate-300 text-sm">VIP Seats:</span>
+											<span className="text-white font-semibold">${formData.vipSeatPrice}</span>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>

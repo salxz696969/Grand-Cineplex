@@ -14,7 +14,9 @@ interface ScreeningFormData {
 	theaterId: string;
 	screeningDate: string;
 	screeningTime: string;
-	price: number;
+	regularSeatPrice: number;
+	premiumSeatPrice: number;
+	vipSeatPrice: number;
 	type?: string;
 }
 
@@ -39,7 +41,9 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 		theaterId: "",
 		screeningDate: "",
 		screeningTime: "",
-		price: 12.5,
+		regularSeatPrice: 5,
+		premiumSeatPrice: 8,
+		vipSeatPrice: 10,
 	});
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,24 +65,9 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 		fetchData();
 	}, []);
 
-	// Dummy data - replace with API calls
-	// const movies: Movie[] = [
-	//     { id: "1", title: "The Dark Knight", duration: "2h 32m", posterUrl: "https://example.com/dark-knight.jpg" },
-	//     { id: "2", title: "Inception", duration: "2h 28m", posterUrl: "https://example.com/inception.jpg" },
-	//     { id: "3", title: "Interstellar", duration: "2h 49m", posterUrl: "https://example.com/interstellar.jpg" },
-	//     { id: "4", title: "The Matrix", duration: "2h 16m", posterUrl: "https://example.com/matrix.jpg" }
-	// ];
-
-	// const theaters: Theater[] = [
-	//     { id: "TH001", name: "Theater A", capacity: 120, location: "Ground Floor" },
-	//     { id: "TH002", name: "Theater B", capacity: 80, location: "First Floor" },
-	//     { id: "TH003", name: "Theater C", capacity: 100, location: "Ground Floor" },
-	//     { id: "TH004", name: "VIP Theater", capacity: 40, location: "Second Floor" }
-	// ];
-
 	const handleInputChange = (
 		field: keyof ScreeningFormData,
-		value: string
+		value: string | number
 	) => {
 		setFormData((prev) => ({
 			...prev,
@@ -90,10 +79,8 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 		e.preventDefault();
 		setIsSubmitting(true);
 
-		// TODO: Implement API call to add screening
 		try {
 			await addScreening(formData);
-			// console.log("Screening added:", formData);
 		} catch (error) {
 			console.error("Error adding screening:", error);
 		} finally {
@@ -104,14 +91,7 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 
 	const selectedMovie = movies.find((m) => m.id === formData.movieId);
 	const selectedTheater = theaters.find((t) => t.id === formData.theaterId);
-
-	const screeningTypes = [
-		{ value: "regular", label: "Regular", price: 12.5 },
-		{ value: "3d", label: "3D", price: 15.0 },
-		{ value: "imax", label: "IMAX", price: 18.0 },
-		{ value: "vip", label: "VIP", price: 25.0 },
-	];
-
+	
 	const timeSlots = [
 		"09:00",
 		"10:00",
@@ -353,79 +333,95 @@ export default function AddScreening({ onBack }: { onBack: () => void }) {
 							</div>
 						</div>
 
-						{/* Pricing & Type */}
+						{/* Pricing */}
 						<div className="bg-gray-950 border border-slate-800 rounded-lg p-6">
 							<h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 								<DollarSign className="w-5 h-5" />
-								Pricing & Type
+								Pricing
 							</h3>
 
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Screening Type *
-									</label>
-									<select
-										required
-										value={formData.type}
-										onChange={(e) =>
-											handleInputChange(
-												"type",
-												e.target.value
-											)
-										}
-										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-									>
-										{screeningTypes.map((type) => (
-											<option
-												key={type.value}
-												value={type.value}
-											>
-												{type.label} - ${type.price}
-											</option>
-										))}
-									</select>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Custom Price (Optional)
+										Regular Seat Price *
 									</label>
 									<input
 										type="number"
 										step="0.01"
 										min="0"
-										value={formData.price}
+										required
+										value={formData.regularSeatPrice}
 										onChange={(e) =>
 											handleInputChange(
-												"price",
-												e.target.value
+												"regularSeatPrice",
+												Number(e.target.value)
 											)
 										}
 										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-										placeholder="Leave empty to use default price"
+										placeholder="e.g., 12.50"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">
+										Premium Seat Price *
+									</label>
+									<input
+										type="number"
+										step="0.01"
+										min="0"
+										required
+										value={formData.premiumSeatPrice}
+										onChange={(e) =>
+											handleInputChange(
+												"premiumSeatPrice",
+												Number(e.target.value)
+											)
+										}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										placeholder="e.g., 15.00"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-slate-300 mb-2">
+										VIP Seat Price *
+									</label>
+									<input
+										type="number"
+										step="0.01"
+										min="0"
+										required
+										value={formData.vipSeatPrice}
+										onChange={(e) =>
+											handleInputChange(
+												"vipSeatPrice",
+												Number(e.target.value)
+											)
+										}
+										className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+										placeholder="e.g., 25.00"
 									/>
 								</div>
 
 								{/* Price Preview */}
-								{formData.type && (
-									<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
+								<div className="bg-gray-900/50 rounded-lg p-4 border border-slate-700">
+									<h4 className="text-white font-semibold mb-3">Price Summary</h4>
+									<div className="space-y-2">
 										<div className="flex items-center justify-between">
-											<span className="text-slate-300">
-												Ticket Price:
-											</span>
-											<span className="text-white font-semibold text-lg">
-												$
-												{formData.price ||
-													screeningTypes.find(
-														(t) =>
-															t.value ===
-															formData.type
-													)?.price}
-											</span>
+											<span className="text-slate-300 text-sm">Regular Seats:</span>
+											<span className="text-white font-semibold">${formData.regularSeatPrice}</span>
+										</div>
+										<div className="flex items-center justify-between">
+											<span className="text-slate-300 text-sm">Premium Seats:</span>
+											<span className="text-white font-semibold">${formData.premiumSeatPrice}</span>
+										</div>
+										<div className="flex items-center justify-between">
+											<span className="text-slate-300 text-sm">VIP Seats:</span>
+											<span className="text-white font-semibold">${formData.vipSeatPrice}</span>
 										</div>
 									</div>
-								)}
+								</div>
 							</div>
 						</div>
 					</div>
