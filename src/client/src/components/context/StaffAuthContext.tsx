@@ -79,10 +79,17 @@ export const StaffAuthProvider = ({ children }: AuthProviderProps) => {
             const userInfo = JSON.parse(userInfoString);
             const userData = {
               ...userInfo,
-              role: decoded.role || userInfo.role || "cashier", // Default to cashier if no role
+              role: decoded.role || userInfo.role,
               exp: decoded.exp,
               token
             };
+
+            const path = window.location.pathname;
+            if (path.startsWith('/cashier') && userData.role === 'manager') {
+              navigate('/cashier/auth');
+            } else if (path.startsWith('/manager') && userData.role === 'cashier') {
+              navigate('/manager/auth');
+            }
             console.log("StaffAuthContext: Setting auth with user data:", userData);
             setAuth(userData);
 

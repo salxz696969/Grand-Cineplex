@@ -177,6 +177,7 @@ export const logInUser = async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
+      role: user.role,
       token,
     });
   } catch (error) {

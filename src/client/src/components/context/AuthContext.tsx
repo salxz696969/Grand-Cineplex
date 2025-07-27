@@ -43,7 +43,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           if (userInfoString) {
             const userInfo = JSON.parse(userInfoString);
-            setAuth({ ...userInfo, exp: decoded.exp, token });
+            if (!userInfo.role) {
+              setAuth({ ...userInfo, exp: decoded.exp, token });
+            }
           } else {
             setAuth({ id: 0, name: "User", email: "", exp: decoded.exp, token });
           }
