@@ -122,3 +122,63 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Booking failed" });
   }
 };
+
+
+export const viewBookingHistory = async (req: Request, res: Response) => {
+  try {
+    const userEmail = (req as any).user?.email;
+
+    if (!userEmail) {
+      return res.status(401).json({ message: "Unauthorized, no email in token" });
+    }
+
+    const user = await Customer.findOne({ where: { email: userEmail } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const bookings = await Booking.findAll({
+      where: { customerId: user.id },
+      include: [
+        {
+          model: Seat,
+          attributes: ["seatNumber", "price"],
+        },
+        {
+          model: Movie,
+          attributes: ["title"],
+        },
+      ],
+    });
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(404).json({ message: "No bookings found for this user." });
+    }
+
+    const bookingSummary = bookings.map((booking: any) => {
+      const seats = booking.tickets?.map((ticket: any) => ({
+        seatNumber: ticket.seat?.seatNumber,
+        price: ticket.seat?.price || 0,
+      })) || [];
+
+      const totalAmount = seats.reduce((sum: number, seat: any) => sum + seat.price, 0);
+
+      return {
+        movieTitle: booking.screening?.movie?.title || "",
+        theater: booking.screening?.theater?.name || "",
+        date: booking.screening?.screeningDate || "",
+        time: booking.screening?.screeningTime || "",
+        seats,
+        totalAmount,
+        customerName: booking.customer?.name || "",
+        customerPhone: booking.customer?.phone || "",
+      };
+    });
+
+    return res.status(200).json({ bookings: bookingSummary });
+  } catch (error) {
+    console.error("ViewBookingHistory error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
