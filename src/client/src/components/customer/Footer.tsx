@@ -1,19 +1,30 @@
 import { Clapperboard } from "lucide-react";
 import React from "react";
+import { FaFacebook } from "react-icons/fa";
+
+const social = [
+  {
+    name: "Facebook",
+    url: "https://www.facebook.com/grandcineplex",
+    icon: <img src="/facebook.svg" alt="Facebook" className="w-8 h-8 invert" />
+  },
+  {
+    name: "Instagram",
+    url: "https://www.instagram.com/grandcineplex",
+    icon: <img src="/instagram.svg" alt="Instagram" className="w-8 h-8 invert" />
+  },
+  {
+    name: "YouTube",
+    url: "https://www.youtube.com/grandcineplex",
+    icon: <img src="/tiktok.svg" alt="YouTube" className="w-8 h-8 invert" />
+  }
+]
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400 text-xs mt-10 border-t border-gray-800">
+    <footer className="bg-gray-950 text-gray-400 text-xs mt-10 border-t border-gray-800 w-full max-w-7xl">
       <div className="w-full max-w-7xl mx-auto py-6 px-4  lg:px-8 flex flex-col justify-center items-center">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 w-full">
-
-          {/* About Us */}
-          <div>
-            <h3 className="text-white text-base font-semibold mb-2 sm:mb-4">About Cinema</h3>
-            <p className="leading-snug break-words text-xs sm:text-sm">
-              Grand-Cineplex is your ultimate destination for blockbuster hits and hidden indie gems. Enjoy next-level sound, razor-sharp screens, and unbeatable comfort — because at Grand-Cineplex, every movie matters.
-            </p>
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 w-full ">
 
           {/* Quick Links */}
           <div>
@@ -37,13 +48,21 @@ export default function Footer() {
           </div>
 
           {/* Follow Us */}
-          <div>
+          <div className="">
             <h3 className="text-white text-base font-semibold mb-2 sm:mb-4">Follow Us</h3>
             <div className="flex flex-wrap gap-2 sm:gap-4">
-              <a href="#" className="hover:text-white break-words text-xs sm:text-sm">Facebook</a>
-              <a href="#" className="hover:text-white break-words text-xs sm:text-sm">Instagram</a>
-              <a href="#" className="hover:text-white break-words text-xs sm:text-sm">YouTube</a>
+              {social.map((item) => (
+                <a href={item.url} className="hover:text-white break-words text-xs sm:text-sm">
+                  {item.icon}
+                </a>
+              ))}
             </div>
+          </div>
+
+          {/* Payment */}
+          <div>
+            <h3 className="text-white text-base font-semibold mb-2 sm:mb-4">Payment</h3>
+            <img src="/aba.png" alt="ABA Payment" className="w-42  object-contain" />
           </div>
         </div>
 

@@ -30,6 +30,7 @@ export default function PaymentContainer() {
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [isAuthRequired, setIsAuthRequired] = useState<boolean>(true);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [hasBooked, setHasBooked] = useState<boolean>(false); // Add this to prevent multiple bookings
 
   // Load booking data from localStorage and set up initial state
   useEffect(() => {
@@ -97,15 +98,12 @@ export default function PaymentContainer() {
     }
   };
 
-  // Handle payment submission
-  const handlePayment = async () => {
-    if (!selectedPaymentMethod) {
-      alert("Select a payment method");
-      return;
-    }
-    if (!bookingSummary) return;
+  // Single booking function to prevent multiple bookings
+  const createBooking = async () => {
+    if (!bookingSummary || hasBooked) return; // Prevent multiple bookings
 
     setProcessing(true);
+    setHasBooked(true); // Mark as booked immediately
 
     try {
       await new Promise((res) => setTimeout(res, 1500));
@@ -116,31 +114,29 @@ export default function PaymentContainer() {
 
       setIsCompleted(true);
     } catch (error: any) {
+      setHasBooked(false); // Reset if booking failed
       alert("Payment failed: " + (error.message || "Unknown error"));
     } finally {
       setProcessing(false);
     }
   };
 
+  // Handle payment submission
+  const handlePayment = async () => {
+    if (!selectedPaymentMethod) {
+      alert("Select a payment method");
+      return;
+    }
+    if (!bookingSummary) return;
+
+    await createBooking();
+  };
+
   // Handle QR payment success
   const handlePaymentSuccess = async () => {
     if (!bookingSummary) return;
 
-    setProcessing(true);
-
-    try {
-      await new Promise((res) => setTimeout(res, 1000)); // Brief delay for UX
-      await bookSeats(bookingSummary.screeningId!, seatIds, "confirmed");
-
-      // Clear stored booking data after successful booking
-      localStorage.removeItem('selectedBooking');
-
-      setIsCompleted(true);
-    } catch (error: any) {
-      alert("Booking failed: " + (error.message || "Unknown error"));
-    } finally {
-      setProcessing(false);
-    }
+    await createBooking();
   };
 
   // Show loading while booking data is being processed

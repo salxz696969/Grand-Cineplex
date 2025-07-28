@@ -5,7 +5,7 @@ const pics = [
   "/featured4.jpg",
   "/featured5.jpg",
   "/featured6.jpg",
-  "/featured7.jpg"
+  "/posterTemplate2.jpg"
 ]
 
 export default function Featured() {
@@ -23,11 +23,11 @@ export default function Featured() {
   }, [totalSlides]);
 
   return (
-    <div className="relative w-full h-[250px] lg:h-[500px] mt-10 rounded-2xl bg-gray-950 overflow-hidden flex justify-center items-center">
+    <div className="relative w-full aspect-[16/7] mt-10 rounded-2xl bg-gray-950 overflow-hidden flex justify-center items-center shadow-2xl shadow-blue-600/50">
       {/* Background image for showing and pop up with breath style */}
       {pics.map((pic, i) => (
         <img key={i} src={pic} alt={`Hall ${i + 1}`} loading="lazy"
-          className={`absolute inset-0 w-full h-full object-cover rounded-2xl transition-opacity duration-[1500ms] ease-in-out
+          className={`absolute inset-0 w-full h-auto object-cover rounded-2xl transition-opacity duration-[1500ms] ease-in-out
             ${i === index ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
           style={{ transitionProperty: "opacity" }}
         />

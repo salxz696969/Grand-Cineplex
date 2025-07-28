@@ -160,11 +160,11 @@ export default function MovieSelectedContainer() {
   return (
     <div className="min-h-screen bg-gray-950 text-white flex justify-start items-center flex-col">
       <Header />
-      <div className="max-w-7xl w-full px-4 ">
+      <div className="max-w-7xl w-full px-4">
 
         {hasCurrentScreenings ? (
-          <div className="relative flex flex-row justify-center items-start gap-4">
-            <div className="wrapper relative max-w-7xl w-full flex lg:flex-row gap-4 flex-col">
+          <div className="relative   flex flex-row justify-center items-start gap-4">
+            <div className="wrapper min-h-[calc(100vh-300px)] relative max-w-7xl w-full flex lg:flex-row gap-4 flex-col">
               <div className="w-full lg:w-80 lg:top-22 lg:left-0 lg:h-full flex-shrink-0 z-10">
                 <MovieSelectedCard movie={movie} isUpcoming={isUpcoming} />
               </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CreditCard, Wallet, Banknote, QrCode, CheckCircle, Clock, XCircle } from "lucide-react";
-import { getQrCode, checkPaymentStatus } from "../../../api/customer";
+import { getQrCode } from "../../../api/customer";
 
 const paymentMethods = [
   { id: "qr", name: "QR", icon: <QrCode className="w-5 h-5" /> },
@@ -29,6 +29,7 @@ export default function PaymentForm({
   const [isPolling, setIsPolling] = useState(false);
   const [pollCount, setPollCount] = useState(0);
   const [showQr, setShowQr] = useState(false);
+  const [hasCalledSuccess, setHasCalledSuccess] = useState(false); // Prevent multiple success calls
 
   // Remove automatic QR generation on mount
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function PaymentForm({
       setPaymentStatus("PENDING");
       setPollCount(0);
       setShowQr(true);
+      setHasCalledSuccess(false); // Reset success flag
       startPolling(transactionId);
     } catch (error) {
       console.error("Error generating QR code:", error);
@@ -58,48 +60,43 @@ export default function PaymentForm({
     }
 
     setIsPolling(true);
+    let currentPollCount = 0;
+
     const pollInterval = setInterval(async () => {
       try {
-        const statusData = await checkPaymentStatus(transactionId);
-        console.log("Payment status:", statusData);
+        // Fake status check - no real API call
+        // const statusData = await checkPaymentStatus(transactionId);
+        // console.log("Payment status:", statusData);
 
-        // Increment poll count
-        setPollCount(prev => {
-          const newCount = prev + 1;
-          console.log(`Poll count: ${newCount}`);
+        currentPollCount++;
+        setPollCount(currentPollCount);
+        console.log(`Poll count: ${currentPollCount}`);
 
-          // Fake completion after 5 polls for sandbox testing
-          if (newCount >= 5) {
-            console.log("Faking payment completion after 5 polls");
-            setPaymentStatus("APPROVED");
-            setIsPolling(false);
-            clearInterval(pollInterval);
-            // Call parent success handler instead of internal one
-            onPaymentSuccess();
-            return newCount;
-          }
-
-          return newCount;
-        });
-
-        if (statusData.status === "APPROVED") {
+        // After 3 polls (9 seconds total), fake completion
+        if (currentPollCount >= 3) {
+          console.log("Faking payment completion after 3 polls");
           setPaymentStatus("APPROVED");
           setIsPolling(false);
           clearInterval(pollInterval);
-          onPaymentSuccess();
-        } else if (statusData.status === "CANCELLED" || statusData.status === "DECLINED") {
-          setPaymentStatus("FAILED");
-          setIsPolling(false);
-          clearInterval(pollInterval);
+
+          // Only call success once
+          if (!hasCalledSuccess) {
+            setHasCalledSuccess(true);
+            onPaymentSuccess();
+          }
+          return;
         }
-        // If still PENDING, continue polling
+
+        // Simulate pending status for first 2 polls
+        setPaymentStatus("PENDING");
+
       } catch (error) {
         console.error("Error checking payment status:", error);
         // Continue polling on error
       }
     }, 3000); // Poll every 3 seconds
 
-    // Stop polling after 15 seconds (TODO: CHANGE TO A REAL TIMEOUT) for now just simulate
+    // Stop polling after 15 seconds as backup
     setTimeout(() => {
       clearInterval(pollInterval);
       setIsPolling(false);
@@ -142,7 +139,7 @@ export default function PaymentForm({
               {paymentStatus === "PENDING" && (
                 <>
                   <Clock className="w-5 h-5 text-yellow-400 animate-pulse" />
-                  <span className="text-yellow-400">Waiting for payment</span>
+                  <span className="text-yellow-400">Waiting for payment ({pollCount}/3)</span>
                 </>
               )}
               {paymentStatus === "APPROVED" && (
