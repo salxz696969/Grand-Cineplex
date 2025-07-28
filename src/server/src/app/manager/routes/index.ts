@@ -7,7 +7,7 @@ import usersRoute from "./usersRoute";
 import staffRoute from "./staffsRoute";
 import ticketsRoute from "./ticketsRoute";
 import homePageRoute from "./homePageRoute";
-import theatersRoute from "./theatersRoute";import authMiddleware from "../../../middleware/authMiddleware";
+import theatersRoute from "./theatersRoute";
 
 const router = Router();
 

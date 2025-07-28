@@ -22,7 +22,7 @@ class Payment extends Model {
   declare amount: number;
   declare method: PaymentType;
   declare status: PaymentStatus;
-  declare transactionReference: string | null;
+  // declare transactionReference: string | null;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -144,11 +144,11 @@ export const initPayment = (sequelize: Sequelize) => {
         allowNull: false,
         defaultValue: PaymentStatus.PENDING,
       },
-      transactionReference: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-        field: "transaction_reference",
-      },
+      // transactionReference: {
+      //   type: DataTypes.STRING(100),
+      //   allowNull: true,
+      //   field: "transaction_reference",
+      // },
     },
     {
       sequelize,

@@ -1,10 +1,13 @@
 import { Router } from "express";
 import { addTheater, getTheaters } from "../controllers/theatersController";
+import authMiddlewareManager from "../../../middleware/authMiddlewareManager";
 
 
-const router = Router();
 
-router.get("/", getTheaters)
-router.post("/", addTheater)
+const route = Router();
+route.use(authMiddlewareManager)
 
-export default router;
+route.get("/", getTheaters)
+route.post("/", addTheater)
+
+export default route;

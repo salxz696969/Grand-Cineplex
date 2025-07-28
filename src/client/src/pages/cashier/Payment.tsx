@@ -73,16 +73,13 @@ interface Screening {
 
 export function Payment() {
 	const navigate = useNavigate();
-	const [selectedPaymentMethod, setSelectedPaymentMethod] =
-		useState<string>("");
+	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isCompleted, setIsCompleted] = useState(false);
 	const [seats, setSeats] = useState<SelectedSeats[]>([]);
 	const [screeningId, setScreeningId] = useState<number>(0);
 	const [price, setPrice] = useState<number>(0);
-	const [screeningDetails, setScreeningDetails] = useState<Screening | null>(
-		null
-	);
+	const [screeningDetails, setScreeningDetails] = useState<Screening | null>(null);
 
 	const [qrCode, setQrCode] = useState<any>("");
 	const [tranId, setTranId] = useState<string>("");
@@ -119,7 +116,7 @@ export function Payment() {
 				console.log("Payment status:", statusData);
 
 				// Increment poll count
-				setPollCount(prev => {
+				setPollCount((prev) => {
 					const newCount = prev + 1;
 					console.log(`Poll count: ${newCount}`);
 
@@ -260,6 +257,13 @@ export function Payment() {
 		}
 
 		setIsProcessing(true);
+		console.log({
+			screeningId: Number(screeningId),
+			seats: seats.map((seat) => seat.idNumber),
+			amount: price,
+			method: selectedPaymentMethod,
+			status: "PENDING",
+		});
 
 		// Simulate payment processing
 		try {
@@ -285,12 +289,8 @@ export function Payment() {
 				<div className="max-w-4xl mx-auto">
 					<div className="bg-blue-600/20 border border-blue-500/30 rounded-2xl p-8 text-center">
 						<CheckCircle className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-						<h1 className="text-2xl font-bold mb-2">
-							Payment Complete!
-						</h1>
-						<p className="text-gray-300 mb-6">
-							Booking confirmed and tickets ready
-						</p>
+						<h1 className="text-2xl font-bold mb-2">Payment Complete!</h1>
+						<p className="text-gray-300 mb-6">Booking confirmed and tickets ready</p>
 
 						<div className="grid md:grid-cols-2 gap-6 mb-6">
 							<div className="bg-gray-800/50 rounded-xl p-6 text-left">
@@ -300,32 +300,22 @@ export function Payment() {
 								</h2>
 								<div className="space-y-2 text-sm">
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Movie:
-										</span>
+										<span className="text-gray-400">Movie:</span>
 										<span>{bookingSummary.movieTitle}</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Theater:
-										</span>
+										<span className="text-gray-400">Theater:</span>
 										<span>{bookingSummary.theater}</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Date & Time:
-										</span>
+										<span className="text-gray-400">Date & Time:</span>
 										<span>
 											{bookingSummary.date} at {bookingSummary.time}
 										</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Seats:
-										</span>
-										<span>
-											{bookingSummary.seats.join(", ")}
-										</span>
+										<span className="text-gray-400">Seats:</span>
+										<span>{bookingSummary.seats.join(", ")}</span>
 									</div>
 								</div>
 							</div>
@@ -337,28 +327,16 @@ export function Payment() {
 								</h2>
 								<div className="space-y-2 text-sm">
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Name:
-										</span>
-										<span>
-											{bookingSummary.customerName}
-										</span>
+										<span className="text-gray-400">Name:</span>
+										<span>{bookingSummary.customerName}</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Phone:
-										</span>
-										<span>
-											{bookingSummary.customerPhone}
-										</span>
+										<span className="text-gray-400">Phone:</span>
+										<span>{bookingSummary.customerPhone}</span>
 									</div>
 									<div className="flex justify-between border-t border-gray-700 pt-2">
-										<span className="text-gray-400">
-											Total Paid:
-										</span>
-										<span className="text-blue-600 font-bold">
-											${bookingSummary.totalAmount}
-										</span>
+										<span className="text-gray-400">Total Paid:</span>
+										<span className="text-blue-600 font-bold">${bookingSummary.totalAmount}</span>
 									</div>
 								</div>
 							</div>
@@ -367,7 +345,10 @@ export function Payment() {
 						{/* Printable Tickets */}
 						<div className="mb-8 print:block hidden">
 							{bookingSummary.seats.map((seat, index) => (
-								<div key={index} className="bg-white text-black p-6 rounded-lg mb-4 border-2 border-gray-800 print:break-inside-avoid">
+								<div
+									key={index}
+									className="bg-white text-black p-6 rounded-lg mb-4 border-2 border-gray-800 print:break-inside-avoid"
+								>
 									<div className="flex justify-between items-center border-b border-dashed border-gray-300 pb-4 mb-4">
 										<div className="text-2xl font-bold">CINEPLEX</div>
 										<div className="text-xl font-mono">{seat}</div>
@@ -459,7 +440,6 @@ export function Payment() {
 					</div>
 				</div>
 			</div>
-
 		);
 	}
 
@@ -468,7 +448,10 @@ export function Payment() {
 			{/* Header */}
 			<div className="max-w-7xl mx-auto mb-8">
 				<div className="flex items-center justify-between mb-6">
-					<button className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors" onClick={() => navigate(-1)}>
+					<button
+						className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+						onClick={() => navigate(-1)}
+					>
 						<ArrowLeft className="w-5 h-5" />
 						Back to Seat Selection
 					</button>
@@ -512,7 +495,6 @@ export function Payment() {
 
 						{/* Customer Info */}
 						<div className="grid md:grid-cols-1 gap-6 mb-6">
-
 							<div className="bg-gray-900/50 rounded-lg p-4">
 								<h4 className="font-semibold mb-3 flex items-center gap-2">
 									<Sofa className="w-4 h-4" />
@@ -520,20 +502,12 @@ export function Payment() {
 								</h4>
 								<div className="space-y-2 text-sm">
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Selected Seats:
-										</span>
-										<span className="font-medium">
-											{bookingSummary.seats.join(", ")}
-										</span>
+										<span className="text-gray-400">Selected Seats:</span>
+										<span className="font-medium">{bookingSummary.seats.join(", ")}</span>
 									</div>
 									<div className="flex justify-between">
-										<span className="text-gray-400">
-											Quantity:
-										</span>
-										<span>
-											{bookingSummary.seats.length} tickets
-										</span>
+										<span className="text-gray-400">Quantity:</span>
+										<span>{bookingSummary.seats.length} tickets</span>
 									</div>
 								</div>
 							</div>
@@ -542,9 +516,7 @@ export function Payment() {
 
 					{/* Price Breakdown */}
 					<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
-						<h3 className="text-xl font-semibold mb-4">
-							Price Breakdown
-						</h3>
+						<h3 className="text-xl font-semibold mb-4">Price Breakdown</h3>
 						<div className="space-y-3">
 							{bookingSummary.seats.map((seat) => (
 								<div
@@ -557,16 +529,12 @@ export function Payment() {
 										</div>
 										<span>Seat {seat}</span>
 									</div>
-									<span className="font-medium">
-										${screeningDetails?.price}
-									</span>
+									<span className="font-medium">${screeningDetails?.price}</span>
 								</div>
 							))}
 							<div className="border-t border-gray-600 pt-4 mt-4">
 								<div className="flex justify-between items-center">
-									<span className="text-lg font-semibold">
-										Total Amount:
-									</span>
+									<span className="text-lg font-semibold">Total Amount:</span>
 									<span className="text-2xl font-bold text-blue-600">
 										${bookingSummary.totalAmount}
 									</span>
@@ -582,17 +550,16 @@ export function Payment() {
 
 					{/* Payment Methods */}
 					<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
-						<h3 className="text-lg font-semibold mb-4">
-							Payment Method
-						</h3>
+						<h3 className="text-lg font-semibold mb-4">Payment Method</h3>
 						<div className="grid grid-cols-2 gap-3">
 							{paymentMethods.map((method) => (
 								<button
 									key={method.id}
-									className={`p-4 rounded-lg border-2 transition-all duration-200 ${selectedPaymentMethod === method.id
-										? "border-blue-800 bg-blue-500/10"
-										: "border-slate-800 bg-gray-900/50 hover:border-gray-500"
-										}`}
+									className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+										selectedPaymentMethod === method.id
+											? "border-blue-800 bg-blue-500/10"
+											: "border-slate-800 bg-gray-900/50 hover:border-gray-500"
+									}`}
 									onClick={() => {
 										setSelectedPaymentMethod(method.id);
 										if (method.id === "qr") {
@@ -602,17 +569,15 @@ export function Payment() {
 								>
 									<div className="text-center">
 										<div
-											className={`p-2 rounded-lg mx-auto mb-2 w-fit ${selectedPaymentMethod ===
-												method.id
-												? "bg-blue-800 text-white"
-												: "bg-gray-950 text-gray-300"
-												}`}
+											className={`p-2 rounded-lg mx-auto mb-2 w-fit ${
+												selectedPaymentMethod === method.id
+													? "bg-blue-800 text-white"
+													: "bg-gray-950 text-gray-300"
+											}`}
 										>
 											{method.icon}
 										</div>
-										<div className="text-sm font-medium">
-											{method.name}
-										</div>
+										<div className="text-sm font-medium">{method.name}</div>
 									</div>
 								</button>
 							))}
@@ -622,9 +587,7 @@ export function Payment() {
 					{/* Payment Form (for card payment) */}
 					{selectedPaymentMethod === "card" && (
 						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
-							<h3 className="text-lg font-semibold mb-4">
-								Card Details
-							</h3>
+							<h3 className="text-lg font-semibold mb-4">Card Details</h3>
 							<div className="space-y-3">
 								<input
 									type="text"
@@ -650,9 +613,7 @@ export function Payment() {
 					{/* Quick Payment Form */}
 					{selectedPaymentMethod === "qr" && qrCode && (
 						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
-							<h3 className="text-lg font-semibold mb-4">
-								QR Payment
-							</h3>
+							<h3 className="text-lg font-semibold mb-4">QR Payment</h3>
 							<div className="space-y-4">
 								<img
 									src={qrCode}
@@ -687,7 +648,6 @@ export function Payment() {
 										</>
 									)}
 								</div>
-
 							</div>
 						</div>
 					)}
@@ -695,9 +655,7 @@ export function Payment() {
 					{/* Digital Payment Form */}
 					{selectedPaymentMethod === "digital" && (
 						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
-							<h3 className="text-lg font-semibold mb-4">
-								Digital Payment
-							</h3>
+							<h3 className="text-lg font-semibold mb-4">Digital Payment</h3>
 							<div className="space-y-3">
 								<div className="flex flex-col gap-2 ">
 									<div className="flex gap-4 border border-gray-700 rounded-lg p-4 items-center">
@@ -726,11 +684,18 @@ export function Payment() {
 					{/* Pay Button */}
 					<button
 						onClick={handlePayment}
-						disabled={!selectedPaymentMethod || isProcessing || (selectedPaymentMethod === "qr" && paymentStatus !== "APPROVED")}
-						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${selectedPaymentMethod && !isProcessing && (selectedPaymentMethod !== "qr" || paymentStatus === "APPROVED")
-							? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white transform hover:scale-105"
-							: "bg-gray-700 text-gray-400 cursor-not-allowed"
-							}`}
+						disabled={
+							!selectedPaymentMethod ||
+							isProcessing ||
+							(selectedPaymentMethod === "qr" && paymentStatus !== "APPROVED")
+						}
+						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
+							selectedPaymentMethod &&
+							!isProcessing &&
+							(selectedPaymentMethod !== "qr" || paymentStatus === "APPROVED")
+								? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white transform hover:scale-105"
+								: "bg-gray-700 text-gray-400 cursor-not-allowed"
+						}`}
 					>
 						{isProcessing ? (
 							<div className="flex items-center justify-center gap-2">

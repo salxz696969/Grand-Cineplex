@@ -9,8 +9,10 @@ import {
   updateShowTime,
 } from "../controllers/showTimesController";
 import { getComingSoonMovies } from "../controllers/moviesController";
+import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
 const route = express.Router();
+route.use(authMiddlewareCashier)
 
 route.get("/today", getTodayShowTimes);
 route.get("/", getAllShowTimes);

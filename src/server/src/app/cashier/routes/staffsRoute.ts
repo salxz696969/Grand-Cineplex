@@ -5,19 +5,21 @@ import {
   updateStaffInfo,
   deleteStaff,
 } from "../controllers/staffsController";
+import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
-const router = Router();
+const route = Router();
+route.use(authMiddlewareCashier)
 
 // Add a new staff member
-router.post("/", addStaff);
+route.post("/", addStaff);
 
 // Get staff info by ID
-router.get("/:id", getStaffInfo);
+route.get("/:id", getStaffInfo);
 
 // Update staff info by ID
-router.put("/:id", updateStaffInfo);
+route.put("/:id", updateStaffInfo);
 
 // Delete staff by ID
-router.delete("/:id", deleteStaff);
+route.delete("/:id", deleteStaff);
 
-export default router;
+export default route;

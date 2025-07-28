@@ -1,13 +1,16 @@
 import express from "express";
 import {
-  addTicket,
-  deleteTicket,
-  getAllTickets,
-  getTicketBasedOnId,
-  updateTicket,
+	addTicket,
+	deleteTicket,
+	getAllTickets,
+	getTicketBasedOnId,
+	updateTicket,
 } from "../controllers/ticketsController";
-import verifyToken from "../../../middleware/verifyToken";
+import verifyToken from "../../../middleware/authMiddlewareManager";
+import authMiddlewareManager from "../../../middleware/authMiddlewareManager";
+
 const route = express.Router();
+route.use(authMiddlewareManager)
 
 route.get("/", verifyToken, getAllTickets);
 route.get("/:id", verifyToken, getTicketBasedOnId);
