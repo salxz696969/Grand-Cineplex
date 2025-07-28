@@ -3,9 +3,8 @@ import { getUserInfo, logInUser } from "../controllers/userController";
 import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
 const route = express.Router();
-route.use(authMiddlewareCashier)
 
-route.get("/", getUserInfo);
+route.get("/", authMiddlewareCashier, getUserInfo);
 route.post("/login", logInUser);
 
 export default route;
