@@ -7,7 +7,6 @@ export default function Header() {
 
   const navigate = useNavigate();
 
-  // ! to make ts know  AuthContext is never null or undefined.
   const { auth, setAuth } = useContext(AuthContext)!;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);

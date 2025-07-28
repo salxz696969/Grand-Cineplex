@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (token) {
       try {
-        const decoded = jwtDecode(token) as { exp: number };
+        const decoded = jwtDecode(token) as { exp: number; role?: string };
         const now = Date.now() / 1000;
 
         if (decoded.exp > now) {
@@ -43,11 +43,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           if (userInfoString) {
             const userInfo = JSON.parse(userInfoString);
-            if (!userInfo.role) {
+            // Only set auth if the user has no role (customer) or if role is not in JWT
+            if (!decoded.role) {
               setAuth({ ...userInfo, exp: decoded.exp, token });
             }
           } else {
-            setAuth({ id: 0, name: "User", email: "", exp: decoded.exp, token });
+            // Only set auth if no role in JWT (customer)
+            if (!decoded.role) {
+              setAuth({ id: 0, name: "User", email: "", exp: decoded.exp, token });
+            }
           }
 
           // Auto logout timer
