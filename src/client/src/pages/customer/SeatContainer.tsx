@@ -131,9 +131,9 @@ export default function SeatContainer() {
         setScreeningDate(result.screeningDate);
         setScreeningTime(result.screeningTime);
         setSeatPrices({
-          regularSeatPrice: result.regularSeatPrice,
-          premiumSeatPrice: result.premiumSeatPrice,
-          vipSeatPrice: result.vipSeatPrice,
+          regularSeatPrice: Number(result.regularSeatPrice),
+          premiumSeatPrice: Number(result.premiumSeatPrice),
+          vipSeatPrice: Number(result.vipSeatPrice),
         });
         const allSeats = mapApiSeatsToUiSeats(result.seats);
         setSeats(allSeats);
@@ -290,7 +290,7 @@ export default function SeatContainer() {
             </div> */}
               <div className="flex items-center gap-2 bg-blue-600 px-3 py-1 rounded-full">
                 <ShoppingCart className="w-4 h-4" />
-                <span className="text-sm font-medium">${getTotalPrice().toFixed(2)}</span>
+                <span className="text-sm font-medium">${getTotalPrice()}</span>
               </div>
             </div>
           </div>

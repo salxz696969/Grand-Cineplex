@@ -5,18 +5,24 @@ import MovieShowTimes from "../../components/cashier/MovieShowtimes";
 import { getMovieAndScreeningBasedOnId } from "../../api/cashier";
 import { useParams } from "react-router-dom";
 
+type Theater = {
+	name: string;
+};
+
 type Screening = {
 	id: number;
 	movieId: number;
 	theaterId: number;
 	screeningDate: string;
 	screeningTime: string;
-	price: number;
+	regularSeatPrice: string;
+	premiumSeatPrice: string;
+	vipSeatPrice: string;
 	createdAt: string;
 	updatedAt: string;
-	theater: {
-		name: string;
-	};
+	theater_id: number;
+	movie_id: number;
+	theater: Theater;
 };
 
 type Movie = {
@@ -91,20 +97,24 @@ const ShowtimesSkeleton = () => (
 
 export default function MovieDetail() {
 	const id = useParams().id;
+	const screeningDate = useParams().screeningDate;
 	const [movieDetail, setMovieDetail] = useState<MovieDetail>();
+
 	useEffect(() => {
 		const fetchMovieDetails = async () => {
 			try {
-				const movie = await getMovieAndScreeningBasedOnId(
-					parseInt(id!)
+				const movieData = await getMovieAndScreeningBasedOnId(
+					parseInt(id!),
+					screeningDate!
 				);
-				setMovieDetail(movie);
+				setMovieDetail(movieData);
 			} catch (error) {
 				console.error("Error fetching movie details:", error);
 			}
 		};
 		fetchMovieDetails();
-	}, [id]);
+	}, [id, screeningDate]);
+
 	return (
 		<div className="min-h-screen bg-black">
 			<Header />
@@ -124,7 +134,8 @@ export default function MovieDetail() {
 					<div className="flex-1 w-full">
 						{movieDetail ? (
 							<MovieShowTimes
-								screening={movieDetail.screenings} movie={movieDetail.movie.title}
+								screening={movieDetail.screenings}
+								movie={movieDetail.movie.title}
 							/>
 						) : (
 							<ShowtimesSkeleton />

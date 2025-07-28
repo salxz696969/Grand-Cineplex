@@ -22,7 +22,7 @@ const CashierRoutes = () => {
           }
         />
         <Route
-          path="/detail/movie/:id"
+          path="/detail/movie/:id/:screeningDate"
           element={
             <ProtectedRoute requiredRole="cashier">
               <MovieDetail />

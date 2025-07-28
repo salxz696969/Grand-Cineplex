@@ -21,7 +21,8 @@ export interface Movie {
 interface MovieContainerProps {
   searchTerm: string;
   activeTab: "now" | "upcoming";
-  movies: Movie[];
+  movies: any;
+  selectedDate?: string;
 }
 
 // Skeleton component for loading state
@@ -34,7 +35,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-export default function MovieContainer({ searchTerm, activeTab, movies }: MovieContainerProps) {
+export default function MovieContainer({ searchTerm, activeTab, movies, selectedDate }: MovieContainerProps) {
   const [movieList, setMovieList] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState<string | null>(null);
@@ -141,7 +142,7 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
       return;
     }
 
-    const filtered = movies.filter((movie) =>
+    const filtered = movies.filter((movie: any) =>
       movie.title.toLowerCase().includes(trimmedTerm)
     );
 
@@ -207,6 +208,7 @@ export default function MovieContainer({ searchTerm, activeTab, movies }: MovieC
             releaseDate={movie.releaseDate}
             duration={movie.duration}
             posterUrl={movie.posterUrl}
+            screeningDate={selectedDate || ""}
           />
         ))
       )}

@@ -18,6 +18,7 @@ interface MovieInTheatreCardProps {
   showtimes: Showtime[];
   selectedTime?: string;
   onTimeSelect?: (time: string, screeningId: string) => void;
+  screeningDate?: string;
 }
 
 export default function MovieInTheatreCard({
@@ -29,7 +30,8 @@ export default function MovieInTheatreCard({
   totalSeats,
   showtimes,
   selectedTime,
-  onTimeSelect
+  onTimeSelect,
+  screeningDate
 }: MovieInTheatreCardProps) {
   const occupancyRate = Math.round(((totalSeats - availableSeats) / totalSeats) * 100);
 
@@ -48,12 +50,28 @@ export default function MovieInTheatreCard({
   // Function to check if showtime has passed
   const isShowtimePassed = (timeString: string): boolean => {
     const now = new Date();
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const showtime = new Date();
-    showtime.setHours(hours, minutes, 0);
 
-    // If showtime is today and has passed
-    return showtime < now;
+    // If no screening date is provided, fall back to original behavior
+    if (!screeningDate) {
+      const [hours, minutes] = timeString.split(':').map(Number);
+      const showtime = new Date();
+      showtime.setHours(hours, minutes, 0);
+      return showtime < now;
+    }
+
+    // Create a date object for the screening date and time
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const screeningDateTime = new Date(screeningDate);
+    screeningDateTime.setHours(hours, minutes, 0, 0);
+
+    // Check if the screening date is today and the time has passed
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const screeningDateOnly = new Date(screeningDate);
+    screeningDateOnly.setHours(0, 0, 0, 0);
+
+    // Only mark as passed if it's today and the time has passed
+    return screeningDateOnly.getTime() === today.getTime() && screeningDateTime < now;
   };
 
   return (
@@ -132,8 +150,8 @@ export default function MovieInTheatreCard({
                 <button
                   disabled={isPassed}
                   className={`rounded-md border px-3 py-2 text-sm font-medium transition-all duration-200 ${isPassed
-                      ? 'border-gray-600 bg-gray-800/30 text-gray-500 cursor-not-allowed opacity-50'
-                      : 'border-slate-800 bg-gray-900/50 hover:bg-gray-900 hover:border-blue-800'
+                    ? 'border-gray-600 bg-gray-800/30 text-gray-500 cursor-not-allowed opacity-50'
+                    : 'border-slate-800 bg-gray-900/50 hover:bg-gray-900 hover:border-blue-800'
                     }`}
                   title={isPassed ? "This showtime has passed" : `Select ${formattedTime} showtime`}
                 >

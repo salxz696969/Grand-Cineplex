@@ -70,8 +70,9 @@ export const getShowTimesBasedOnMovieId = async (
 ) => {
   try {
     const movieId = parseInt(req.params.id);
+    const screeningDate = req.query.screeningDate as string;
     const showTimesForMovie = await Screening.findAll({
-      where: { movieId },
+      where: { movieId, screeningDate },
       include: [
         {
           association: "theater",
@@ -160,7 +161,7 @@ export const deleteShowTime = async (req: Request, res: Response) => {
   }
 };
 
-export const getShowTimesBasedOnId= async (req: Request, res: Response) => {
+export const getShowTimesBasedOnId = async (req: Request, res: Response) => {
   try {
     const showTimeId = parseInt(req.params.id);
     const showTime = await Screening.findByPk(showTimeId, {
@@ -184,4 +185,4 @@ export const getShowTimesBasedOnId= async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
-}
+};

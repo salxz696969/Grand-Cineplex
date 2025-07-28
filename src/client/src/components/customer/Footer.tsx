@@ -52,7 +52,7 @@ export default function Footer() {
             <h3 className="text-white text-base font-semibold mb-2 sm:mb-4">Follow Us</h3>
             <div className="flex flex-wrap gap-2 sm:gap-4">
               {social.map((item) => (
-                <a href={item.url} className="hover:text-white break-words text-xs sm:text-sm">
+                <a key={item.name} href={item.url} className="hover:text-white break-words text-xs sm:text-sm">
                   {item.icon}
                 </a>
               ))}

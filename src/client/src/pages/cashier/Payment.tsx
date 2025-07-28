@@ -18,7 +18,7 @@ import {
 	XCircle,
 } from "lucide-react";
 import sequelize from "./../../../../server/src/db/index";
-import { getMoviesAndItsScreenings, getQrCode, submitBooking, checkPaymentStatus } from "../../api/cashier";
+import { getMoviesAndItsScreenings, getQrCode, submitBooking } from "../../api/cashier";
 import { Link, useNavigate } from "react-router-dom";
 
 interface PaymentMethod {
@@ -40,9 +40,30 @@ interface BookingSummary {
 }
 
 type BookingData = {
-	screeningId: string;
+	screeningId: number;
 	seats: SelectedSeats[];
 	totalPrice: number;
+	bookingSummary: {
+		movieTitle: string;
+		theaterName: string;
+		screeningDate: string;
+		screeningTime: string;
+		seatIds: number[];
+		selectedSeats: {
+			id: number;
+			seatNumber: string;
+			price: number;
+			seatType: string;
+		}[];
+		totalAmount: number;
+		seatPrices: {
+			regularSeatPrice: number;
+			premiumSeatPrice: number;
+			vipSeatPrice: number;
+		};
+		cashierName: string;
+		cashierId: string;
+	};
 };
 
 type SelectedSeats = {
@@ -76,9 +97,7 @@ export function Payment() {
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isCompleted, setIsCompleted] = useState(false);
-	const [seats, setSeats] = useState<SelectedSeats[]>([]);
-	const [screeningId, setScreeningId] = useState<number>(0);
-	const [price, setPrice] = useState<number>(0);
+	const [bookingData, setBookingData] = useState<BookingData | null>(null);
 	const [screeningDetails, setScreeningDetails] = useState<Screening | null>(null);
 
 	const [qrCode, setQrCode] = useState<any>("");
@@ -86,6 +105,8 @@ export function Payment() {
 	const [paymentStatus, setPaymentStatus] = useState<string>("PENDING");
 	const [isPolling, setIsPolling] = useState(false);
 	const [pollCount, setPollCount] = useState(0);
+	const [hasCalledSuccess, setHasCalledSuccess] = useState(false); // Prevent multiple success calls
+	const [hasBooked, setHasBooked] = useState(false); // Prevent multiple bookings
 
 	const handleQrCodePayment = async () => {
 		try {
@@ -96,6 +117,8 @@ export function Payment() {
 			setTranId(transactionId); // Store transaction ID for polling
 			setPaymentStatus("PENDING");
 			setPollCount(0);
+			setHasCalledSuccess(false); // Reset success flag
+			setHasBooked(false); // Reset booking flag
 			// Start polling after QR code is generated and tranId is set
 			startPolling(transactionId);
 		} catch (error) {
@@ -110,72 +133,70 @@ export function Payment() {
 		}
 
 		setIsPolling(true);
+		let currentPollCount = 0;
+
 		const pollInterval = setInterval(async () => {
 			try {
-				const statusData = await checkPaymentStatus(transactionId);
-				console.log("Payment status:", statusData);
+				// Fake status check - no real API call
+				// const statusData = await checkPaymentStatus(transactionId);
+				// console.log("Payment status:", statusData);
 
-				// Increment poll count
-				setPollCount((prev) => {
-					const newCount = prev + 1;
-					console.log(`Poll count: ${newCount}`);
+				currentPollCount++;
+				setPollCount(currentPollCount);
+				console.log(`Poll count: ${currentPollCount}`);
 
-					// Fake completion after 5 polls for sandbox testing
-					if (newCount >= 5) {
-						console.log("Faking payment completion after 5 polls");
-						setPaymentStatus("APPROVED");
-						setIsPolling(false);
-						clearInterval(pollInterval);
-						// Auto-complete the payment
-						handlePaymentSuccess();
-						return newCount;
-					}
-
-					return newCount;
-				});
-
-				if (statusData.status === "APPROVED") {
+				// After 3 polls (9 seconds total), fake completion
+				if (currentPollCount >= 3) {
+					console.log("Faking payment completion after 3 polls");
 					setPaymentStatus("APPROVED");
 					setIsPolling(false);
 					clearInterval(pollInterval);
-					// Auto-complete the payment
-					handlePaymentSuccess();
-				} else if (statusData.status === "CANCELLED" || statusData.status === "DECLINED") {
-					setPaymentStatus("FAILED");
-					setIsPolling(false);
-					clearInterval(pollInterval);
+
+					// Only call success once
+					if (!hasCalledSuccess) {
+						setHasCalledSuccess(true);
+						handlePaymentSuccess();
+					}
+					return;
 				}
-				// If still PENDING, continue polling
+
+				// Simulate pending status for first 2 polls
+				setPaymentStatus("PENDING");
+
 			} catch (error) {
 				console.error("Error checking payment status:", error);
 				// Continue polling on error
 			}
 		}, 3000); // Poll every 3 seconds
 
-		// Stop polling after 5 minutes (300 seconds)
+		// Stop polling after 15 seconds as backup
 		setTimeout(() => {
 			clearInterval(pollInterval);
 			setIsPolling(false);
 			if (paymentStatus === "PENDING") {
 				setPaymentStatus("timeout");
 			}
-		}, 200000);
+		}, 15000);
 	};
 
 	const handlePaymentSuccess = async () => {
+		if (!bookingData || hasBooked) return; // Prevent multiple bookings
+
+		setHasBooked(true); // Mark as booked immediately
 		setIsProcessing(true);
 		try {
 			const request = await submitBooking({
-				screeningId: Number(screeningId),
-				seats: seats.map((seat) => seat.idNumber),
-				amount: price,
+				screeningId: bookingData.screeningId,
+				seats: bookingData.seats.map((seat) => seat.idNumber),
+				amount: bookingData.totalPrice,
 				method: "qr",
-				status: "completed",
+				status: "confirmed",
 			});
 			console.log("Booking request:", request);
 			setIsCompleted(true);
 		} catch (error) {
 			console.error("Payment processing failed:", error);
+			setHasBooked(false); // Reset if booking failed
 		} finally {
 			setIsProcessing(false);
 		}
@@ -183,19 +204,23 @@ export function Payment() {
 
 	// Handle manual completion for QR - Telegram
 	const handleManualPaymentCompletion = async () => {
+		if (!bookingData || hasBooked) return; // Prevent multiple bookings
+
+		setHasBooked(true); // Mark as booked immediately
 		setIsProcessing(true);
 		try {
 			const request = await submitBooking({
-				screeningId: Number(screeningId),
-				seats: seats.map((seat) => seat.idNumber),
-				amount: price,
-				method: "qr-telegram",
-				status: "completed",
+				screeningId: bookingData.screeningId,
+				seats: bookingData.seats.map((seat) => seat.idNumber),
+				amount: bookingData.totalPrice,
+				method: "qr",
+				status: "confirmed",
 			});
 			console.log("Booking request:", request);
 			setIsCompleted(true);
 		} catch (error) {
 			console.error("Payment processing failed:", error);
+			setHasBooked(false); // Reset if booking failed
 		} finally {
 			setIsProcessing(false);
 		}
@@ -207,36 +232,38 @@ export function Payment() {
 			if (data) {
 				console.log("Data from local storage:", JSON.parse(data));
 				const parsedData = JSON.parse(data) as BookingData;
-				setSeats(parsedData.seats);
-				setScreeningId(Number(parsedData.screeningId));
-				setPrice(parsedData.totalPrice);
+				setBookingData(parsedData);
 			} else {
 				console.log("No selected seats found in local storage.");
+				// Redirect back to seat selection if no data
+				navigate("/cashier");
 			}
 		};
 		getDataFromLocalStorage();
-	}, []);
+	}, [navigate]);
 
 	useEffect(() => {
 		const fetchScreeningDetails = async () => {
+			if (!bookingData) return;
+
 			try {
-				const response = await getMoviesAndItsScreenings(screeningId);
+				const response = await getMoviesAndItsScreenings(bookingData.screeningId);
 				setScreeningDetails(response);
 			} catch (error) {
 				console.error("Error fetching screening details:", error);
 			}
 		};
 		fetchScreeningDetails();
-	}, [screeningId]);
+	}, [bookingData]);
 
-	// Mock booking data
+	// Use booking data from localStorage
 	const bookingSummary: BookingSummary = {
-		movieTitle: screeningDetails?.movie?.title ?? "",
-		theater: screeningDetails?.theater?.name ?? "",
-		date: screeningDetails?.screeningDate ?? "",
-		time: screeningDetails?.screeningTime ?? "",
-		seats: seats.map((seat) => seat.seatId),
-		totalAmount: price,
+		movieTitle: bookingData?.bookingSummary.movieTitle ?? "",
+		theater: bookingData?.bookingSummary.theaterName ?? "",
+		date: bookingData?.bookingSummary.screeningDate ?? "",
+		time: bookingData?.bookingSummary.screeningTime ?? "",
+		seats: bookingData?.seats.map((seat) => seat.seatId) ?? [],
+		totalAmount: bookingData?.totalPrice ?? 0,
 		customerName: "John Doe",
 		customerPhone: "+1 (555) 123-4567",
 	};
@@ -287,11 +314,14 @@ export function Payment() {
 			return;
 		}
 
+		if (!bookingData || hasBooked) return; // Prevent multiple bookings
+
+		setHasBooked(true); // Mark as booked immediately
 		setIsProcessing(true);
 		console.log({
-			screeningId: Number(screeningId),
-			seats: seats.map((seat) => seat.idNumber),
-			amount: price,
+			screeningId: bookingData.screeningId,
+			seats: bookingData.seats.map((seat) => seat.idNumber),
+			amount: bookingData.totalPrice,
 			method: selectedPaymentMethod,
 			status: "PENDING",
 		});
@@ -299,15 +329,16 @@ export function Payment() {
 		// Simulate payment processing
 		try {
 			const request = await submitBooking({
-				screeningId: Number(screeningId),
-				seats: seats.map((seat) => seat.idNumber),
-				amount: price,
+				screeningId: bookingData.screeningId,
+				seats: bookingData.seats.map((seat) => seat.idNumber),
+				amount: bookingData.totalPrice,
 				method: selectedPaymentMethod,
-				status: "PENDING",
+				status: "confirmed",
 			});
 			console.log("Booking request:", request);
 		} catch (error) {
 			console.error("Payment processing failed:", error);
+			setHasBooked(false); // Reset if booking failed
 		} finally {
 			setIsProcessing(false);
 			setIsCompleted(true);
@@ -351,26 +382,6 @@ export function Payment() {
 								</div>
 							</div>
 
-							<div className="bg-gray-800/50 rounded-xl p-6 text-left">
-								<h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-									<User className="w-5 h-5" />
-									Customer Info
-								</h2>
-								<div className="space-y-2 text-sm">
-									<div className="flex justify-between">
-										<span className="text-gray-400">Name:</span>
-										<span>{bookingSummary.customerName}</span>
-									</div>
-									<div className="flex justify-between">
-										<span className="text-gray-400">Phone:</span>
-										<span>{bookingSummary.customerPhone}</span>
-									</div>
-									<div className="flex justify-between border-t border-gray-700 pt-2">
-										<span className="text-gray-400">Total Paid:</span>
-										<span className="text-blue-600 font-bold">${bookingSummary.totalAmount}</span>
-									</div>
-								</div>
-							</div>
 						</div>
 
 						{/* Printable Tickets */}
@@ -549,18 +560,18 @@ export function Payment() {
 					<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
 						<h3 className="text-xl font-semibold mb-4">Price Breakdown</h3>
 						<div className="space-y-3">
-							{bookingSummary.seats.map((seat) => (
+							{bookingData?.bookingSummary.selectedSeats.map((seat) => (
 								<div
-									key={seat}
+									key={seat.id}
 									className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0"
 								>
 									<div className="flex items-center gap-3">
 										<div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center">
 											<Sofa className="w-4 h-4 text-blue-600" />
 										</div>
-										<span>Seat {seat}</span>
+										<span>Seat {seat.seatNumber}</span>
 									</div>
-									<span className="font-medium">${screeningDetails?.price}</span>
+									<span className="font-medium">${seat.price}</span>
 								</div>
 							))}
 							<div className="border-t border-gray-600 pt-4 mt-4">
@@ -655,7 +666,7 @@ export function Payment() {
 									{paymentStatus === "PENDING" && (
 										<>
 											<Clock className="w-5 h-5 text-yellow-400 animate-pulse" />
-											<span className="text-yellow-400">Waiting for payment </span>
+											<span className="text-yellow-400">Waiting for payment ({pollCount}/3)</span>
 										</>
 									)}
 									{paymentStatus === "APPROVED" && (

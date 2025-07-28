@@ -12,29 +12,43 @@ type CalendarDay = {
 	month: string;
 };
 
+type Theater = {
+	name: string;
+};
+
 type Screening = {
-	createdAt: string;
 	id: number;
 	movieId: number;
-	price: number;
+	theaterId: number;
 	screeningDate: string;
 	screeningTime: string;
-	theaterId: number;
+	regularSeatPrice: string;
+	premiumSeatPrice: string;
+	vipSeatPrice: string;
+	createdAt: string;
 	updatedAt: string;
+	theater_id: number;
+	movie_id: number;
+	theater: Theater;
 };
 
 type Movie = {
-	createdAt: string;
+	id: number;
+	title: string;
 	description: string;
 	duration: number;
 	genre: string;
-	id: number;
+	rating: number;
 	posterUrl: string;
-	rating: string;
 	releaseDate: string;
-	screenings: Screening[];
-	title: string;
+	createdAt: string;
 	updatedAt: string;
+	trailerUrl: string;
+};
+
+type MovieWithScreenings = {
+	movie: Movie;
+	screenings: Screening[];
 };
 
 // Skeleton component for loading state
@@ -51,10 +65,11 @@ const SkeletonCard = () => (
 );
 
 export default function Movies() {
-	const [movies, setMovies] = useState<any[]>([]);
+	const [movies, setMovies] = useState<MovieWithScreenings[]>([]);
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const [showedMovies, setShowedMovies] = useState<any[]>([]);
+	const [showedMovies, setShowedMovies] = useState<MovieWithScreenings[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [selectedDate, setSelectedDate] = useState<string>("");
 
 	useEffect(() => {
 		console.log("Movies component rendered");
@@ -78,11 +93,14 @@ export default function Movies() {
 			const today = new Date();
 			const date = new Date(today);
 			date.setDate(today.getDate() + selectedIndex);
-			const filteredMovies = movies.filter((movie: Movie) =>
-				movie.screenings.some(
+			const calculatedSelectedDate = date.toISOString().split("T")[0];
+			setSelectedDate(calculatedSelectedDate);
+
+			// Filter movies that have screenings on the selected date
+			const filteredMovies = movies.filter((movieData: MovieWithScreenings) =>
+				movieData.screenings.some(
 					(screening: Screening) =>
-						screening.screeningDate ===
-						date.toISOString().split("T")[0]
+						screening.screeningDate === calculatedSelectedDate
 				)
 			);
 			setShowedMovies(filteredMovies);
@@ -90,6 +108,7 @@ export default function Movies() {
 			setShowedMovies([]);
 		}
 	}, [movies, selectedIndex]);
+
 	const sevenDaysArray = (start: Date): CalendarDay[] => {
 		const daysArray: CalendarDay[] = [];
 		for (let i = 0; i < 7; i++) {
@@ -147,6 +166,7 @@ export default function Movies() {
 								searchTerm={""}
 								activeTab={"now"}
 								movies={showedMovies || []}
+								selectedDate={selectedDate}
 							/>
 						)
 					}

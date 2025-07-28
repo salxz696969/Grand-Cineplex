@@ -211,7 +211,7 @@ export const viewBookingHistory = async (req: Request, res: Response) => {
         }) || [];
 
       const totalAmount = seats.reduce(
-        (sum: number, seat: any) => sum + seat.price,
+        (sum: number, seat: any) => sum + parseFloat(seat.price),
         0
       );
 

@@ -1,24 +1,34 @@
 import React from "react";
 import MovieInTheatreCard from "./MovieInTheatreCard";
 import { MapPin } from "lucide-react";
+
+type Theater = {
+	name: string;
+};
+
 type Screening = {
 	id: number;
 	movieId: number;
 	theaterId: number;
 	screeningDate: string;
 	screeningTime: string;
-	price: number;
+	regularSeatPrice: string;
+	premiumSeatPrice: string;
+	vipSeatPrice: string;
 	createdAt: string;
 	updatedAt: string;
-	theater: {
-		name: string
-	}
+	theater_id: number;
+	movie_id: number;
+	theater: Theater;
 };
+
 export default function MovieShowTimes({
 	screening, movie
 }: {
 	screening: Screening[]; movie: string
 }) {
+	// Get the screening date from the first screening (they should all be the same date)
+	const screeningDate = screening.length > 0 ? screening[0].screeningDate : "";
 	const movieTheatersSet = new Set(screening.map((s) => s.theater.name));
 	const groupedScreenings: { [key: string]: Screening[] } = {};
 	for (const theater of movieTheatersSet) {
@@ -60,6 +70,7 @@ export default function MovieShowTimes({
 							screeningId: String(s.id),
 						}
 					))}
+					screeningDate={screeningDate}
 				/>
 			))}
 		</div>

@@ -126,19 +126,14 @@ export function SeatSelection() {
 	useEffect(() => {
 		try {
 			const generateSeats = (
-				seatsFromApi: ApiSeat[],
-				pricing: {
-					regularSeatPrice: number;
-					premiumSeatPrice: number;
-					vipSeatPrice: number;
-				}
+				seatsFromApi: ApiSeat[]
 			): Seat[] => {
 				return seatsFromApi.map((seat) => ({
 					id: `${seat.rowNumber}${seat.seatNumber}`,
 					row: seat.rowNumber,
 					number: seat.seatNumber,
 					type: seat.seatType,
-					price: calculateSeatPrice(seat.seatType, pricing),
+					price: 0, // Price will be calculated dynamically
 					isBooked: seat.isBooked,
 					idNumber: seat.id,
 				}));
@@ -150,24 +145,20 @@ export function SeatSelection() {
 				);
 
 				setSeatPrices({
-					regularSeatPrice: response.regularSeatPrice,
-					premiumSeatPrice: response.premiumSeatPrice,
-					vipSeatPrice: response.vipSeatPrice,
+					regularSeatPrice: parseFloat(typeof response.regularSeatPrice === 'number' ? response.regularSeatPrice.toString() : response.regularSeatPrice),
+					premiumSeatPrice: parseFloat(typeof response.premiumSeatPrice === 'number' ? response.premiumSeatPrice.toString() : response.premiumSeatPrice),
+					vipSeatPrice: parseFloat(typeof response.vipSeatPrice === 'number' ? response.vipSeatPrice.toString() : response.vipSeatPrice),
 				});
 
-				const tempRow = rows;
-				setRows(
-					tempRow.slice(
-						0,
-						response.seats.length / seatsPerRow
-					)
-				);
+				// Generate seats first
+				const generatedSeats = generateSeats(response.seats);
+
+				// Calculate rows based on actual seat data
+				const uniqueRows = [...new Set(generatedSeats.map(seat => seat.row))].sort();
+				setRows(uniqueRows);
+
 				setSeats(
-					generateSeats(response.seats, {
-						regularSeatPrice: response.regularSeatPrice,
-						premiumSeatPrice: response.premiumSeatPrice,
-						vipSeatPrice: response.vipSeatPrice,
-					}).sort((a, b) => {
+					generatedSeats.sort((a, b) => {
 						// First sort by row (A-Z)
 						if (a.row !== b.row) {
 							return a.row.localeCompare(b.row);
@@ -254,21 +245,55 @@ export function SeatSelection() {
 	const getTotalPrice = () => {
 		const total = selectedSeats.reduce((total, selectedSeat) => {
 			const seat = seats.find((s) => s.id === selectedSeat.seatId);
-			return total + (typeof seat?.price === "number" ? seat.price : 0);
+			if (!seat) return total;
+
+			// Calculate price based on seat type and current pricing
+			const price = calculateSeatPrice(seat.type, seatPrices);
+			return total + price;
 		}, 0);
 		return isNaN(total) ? 0 : total;
 	};
 
 	const saveToLocalStorage = () => {
-		const selectedSeat = selectedSeats.map((seatId) => seatId);
-		console.log("Selected seats:", selectedSeat);
-		const dataToSave = {
-			screeningId: id,
-			seats: selectedSeat,
+		if (selectedSeats.length === 0) {
+			alert("Please select at least one seat");
+			return;
+		}
+
+		// Get selected seat details with pricing
+		const selectedSeatDetails = selectedSeats.map(selectedSeat => {
+			const seat = seats.find(s => s.id === selectedSeat.seatId);
+			return {
+				id: seat!.idNumber,
+				seatNumber: seat!.row + seat!.number,
+				price: calculateSeatPrice(seat!.type, seatPrices),
+				seatType: seat!.type
+			};
+		});
+
+		// Create complete booking data similar to customer side
+		const bookingData = {
+			screeningId: parseInt(id!),
+			seats: selectedSeats,
 			totalPrice: getTotalPrice(),
+			// Additional booking summary data
+			bookingSummary: {
+				movieTitle: "Movie Title", // This will be fetched in Payment component
+				theaterName: "Theater Name", // This will be fetched in Payment component
+				screeningDate: "2025-01-01", // This will be fetched in Payment component
+				screeningTime: "10:00:00", // This will be fetched in Payment component
+				seatIds: selectedSeats.map(seat => seat.idNumber),
+				selectedSeats: selectedSeatDetails,
+				totalAmount: getTotalPrice(),
+				seatPrices,
+				// Cashier info
+				cashierName: "Cashier", // You can add cashier context if needed
+				cashierId: "CASHIER_001"
+			}
 		};
-		console.log("Data to save:", dataToSave);
-		localStorage.setItem("selectedSeats", JSON.stringify(dataToSave));
+
+		console.log("Complete booking data to save:", bookingData);
+		localStorage.setItem("selectedSeats", JSON.stringify(bookingData));
 	};
 
 	return (
@@ -334,7 +359,7 @@ export function SeatSelection() {
 															)
 														}
 														disabled={seat.isBooked}
-														title={`${seat.row}${seat.number} - $${seat.price}`}
+														title={`${seat.row}${seat.number} - $${calculateSeatPrice(seat.type, seatPrices)}`}
 													>
 														<Sofa> </Sofa>
 													</button>
@@ -389,7 +414,7 @@ export function SeatSelection() {
 														className="bg-blue-600/20 border border-blue-500/30 px-3 py-1 rounded-full text-blue-300 text-sm"
 													>
 														{selectedSeat.seatId} - $
-														{seat?.price}
+														{seat ? calculateSeatPrice(seat.type, seatPrices) : 0}
 													</div>
 												);
 											})}

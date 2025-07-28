@@ -29,9 +29,9 @@ export const getMoviesFor7Days = async () => {
 	}
 };
 
-export const getMovieAndScreeningBasedOnId = async (id: number) => {
+export const getMovieAndScreeningBasedOnId = async (id: number, screeningDate: string) => {
 	try {
-		const response = await axios.get(`${API_BASE_URL}/cashier/movies/${id}`, { headers: getAuthHeaders() });
+		const response = await axios.get(`${API_BASE_URL}/cashier/movies/${id}?screeningDate=${screeningDate}`, { headers: getAuthHeaders() });
 		return response.data;
 	} catch (error) {
 		console.error("Error fetching movie and screening based on ID:", error);

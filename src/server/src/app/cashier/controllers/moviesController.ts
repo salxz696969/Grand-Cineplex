@@ -58,9 +58,13 @@ export const getMovieBasedOnId = async (req: Request, res: Response) => {
   }
 };
 
-export const getMovieAndScreeningBasedOnId = async (req: Request, res: Response) => {
+export const getMovieAndScreeningBasedOnId = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const movieId = parseInt(req.params.id);
+    const screeningDate = req.query.screeningDate as string;
     const movie = await Movie.findByPk(movieId);
 
     if (!movie) {
@@ -71,7 +75,10 @@ export const getMovieAndScreeningBasedOnId = async (req: Request, res: Response)
     // import Theater from "../../../db/models/Theater"; // Make sure this import exists at the top
 
     const screenings = await Screening.findAll({
-      where: { movieId },
+      where: {
+        movieId,
+        ...(screeningDate && { screeningDate }),
+      },
       include: [
         {
           model: require("../../../db/models/Theater").default,
@@ -109,11 +116,17 @@ export const getMoviesAndItsScreenings = async (
     let dayOffset = 0;
     if (dayParam !== undefined) {
       if (!/^\d+$/.test(dayParam)) {
-        return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+        return res.status(400).json({
+          message:
+            "Invalid day parameter. It must be an integer between 0 and 6.",
+        });
       }
       dayOffset = parseInt(dayParam, 10);
       if (isNaN(dayOffset) || dayOffset < 0 || dayOffset > 6) {
-        return res.status(400).json({ message: "Invalid day parameter. It must be an integer between 0 and 6." });
+        return res.status(400).json({
+          message:
+            "Invalid day parameter. It must be an integer between 0 and 6.",
+        });
       }
     }
 
@@ -145,7 +158,9 @@ export const getMoviesAndItsScreenings = async (
     });
 
     if (!movieWithScreenings) {
-      return res.status(404).json({ message: "Movie or screenings not found for the specified day." });
+      return res.status(404).json({
+        message: "Movie or screenings not found for the specified day.",
+      });
     }
 
     res.status(200).json(movieWithScreenings);
