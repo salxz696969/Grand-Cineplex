@@ -123,13 +123,14 @@ export const createBooking = async (req: Request, res: Response) => {
   }
 };
 
-
 export const viewBookingHistory = async (req: Request, res: Response) => {
   try {
     const userEmail = (req as any).user?.email;
 
     if (!userEmail) {
-      return res.status(401).json({ message: "Unauthorized, no email in token" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized, no email in token" });
     }
 
     const user = await Customer.findOne({ where: { email: userEmail } });
@@ -142,37 +143,110 @@ export const viewBookingHistory = async (req: Request, res: Response) => {
       where: { customerId: user.id },
       include: [
         {
-          model: Seat,
-          attributes: ["seatNumber", "price"],
+          model: Customer,
+          as: "customer",
+          attributes: ["name", "phone"],
         },
         {
-          model: Movie,
-          attributes: ["title"],
+          model: Screening,
+          as: "screening",
+          include: [
+            {
+              model: Movie,
+              as: "movie",
+              attributes: ["title"],
+            },
+            {
+              model: Theater,
+              as: "theater",
+              attributes: ["name"],
+            },
+          ],
+        },
+        {
+          model: Ticket,
+          as: "tickets",
+          include: [
+            {
+              model: Seat,
+              as: "seat",
+              attributes: ["seatNumber", "rowNumber", "seatType"],
+            },
+          ],
         },
       ],
     });
 
     if (!bookings || bookings.length === 0) {
-      return res.status(404).json({ message: "No bookings found for this user." });
+      return res
+        .status(404)
+        .json({ message: "No bookings found for this user." });
     }
 
     const bookingSummary = bookings.map((booking: any) => {
-      const seats = booking.tickets?.map((ticket: any) => ({
-        seatNumber: ticket.seat?.seatNumber,
-        price: ticket.seat?.price || 0,
-      })) || [];
+      const seats =
+        booking.tickets?.map((ticket: any) => {
+          const seat = ticket.seat;
+          let price = 0;
 
-      const totalAmount = seats.reduce((sum: number, seat: any) => sum + seat.price, 0);
+          // Calculate price based on seat type and screening pricing
+          switch (seat.seatType) {
+            case "regular":
+              price = booking.screening.regularSeatPrice;
+              break;
+            case "premium":
+              price = booking.screening.premiumSeatPrice;
+              break;
+            case "vip":
+              price = booking.screening.vipSeatPrice;
+              break;
+            default:
+              price = booking.screening.regularSeatPrice;
+          }
+
+          return {
+            seatNumber: seat.rowNumber + seat.seatNumber,
+            price: price,
+          };
+        }) || [];
+
+      const totalAmount = seats.reduce(
+        (sum: number, seat: any) => sum + seat.price,
+        0
+      );
 
       return {
         movieTitle: booking.screening?.movie?.title || "",
-        theater: booking.screening?.theater?.name || "",
-        date: booking.screening?.screeningDate || "",
-        time: booking.screening?.screeningTime || "",
+        theaterName: booking.screening?.theater?.name || "",
+        date:
+          booking.screening?.screeningDate && booking.screening?.screeningTime
+            ? new Date(
+                `${booking.screening.screeningDate} ${booking.screening.screeningTime}`
+              ).toLocaleString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : "",
+        time: booking.createdAt
+          ? new Date(booking.createdAt).toLocaleString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })
+          : "",
         seats,
         totalAmount,
+        status: booking.status || "",
         customerName: booking.customer?.name || "",
         customerPhone: booking.customer?.phone || "",
+        screeningId: booking.screening?.id || null,
       };
     });
 

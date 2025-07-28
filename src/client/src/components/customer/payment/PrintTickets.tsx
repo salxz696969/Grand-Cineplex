@@ -114,7 +114,7 @@ export default function PrintTickets({ bookingSummary, onClose }: PrintTicketsPr
       </div>
       <div className="mb-4">
         <strong>Seats:</strong>{" "}
-        {bookingSummary.seats.map((s: any) => s.seat_number || s).join(", ")}
+        {bookingSummary.seats.map((s: any) => s.seatNumber || s).join(", ")}
       </div>
       <div className="mb-4">
         <strong>Customer:</strong> {bookingSummary.customerName} | Phone: {bookingSummary.customerPhone}

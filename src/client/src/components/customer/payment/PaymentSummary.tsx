@@ -71,7 +71,7 @@ export default function PaymentSummary({ bookingSummary, }: PaymentSummaryProps)
                 <span className="text-gray-400">Selected Seats:</span>
                 <span className="font-medium">
                   {bookingSummary.seats
-                    .map((s: any) => s.seat_number)
+                    .map((s: any) => s.seatNumber)
                     .join(", ")}
                 </span>
               </div>
@@ -95,7 +95,7 @@ export default function PaymentSummary({ bookingSummary, }: PaymentSummaryProps)
                 <div className="w-8 h-8 bg-sky-600/20 rounded-lg flex items-center justify-center">
                   <Sofa className="w-4 h-4 text-sky-400" />
                 </div>
-                <span>Seat {seat.seat_number}</span>
+                <span>Seat {seat.seatNumber}</span>
               </div>
               <span className="font-medium">${seat.price || 0}</span>
             </div>

@@ -28,21 +28,23 @@ export default function PaymentForm({
   const [paymentStatus, setPaymentStatus] = useState<string>("PENDING");
   const [isPolling, setIsPolling] = useState(false);
   const [pollCount, setPollCount] = useState(0);
+  const [showQr, setShowQr] = useState(false);
 
+  // Remove automatic QR generation on mount
   useEffect(() => {
-    handleQrCodePayment();
     setSelectedPaymentMethod("qr");
   }, []);
 
   const handleQrCodePayment = async () => {
     try {
       // For testing, use a small amount
-      const data = await getQrCode(0.01);
+      const data = await getQrCode(totalAmount);
       const transactionId = data.tranId || "";
       setQrCode(data.qrImage);
       setTranId(transactionId);
       setPaymentStatus("PENDING");
       setPollCount(0);
+      setShowQr(true);
       startPolling(transactionId);
     } catch (error) {
       console.error("Error generating QR code:", error);
@@ -97,53 +99,37 @@ export default function PaymentForm({
       }
     }, 3000); // Poll every 3 seconds
 
-    // Stop polling after 5 minutes (300 seconds)
+    // Stop polling after 15 seconds (TODO: CHANGE TO A REAL TIMEOUT) for now just simulate
     setTimeout(() => {
       clearInterval(pollInterval);
       setIsPolling(false);
       if (paymentStatus === "PENDING") {
         setPaymentStatus("timeout");
       }
-    }, 200000);
+    }, 15000);
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold mb-6">Payment</h2>
-      {/* Payment method selection commented out
-      <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
-        <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {paymentMethods.map((method) => (
-            <button key={method.id} className={`p-4 rounded-lg border-2 transition-all duration-200 ${selectedPaymentMethod === method.id
-              ? "border-sky-500 bg-sky-500/10"
-              : "border-gray-600 bg-gray-700/50 hover:border-gray-500"
-              }`} onClick={() => {
-                setSelectedPaymentMethod(method.id);
-                if (method.id === "qr") {
-                  handleQrCodePayment();
-                }
-              }} type="button"
-            >
-              <div className="text-center">
-                <div className={`p-2 rounded-lg mx-auto mb-2 w-fit ${selectedPaymentMethod === method.id
-                  ? "bg-sky-500 text-white"
-                  : "bg-gray-600 text-gray-300"
-                  }`}
-                >
-                  {method.icon}
-                </div>
-                <div className="text-sm font-medium">{method.name}</div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-      */}
 
-      {qrCode && (
+      {/* Show QR Button */}
+      {!showQr && (
+        <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+          <h3 className="text-lg font-semibold mb-4">QR Payment</h3>
+          <p className="text-gray-400 mb-4">Click the button below to generate a QR code for payment</p>
+          <button
+            onClick={handleQrCodePayment}
+            disabled={isProcessing}
+            className="w-full py-3 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+          >
+            Show QR Code
+          </button>
+        </div>
+      )}
+
+      {qrCode && showQr && (
         <div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
-          {/* <h3 className="text-lg font-semibold mb-4">QR Payment</h3> */}
           <div className="space-y-4">
             <img
               src={qrCode}
@@ -156,7 +142,7 @@ export default function PaymentForm({
               {paymentStatus === "PENDING" && (
                 <>
                   <Clock className="w-5 h-5 text-yellow-400 animate-pulse" />
-                  <span className="text-yellow-400">Waiting for payment (Poll {pollCount}/5)</span>
+                  <span className="text-yellow-400">Waiting for payment</span>
                 </>
               )}
               {paymentStatus === "APPROVED" && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PaymentSummary from "../../components/customer/payment/PaymentSummary";
@@ -6,21 +6,21 @@ import PaymentForm from "../../components/customer/payment/PaymentForm";
 import PaymentSuccess from "../../components/customer/payment/PaymentSuccess";
 import LoadingSpinner from "../../components/customer/LoadingSpinner";
 import AuthModal from "../../components/customer/useraccess/PopupLogSign";
-import { bookSeats, fetchSeatsByScreening } from "../../api/customer";
-import { BookingSummary, ApiSeat } from "../../../../shared/types/type";
-import { jwtDecode } from "jwt-decode";
-import { fetchUserInfo } from "../../api/customer";
+import { bookSeats } from "../../api/customer";
+import { BookingSummary } from "../../../../shared/types/type";
+import { AuthContext } from "../../components/context/AuthContext";
 import Header from "../../components/customer/Header";
 
 export default function PaymentContainer() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { auth } = useContext(AuthContext)!;
 
   const screeningIdParam = searchParams.get("screeningId");
   const seatParam = searchParams.get("seats");
 
   const screeningId = screeningIdParam ? Number(screeningIdParam) : undefined;
-  const seatIds: number[] = useMemo(() => {
+  const seatIds: number[] = React.useMemo(() => {
     return seatParam ? seatParam.split(",").map(Number) : [];
   }, [seatParam]);
 
@@ -29,100 +29,71 @@ export default function PaymentContainer() {
   const [processing, setProcessing] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [isAuthRequired, setIsAuthRequired] = useState<boolean>(true);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 
-  // Check token on load and set auth requirement + customer info
+  // Load booking data from localStorage and set up initial state
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        const now = Date.now() / 1000;
-        if (decoded.exp > now) {
-          setIsAuthRequired(false);
-          fetchUserInfo()
-            .then((userData) => {
-              setBookingSummary((prev) =>
-                prev
-                  ? {
-                    ...prev,
-                    customerName: userData.name,
-                    customerPhone: userData.phone || "-",
-                  }
-                  : prev
-              );
-            })
-            .catch((err) => {
-              console.error("Failed to fetch user info on load:", err);
-            });
-        } else {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setIsAuthRequired(true);
-        }
-      } catch {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setIsAuthRequired(true);
-      }
-    } else {
-      setIsAuthRequired(true);
-    }
-  }, []);
+    const storedBooking = localStorage.getItem('selectedBooking');
 
-  // Fetch booking info (movie, theater, seats)
-  useEffect(() => {
-    if (!screeningId || seatIds.length === 0) {
-      alert("Missing screening or seats.");
+    if (!storedBooking) {
+      alert("No booking data found. Please return to seat selection.");
       navigate(-1);
       return;
     }
 
-    fetchSeatsByScreening(screeningId)
-      .then((data) => {
-        if (!data || !data.seats) throw new Error("Invalid data format from API");
-
-        const selectedSeats = data.seats.filter((seat: ApiSeat) => seatIds.includes(seat.id));
-        const totalAmount = selectedSeats.reduce((sum, s) => sum + s.seatType === "regular" ? data.regularSeatPrice : s.seatType === "premium" ? data.premiumSeatPrice : data.vipSeatPrice, 0);
-
-        setBookingSummary({
-          movieTitle: data.movieTitle,
-          theaterName: data.theaterName,
-          date: data.screeningDate,
-          time: data.screeningTime,
-          customerName: "Guest",
-          customerPhone: "-",
-          seats: selectedSeats.map((s) => ({
-            seatNumber: s.rowNumber + s.seatNumber,
-            price: s.seatType === "regular" ? data.regularSeatPrice : s.seatType === "premium" ? data.premiumSeatPrice : data.vipSeatPrice,
-          })),
-          totalAmount,
-          screeningId,
-        });
-
-      })
-      .catch((error) => {
-        console.error("Failed to load seat info:", error);
-        alert("Failed to load seat info.");
-        navigate(-1);
-      });
-  }, [screeningId, seatIds, navigate]);
-
-  // On successful login from modal: update auth and user info
-  const handleAuthSuccess = async () => {
-    setIsAuthRequired(false);
     try {
-      const userData = await fetchUserInfo();
-      setBookingSummary((prev) =>
-        prev
-          ? {
-            ...prev,
-            customerName: userData.name,
-            customerPhone: userData.phone || "-",
-          }
-          : prev
-      );
+      const bookingData = JSON.parse(storedBooking);
+
+      // Create booking summary from stored data
+      const summary: BookingSummary = {
+        movieTitle: bookingData.movieTitle,
+        theaterName: bookingData.theaterName,
+        date: bookingData.date,
+        time: bookingData.time,
+        customerName: auth?.name || bookingData.customerName || "Guest",
+        customerPhone: auth?.phone || bookingData.customerPhone || "-",
+        seats: bookingData.selectedSeats.map((seat: any) => ({
+          seatNumber: seat.seatNumber,
+          price: seat.price,
+        })),
+        totalAmount: bookingData.totalAmount,
+        screeningId: bookingData.screeningId,
+      };
+
+      setBookingSummary(summary);
+
+      // Check if user is authenticated
+      if (auth) {
+        setIsAuthRequired(false);
+        // Update customer info from auth context
+        setBookingSummary(prev => prev ? {
+          ...prev,
+          customerName: auth.name,
+          customerPhone: auth.phone || "-",
+        } : prev);
+      } else {
+        setIsAuthRequired(true);
+        setShowAuthModal(true);
+      }
     } catch (error) {
-      console.error("Failed to fetch user info after login:", error);
+      console.error("Failed to parse booking data:", error);
+      alert("Invalid booking data. Please return to seat selection.");
+      navigate(-1);
+    }
+  }, [auth, navigate]);
+
+  // Handle successful authentication
+  const handleAuthSuccess = () => {
+    setIsAuthRequired(false);
+    setShowAuthModal(false);
+
+    // Update booking summary with user info
+    if (auth && bookingSummary) {
+      setBookingSummary({
+        ...bookingSummary,
+        customerName: auth.name,
+        customerPhone: auth.phone || "-",
+      });
     }
   };
 
@@ -139,6 +110,10 @@ export default function PaymentContainer() {
     try {
       await new Promise((res) => setTimeout(res, 1500));
       await bookSeats(bookingSummary.screeningId!, seatIds, "confirmed");
+
+      // Clear stored booking data after successful booking
+      localStorage.removeItem('selectedBooking');
+
       setIsCompleted(true);
     } catch (error: any) {
       alert("Payment failed: " + (error.message || "Unknown error"));
@@ -156,6 +131,10 @@ export default function PaymentContainer() {
     try {
       await new Promise((res) => setTimeout(res, 1000)); // Brief delay for UX
       await bookSeats(bookingSummary.screeningId!, seatIds, "confirmed");
+
+      // Clear stored booking data after successful booking
+      localStorage.removeItem('selectedBooking');
+
       setIsCompleted(true);
     } catch (error: any) {
       alert("Booking failed: " + (error.message || "Unknown error"));
@@ -164,18 +143,28 @@ export default function PaymentContainer() {
     }
   };
 
-  if (isCompleted) return <PaymentSuccess bookingSummary={bookingSummary!} />;
+  // Show loading while booking data is being processed
+  if (!bookingSummary) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white">
+        <Header />
+        <div className="flex items-center justify-center min-h-screen">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
+  if (isCompleted) return <PaymentSuccess bookingSummary={bookingSummary} />;
 
   return (
     <>
-
-      <div className={`min-h-screen bg-gray-950 text-white transition-filter duration-300`}
-      >
+      <div className={`min-h-screen bg-gray-950 text-white transition-filter duration-300`}>
         <Header />
         <div className="pb-6">
-          <div className="max-w-7xl mx-auto  pb-6">
+          <div className="max-w-7xl mx-auto pb-6">
             <div className="flex items-center justify-between mb-6">
-              <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-300 hover:text-white" >
+              <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-300 hover:text-white">
                 <ArrowLeft className="w-5 h-5" />
                 Back to Seats
               </button>
@@ -185,18 +174,26 @@ export default function PaymentContainer() {
           </div>
 
           <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
-            <PaymentSummary bookingSummary={bookingSummary!} />
+            <PaymentSummary bookingSummary={bookingSummary} />
             <PaymentForm
               selectedPaymentMethod={selectedPaymentMethod}
               setSelectedPaymentMethod={setSelectedPaymentMethod}
               handlePayment={handlePayment}
               isProcessing={processing}
-              totalAmount={bookingSummary!.totalAmount || 0}
+              totalAmount={bookingSummary.totalAmount || 0}
               onPaymentSuccess={handlePaymentSuccess}
             />
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onSuccess={handleAuthSuccess}
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
     </>
   );
 }

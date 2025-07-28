@@ -181,6 +181,26 @@ export function Payment() {
 		}
 	};
 
+	// Handle manual completion for QR - Telegram
+	const handleManualPaymentCompletion = async () => {
+		setIsProcessing(true);
+		try {
+			const request = await submitBooking({
+				screeningId: Number(screeningId),
+				seats: seats.map((seat) => seat.idNumber),
+				amount: price,
+				method: "qr-telegram",
+				status: "completed",
+			});
+			console.log("Booking request:", request);
+			setIsCompleted(true);
+		} catch (error) {
+			console.error("Payment processing failed:", error);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
+
 	useEffect(() => {
 		const getDataFromLocalStorage = () => {
 			const data = localStorage.getItem("selectedSeats");
@@ -246,6 +266,12 @@ export function Payment() {
 			icon: <QrCode className="w-5 h-5" />,
 			description: "QR payment",
 		},
+		{
+			id: "qr-telegram",
+			name: "QR - Telegram",
+			icon: <QrCode className="w-5 h-5" />,
+			description: "QR payment via Telegram",
+		},
 	];
 
 	const handlePayment = async () => {
@@ -253,6 +279,11 @@ export function Payment() {
 
 		// For QR payments, the polling will handle completion
 		if (selectedPaymentMethod === "qr") {
+			return;
+		}
+
+		// For QR - Telegram, manual completion is handled separately
+		if (selectedPaymentMethod === "qr-telegram") {
 			return;
 		}
 
@@ -555,11 +586,10 @@ export function Payment() {
 							{paymentMethods.map((method) => (
 								<button
 									key={method.id}
-									className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-										selectedPaymentMethod === method.id
-											? "border-blue-800 bg-blue-500/10"
-											: "border-slate-800 bg-gray-900/50 hover:border-gray-500"
-									}`}
+									className={`p-4 rounded-lg border-2 transition-all duration-200 ${selectedPaymentMethod === method.id
+										? "border-blue-800 bg-blue-500/10"
+										: "border-slate-800 bg-gray-900/50 hover:border-gray-500"
+										}`}
 									onClick={() => {
 										setSelectedPaymentMethod(method.id);
 										if (method.id === "qr") {
@@ -569,11 +599,10 @@ export function Payment() {
 								>
 									<div className="text-center">
 										<div
-											className={`p-2 rounded-lg mx-auto mb-2 w-fit ${
-												selectedPaymentMethod === method.id
-													? "bg-blue-800 text-white"
-													: "bg-gray-950 text-gray-300"
-											}`}
+											className={`p-2 rounded-lg mx-auto mb-2 w-fit ${selectedPaymentMethod === method.id
+												? "bg-blue-800 text-white"
+												: "bg-gray-950 text-gray-300"
+												}`}
 										>
 											{method.icon}
 										</div>
@@ -652,6 +681,18 @@ export function Payment() {
 						</div>
 					)}
 
+					{/* QR - Telegram Payment Form */}
+					{selectedPaymentMethod === "qr-telegram" && (
+						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
+							<h3 className="text-lg font-semibold mb-4">QR - Telegram Payment</h3>
+							<img
+								src="/qr.png"
+								alt="Telegram QR Code"
+								className=" mx-auto rounded-3xl border-2 border-blue-600"
+							/>
+						</div>
+					)}
+
 					{/* Digital Payment Form */}
 					{selectedPaymentMethod === "digital" && (
 						<div className="bg-gray-950 rounded-xl p-6 border border-gray-700">
@@ -683,19 +724,18 @@ export function Payment() {
 
 					{/* Pay Button */}
 					<button
-						onClick={handlePayment}
+						onClick={selectedPaymentMethod === "qr-telegram" ? handleManualPaymentCompletion : handlePayment}
 						disabled={
 							!selectedPaymentMethod ||
 							isProcessing ||
 							(selectedPaymentMethod === "qr" && paymentStatus !== "APPROVED")
 						}
-						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-							selectedPaymentMethod &&
+						className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${selectedPaymentMethod &&
 							!isProcessing &&
 							(selectedPaymentMethod !== "qr" || paymentStatus === "APPROVED")
-								? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white transform hover:scale-105"
-								: "bg-gray-700 text-gray-400 cursor-not-allowed"
-						}`}
+							? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white transform hover:scale-105"
+							: "bg-gray-700 text-gray-400 cursor-not-allowed"
+							}`}
 					>
 						{isProcessing ? (
 							<div className="flex items-center justify-center gap-2">
@@ -704,6 +744,8 @@ export function Payment() {
 							</div>
 						) : selectedPaymentMethod === "qr" && paymentStatus === "APPROVED" ? (
 							"Complete Booking"
+						) : selectedPaymentMethod === "qr-telegram" ? (
+							`Complete Payment - $${bookingSummary.totalAmount}`
 						) : (
 							`Complete Payment - $${bookingSummary.totalAmount}`
 						)}

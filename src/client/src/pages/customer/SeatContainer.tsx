@@ -95,8 +95,7 @@ export default function SeatContainer() {
   const [theaterName, setTheaterName] = useState<string>("");
   const [screeningDate, setScreeningDate] = useState<string>("");
   const [screeningTime, setScreeningTime] = useState<string>("");
-  // const { auth, setAuth, loading } = useContext(AuthContext)!;
-  // const isAuthenticated = !!auth;
+  const { auth } = useContext(AuthContext)!;
 
   const [seatPrices, setSeatPrices] = useState<{
     regularSeatPrice: number;
@@ -188,6 +187,47 @@ export default function SeatContainer() {
       return total + price;
     }, 0);
 
+  // Store complete booking data in localStorage when proceeding to payment
+  const handleProceedToPayment = () => {
+    if (selectedSeats.length === 0) {
+      alert("Please select at least one seat");
+      return;
+    }
+
+    // Get selected seat details
+    const selectedSeatDetails = selectedSeats.map(seatId => {
+      const seat = seats.find(s => s.id === Number(seatId));
+      return {
+        id: seat!.id,
+        seatNumber: seat!.rowNumber + seat!.seatNumber,
+        price: calculateSeatPrice(seat!.seatType, seatPrices),
+        seatType: seat!.seatType
+      };
+    });
+
+    // Create complete booking data
+    const bookingData = {
+      movieTitle,
+      theaterName,
+      date: screeningDate,
+      time: screeningTime,
+      screeningId: parseInt(screeningId!),
+      seatIds: selectedSeats.map(Number),
+      selectedSeats: selectedSeatDetails,
+      totalAmount: getTotalPrice(),
+      seatPrices,
+      // User data from auth context
+      customerName: auth?.name || "Guest",
+      customerPhone: auth?.phone || "-",
+      customerEmail: auth?.email || ""
+    };
+
+    // Store in localStorage
+    localStorage.setItem('selectedBooking', JSON.stringify(bookingData));
+
+    // Navigate to payment with minimal URL params
+    navigate(`/payment?screeningId=${screeningId}&seats=${selectedSeats.join(',')}`);
+  };
 
   if (isLoading) {
     return (
@@ -327,6 +367,7 @@ export default function SeatContainer() {
             totalPrice={getTotalPrice()}
             screeningId={screeningId}
             pricing={seatPrices}
+            onProceedToPayment={handleProceedToPayment}
           />
         </div>
       </div>

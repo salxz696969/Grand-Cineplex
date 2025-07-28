@@ -16,9 +16,10 @@ interface SelectedSeatsProps {
     premiumSeatPrice: number;
     vipSeatPrice: number;
   };
+  onProceedToPayment?: () => void;
 }
 
-const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId, pricing }: SelectedSeatsProps) => {
+const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId, pricing, onProceedToPayment }: SelectedSeatsProps) => {
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -41,17 +42,23 @@ const SelectedSeats = ({ selectedSeats, seats, totalPrice, screeningId, pricing 
       setShowAuthModal(true);
       return;
     }
-    if (!screeningId) {
-      alert("Screening information is missing.");
-      return;
-    }
     if (selectedSeats.length === 0) {
       alert("Please select at least one seat.");
       return;
     }
 
-    const seatParam = selectedSeats.join(",");
-    navigate(`/payment?screeningId=${screeningId}&seats=${seatParam}`);
+    // Use the provided callback if available, otherwise fall back to default navigation
+    if (onProceedToPayment) {
+      onProceedToPayment();
+    } else {
+      // Fallback to original behavior
+      if (!screeningId) {
+        alert("Screening information is missing.");
+        return;
+      }
+      const seatParam = selectedSeats.join(",");
+      navigate(`/payment?screeningId=${screeningId}&seats=${seatParam}`);
+    }
   };
 
   return (

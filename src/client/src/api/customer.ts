@@ -218,3 +218,25 @@ export async function checkPaymentStatus(tranId: string) {
     throw error;
   }
 }
+
+export async function fetchBookingHistory() {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("User not logged in");
+
+    const response = await fetch(
+      "http://localhost:6900/customer/bookings/history",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await handleResponse<{ bookings: BookingSummary[] }>(response);
+    return data.bookings;
+  } catch (error) {
+    console.error("Error fetching booking history:", error);
+    throw error;
+  }
+}

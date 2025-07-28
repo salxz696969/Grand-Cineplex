@@ -60,7 +60,7 @@ export const logInUser = async (req: Request, res: Response) => {
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "6h",
       }
     );
 
