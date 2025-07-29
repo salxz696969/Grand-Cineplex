@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PlusCircle, DollarSign, CalendarClock, Ticket, Film, Theater, Users, Clapperboard, ArrowUpRight } from "lucide-react";
+import { PlusCircle, DollarSign, CalendarClock, Ticket, Film, Theater, Users, Clapperboard, ArrowUpRight, X } from "lucide-react";
 import { getHomePageInfo } from './../../api/manager';
 
 interface StatCardProps {
@@ -243,23 +243,15 @@ export default function Dashboard() {
                                 <tr>
                                     <th scope="col" className="px-6 py-3">Booking ID</th>
                                     <th scope="col" className="px-6 py-3">Customer</th>
-                                    <th scope="col" className="px-6 py-3">Staff</th>
                                     <th scope="col" className="px-6 py-3">Movie</th>
-                                    <th scope="col" className="px-6 py-3">Amount</th>
-                                    <th scope="col" className="px-6 py-3">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {totalBookings.map((booking) => (
                                     <tr key={booking.id} className="border border-slate-800 hover:bg-slate-800/40">
                                         <td className="px-6 py-4 font-medium">{booking.id}</td>
-                                        <td className="px-6 py-4">{booking.customer ? booking.customer.name : "null"}</td>
-                                        <td className="px-6 py-4">{booking.createdByStaff ? booking.createdByStaff.name : "null"}</td>
+                                        <td className="px-6 py-4">{booking.customer ? booking.customer.name : <p >N/A</p>}</td>
                                         <td className="px-6 py-4">{booking.movieTitle}</td>
-                                        <td className="px-6 py-4">${booking.amount}</td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${booking.status === 'Confirmed' ? 'bg-green-600/20 text-green-400' : 'bg-yellow-600/20 text-yellow-400'}`}>{booking.status}</span>
-                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

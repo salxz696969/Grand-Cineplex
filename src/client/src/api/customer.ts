@@ -102,7 +102,9 @@ export async function selectSeats(
 export async function bookSeats(
   screeningId: number,
   seatIds: number[],
-  status: string = "pending"
+  method: string,
+  amount: number,
+  status: string = "confirmed"
 ): Promise<{ id: number }> {
   try {
     const token = localStorage.getItem("token");
@@ -117,6 +119,8 @@ export async function bookSeats(
       body: JSON.stringify({
         screening_id: screeningId,
         seat_ids: seatIds,
+        method,
+        amount,
         status,
       }),
     });

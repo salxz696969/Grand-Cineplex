@@ -6,6 +6,7 @@ import Ticket from "../../../db/models/Ticket";
 import Screening from "../../../db/models/Screening";
 import Movie from "../../../db/models/Movie";
 import Theater from "../../../db/models/Theater";
+import Payment from "../../../db/models/Payment";
 
 export const getBookingBasedOnId = async (req: Request, res: Response) => {
   try {
@@ -92,12 +93,26 @@ export const createBooking = async (req: Request, res: Response) => {
         .json({ message: "Unauthorized. Please log in to book." });
     }
 
-    const { screening_id, seat_ids, status = "pending" } = req.body;
+    const {
+      screening_id,
+      seat_ids,
+      method,
+      amount,
+      status = "confirmed",
+    } = req.body;
 
-    if (!screening_id || !Array.isArray(seat_ids) || seat_ids.length === 0) {
+    if (
+      !screening_id ||
+      !Array.isArray(seat_ids) ||
+      seat_ids.length === 0 ||
+      !method ||
+      !amount
+    ) {
       return res
         .status(400)
-        .json({ message: "screening_id and seat_ids are required" });
+        .json({
+          message: "screening_id, seat_ids, method, and amount are required",
+        });
     }
 
     // Use user.id directly as customer_id
@@ -116,7 +131,15 @@ export const createBooking = async (req: Request, res: Response) => {
       )
     );
 
-    return res.status(201).json({ id: booking.id });
+    // Create payment record
+    const payment = await Payment.create({
+      bookingId: booking.id,
+      method,
+      amount,
+      status: "completed",
+    });
+
+    return res.status(201).json({ id: booking.id, payment });
   } catch (error) {
     console.error("createBooking error:", error);
     return res.status(500).json({ message: "Booking failed" });

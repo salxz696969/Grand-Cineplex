@@ -3,7 +3,7 @@ import { PlusCircle, Search, Calendar, Clock, MapPin, Users, Filter, Film } from
 import MovieScreeningCard from "./MovieScreeningCard";
 import AddScreening from "./AddScreening";
 import EditScreening from "./EditScreening";
-import { getTodayShowTimes } from "../../api/manager";
+import { getTodayShowTimes, getAllShowTimes } from "../../api/manager";
 
 export interface Screening {
 	id: number;
@@ -32,13 +32,16 @@ export default function Screenings() {
 	const [addingScreening, setAddingScreening] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [editScreening, setEditScreening] = useState<Screening | null>(null);
+	const [refreshKey, setRefreshKey] = useState(0); // Add refresh state
 
-	// Use today's date for filtering
-	const today = new Date().toISOString().split("T")[0];
 	useEffect(() => {
 		const fetchScreenings = async () => {
+			setLoading(true); // Set loading to true when fetching
 			try {
-				const response = await getTodayShowTimes();
+				// For "today" tab, use getTodayShowTimes, for "all" tab, use getAllShowTimes
+				const response = activeTab === "today"
+					? await getTodayShowTimes()
+					: await getAllShowTimes();
 				setScreenings(response);
 			} catch (error) {
 				console.error("Error fetching screenings:", error);
@@ -47,16 +50,16 @@ export default function Screenings() {
 			}
 		};
 		fetchScreenings();
-	}, []);
+	}, [activeTab, refreshKey]); // Add refreshKey to dependencies
+
 	const filteredScreenings = screenings.filter((screening) => {
-		const matchesTab = activeTab === "today" ? screening.date === today : true;
 		const matchesSearch =
 			screening.movieTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
 			screening.theater.toLowerCase().includes(searchTerm.toLowerCase());
 		const matchesTheater = selectedTheater === "all" || screening.theater === selectedTheater;
 		const matchesStatus = selectedStatus === "all" || screening.status === selectedStatus;
 
-		return matchesTab && matchesSearch && matchesTheater && matchesStatus;
+		return matchesSearch && matchesTheater && matchesStatus;
 	});
 
 	const theaters = Array.from(new Set(screenings.map((s) => s.theater)));
@@ -76,6 +79,7 @@ export default function Screenings() {
 
 	const handleBackToScreenings = () => {
 		setAddingScreening(false);
+		setRefreshKey(prev => prev + 1); // Trigger refresh when returning
 	};
 
 	const handleAddScreening = () => {
@@ -93,7 +97,10 @@ export default function Screenings() {
 		// For demo, use empty arrays:
 		return (
 			<EditScreening
-				onBack={() => setEditScreening(null)}
+				onBack={() => {
+					setEditScreening(null);
+					setRefreshKey(prev => prev + 1); // Trigger refresh when returning from edit
+				}}
 				screening={{
 					...editScreening,
 					movieId: (editScreening as any).movieId ?? 0,

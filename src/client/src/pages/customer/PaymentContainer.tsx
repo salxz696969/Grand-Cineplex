@@ -107,7 +107,13 @@ export default function PaymentContainer() {
 
     try {
       await new Promise((res) => setTimeout(res, 1500));
-      await bookSeats(bookingSummary.screeningId!, seatIds, "confirmed");
+      await bookSeats(
+        bookingSummary.screeningId!,
+        seatIds,
+        selectedPaymentMethod || "qr", // Default to QR if no method selected
+        bookingSummary.totalAmount || 0,
+        "confirmed"
+      );
 
       // Clear stored booking data after successful booking
       localStorage.removeItem('selectedBooking');

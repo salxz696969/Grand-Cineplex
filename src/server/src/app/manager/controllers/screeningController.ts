@@ -17,7 +17,34 @@ export const get7DaysShowTimes = async (req: Request, res: Response) => {
       next5Days.push(date.toISOString().split("T")[0]);
     }
 
-    const showTimeForToday = await Screening.findAll({
+    const screenings = await Screening.findAll({
+      attributes: [
+        "id",
+        "screeningDate",
+        "screeningTime",
+        "regularSeatPrice",
+        "premiumSeatPrice",
+        "vipSeatPrice",
+        "movieId",
+        "theaterId",
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM seats s
+            WHERE s.theater_id = "Screening"."theater_id"
+          )`),
+          "totalSeats",
+        ],
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM tickets t
+            JOIN bookings b ON t.booking_id = b.id
+            WHERE b.screening_id = "Screening"."id" AND b.status = 'confirmed'
+          )`),
+          "bookedSeats",
+        ],
+      ],
       where: {
         screeningDate: {
           [Op.in]: next5Days,
@@ -25,21 +52,62 @@ export const get7DaysShowTimes = async (req: Request, res: Response) => {
       },
       include: [
         {
-          association: "movie",
-          attributes: ["id", "title", "duration", "genre"],
+          model: Movie,
+          as: "movie",
+          attributes: ["id", "title", "duration", "genre", "posterUrl"],
         },
         {
-          association: "theater",
+          model: Theater,
+          as: "theater",
           attributes: ["id", "name"],
         },
       ],
       order: [
-        ["screening_date", "ASC"],
-        ["screening_time", "ASC"],
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
       ],
+      raw: true,
+      nest: true,
     });
 
-    res.status(200).json(showTimeForToday);
+    const result = screenings.map((s: any) => {
+      const screeningDate = s.screeningDate;
+      const screeningTime = s.screeningTime;
+      const screeningDateTime = new Date(`${screeningDate}T${screeningTime}`);
+      const durationMinutes = s.movie?.duration || 0;
+      const endDateTime = new Date(
+        screeningDateTime.getTime() + durationMinutes * 60_000
+      );
+
+      const now = new Date();
+      let status: "upcoming" | "ongoing" | "completed";
+      if (now < screeningDateTime) status = "upcoming";
+      else if (now <= endDateTime) status = "ongoing";
+      else status = "completed";
+
+      const totalSeats = Number(s.totalSeats) || 0;
+      const bookedSeats = Number(s.bookedSeats) || 0;
+
+      return {
+        id: s.id,
+        movieId: s.movieId,
+        theaterId: s.theaterId,
+        movieTitle: s.movie?.title,
+        movieImage: s.movie?.posterUrl,
+        theater: s.theater?.name,
+        date: screeningDate,
+        time: screeningTime.slice(0, 5),
+        duration: `${durationMinutes} min`,
+        availableSeats: totalSeats - bookedSeats,
+        totalSeats,
+        regularSeatPrice: Number(s.regularSeatPrice),
+        premiumSeatPrice: Number(s.premiumSeatPrice),
+        vipSeatPrice: Number(s.vipSeatPrice),
+        status,
+      };
+    });
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
@@ -48,73 +116,105 @@ export const get7DaysShowTimes = async (req: Request, res: Response) => {
 export const getTodayShowTimes = async (req: Request, res: Response) => {
   try {
     const today = new Date();
-    const showTimeForToday = await Screening.findAll({
+    // Format today's date in local timezone (YYYY-MM-DD)
+    const todayString =
+      today.getFullYear() +
+      "-" +
+      String(today.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(today.getDate()).padStart(2, "0");
+
+    const screenings = await Screening.findAll({
+      attributes: [
+        "id",
+        "screeningDate",
+        "screeningTime",
+        "regularSeatPrice",
+        "premiumSeatPrice",
+        "vipSeatPrice",
+        "movieId",
+        "theaterId",
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM seats s
+            WHERE s.theater_id = "Screening"."theater_id"
+          )`),
+          "totalSeats",
+        ],
+        [
+          Sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM tickets t
+            JOIN bookings b ON t.booking_id = b.id
+            WHERE b.screening_id = "Screening"."id" AND b.status = 'confirmed'
+          )`),
+          "bookedSeats",
+        ],
+      ],
       where: {
         screeningDate: {
-          [Op.eq]: today.toISOString().split("T")[0],
+          [Op.eq]: todayString,
         },
       },
       include: [
         {
-          association: "movie",
+          model: Movie,
+          as: "movie",
           attributes: ["id", "title", "duration", "genre", "posterUrl"],
         },
         {
-          association: "theater",
-          attributes: {
-            include: [
-              [
-                Sequelize.literal(`(
-								SELECT COUNT(*)
-								FROM seats AS seat
-								WHERE seat.theater_id = theater.id
-							)`),
-                "seatCount",
-              ],
-            ],
-            exclude: [],
-          },
+          model: Theater,
+          as: "theater",
+          attributes: ["id", "name"],
         },
       ],
       order: [
-        ["screening_date", "ASC"],
-        ["screening_time", "ASC"],
+        ["screeningDate", "ASC"],
+        ["screeningTime", "ASC"],
       ],
+      raw: true,
+      nest: true,
     });
-    const formatData = showTimeForToday.map((data: any) => {
-      const screeningDate = data.screeningDate;
-      const screeningTime = data.screeningTime;
-      const now = new Date();
+
+    const result = screenings.map((s: any) => {
+      const screeningDate = s.screeningDate;
+      const screeningTime = s.screeningTime;
       const screeningDateTime = new Date(`${screeningDate}T${screeningTime}`);
-      let status: "upcoming" | "ongoing" | "completed" = "upcoming";
-      const durationMinutes = data.movie?.duration || 0;
+      const durationMinutes = s.movie?.duration || 0;
       const endDateTime = new Date(
-        screeningDateTime.getTime() + durationMinutes * 60000
+        screeningDateTime.getTime() + durationMinutes * 60_000
       );
 
-      if (now < screeningDateTime) {
-        status = "upcoming";
-      } else if (now >= screeningDateTime && now <= endDateTime) {
-        status = "ongoing";
-      } else {
-        status = "completed";
-      }
+      const now = new Date();
+      let status: "upcoming" | "ongoing" | "completed";
+      if (now < screeningDateTime) status = "upcoming";
+      else if (now <= endDateTime) status = "ongoing";
+      else status = "completed";
+
+      const totalSeats = Number(s.totalSeats) || 0;
+      const bookedSeats = Number(s.bookedSeats) || 0;
 
       return {
-        id: data.id,
-        movieTitle: data.movie?.title,
-        movieImage: data.movie?.posterUrl,
-        theater: data.theater?.name,
+        id: s.id,
+        movieId: s.movieId,
+        theaterId: s.theaterId,
+        movieTitle: s.movie?.title,
+        movieImage: s.movie?.posterUrl,
+        theater: s.theater?.name,
         date: screeningDate,
         time: screeningTime.slice(0, 5),
-        duration: String(data.movie?.duration) + " min",
-        availableSeats: Number(data.theater?.seatCount) || 100,
-        totalSeats: Number(data.theater?.seatCount) || 50,
-        price: Number(data.price),
+        duration: `${durationMinutes} min`,
+        availableSeats: totalSeats - bookedSeats,
+        totalSeats,
+        regularSeatPrice: Number(s.regularSeatPrice),
+        premiumSeatPrice: Number(s.premiumSeatPrice),
+        vipSeatPrice: Number(s.vipSeatPrice),
         status,
       };
     });
-    res.json(formatData);
+
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }
@@ -146,8 +246,8 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
           Sequelize.literal(`(
             SELECT COUNT(*)
             FROM tickets t
-            JOIN bookings b ON b.id = t.booking_id
-            WHERE b.screening_id = "Screening"."id"
+            JOIN bookings b ON t.booking_id = b.id
+            WHERE b.screening_id = "Screening"."id" AND b.status = 'confirmed'
           )`),
           "bookedSeats",
         ],
@@ -231,10 +331,25 @@ export const getShowTimesBasedOnMovieId = async (
 
 export const addShowTime = async (req: Request, res: Response) => {
   try {
-    const { movieId, theaterId, screeningDate, screeningTime, regularSeatPrice, premiumSeatPrice, vipSeatPrice } =
-      req.body;
+    const {
+      movieId,
+      theaterId,
+      screeningDate,
+      screeningTime,
+      regularSeatPrice,
+      premiumSeatPrice,
+      vipSeatPrice,
+    } = req.body;
 
-    if (!movieId || !theaterId || !screeningDate || !screeningTime || !regularSeatPrice || !premiumSeatPrice || !vipSeatPrice) {
+    if (
+      !movieId ||
+      !theaterId ||
+      !screeningDate ||
+      !screeningTime ||
+      !regularSeatPrice ||
+      !premiumSeatPrice ||
+      !vipSeatPrice
+    ) {
       return res.status(400).json({
         message: "All fields are required",
       });
@@ -259,10 +374,25 @@ export const addShowTime = async (req: Request, res: Response) => {
 export const updateShowTime = async (req: Request, res: Response) => {
   try {
     const screeningId = parseInt(req.params.id);
-    const { movieId, theaterId, screeningDate, screeningTime, regularSeatPrice, premiumSeatPrice, vipSeatPrice } =
-      req.body;
+    const {
+      movieId,
+      theaterId,
+      screeningDate,
+      screeningTime,
+      regularSeatPrice,
+      premiumSeatPrice,
+      vipSeatPrice,
+    } = req.body;
 
-    if (!movieId || !theaterId || !screeningDate || !screeningTime || !regularSeatPrice || !premiumSeatPrice || !vipSeatPrice) {
+    if (
+      !movieId ||
+      !theaterId ||
+      !screeningDate ||
+      !screeningTime ||
+      !regularSeatPrice ||
+      !premiumSeatPrice ||
+      !vipSeatPrice
+    ) {
       return res.status(400).json({
         message: "All fields are required",
       });

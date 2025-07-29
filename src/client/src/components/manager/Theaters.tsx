@@ -75,10 +75,12 @@ export default function Theaters() {
     const [editingTheater, setEditingTheater] = useState<Theater | null>(null);
     const [addingTheater, setAddingTheater] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0); // Add refresh state
 
     useEffect(() => {
         // Fetch theaters from API
         const fetchTheaters = async () => {
+            setLoading(true);
             try {
                 const data = await getTheaters()
                 setTheaters(data);
@@ -89,7 +91,7 @@ export default function Theaters() {
             }
         }
         fetchTheaters();
-    }, []);
+    }, [refreshKey]); // Add refreshKey to dependencies
 
     const filteredTheaters = theaters.filter(theater => {
         const matchesSearch = theater.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -106,6 +108,8 @@ export default function Theaters() {
     const handleBackToTheaters = () => {
         setEditingTheater(null);
         setAddingTheater(false);
+        // Trigger refresh when returning from add/edit
+        setRefreshKey(prev => prev + 1);
     };
 
     const handleAddTheater = () => {

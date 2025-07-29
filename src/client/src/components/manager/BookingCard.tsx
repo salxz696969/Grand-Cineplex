@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Calendar, Clock, MapPin, Film, CreditCard, Smartphone, Monitor } from "lucide-react";
+import { User, Calendar, Clock, MapPin, Film, CreditCard, Smartphone, Monitor, QrCode } from "lucide-react";
 
 export interface Booking {
     id: number;
@@ -47,6 +47,7 @@ export default function BookingCard({ booking }: BookingCardProps) {
         switch (method) {
             case "cash": return <CreditCard className="w-4 h-4" />;
             case "card": return <CreditCard className="w-4 h-4" />;
+            case "qr": return <QrCode className="w-4 h-4" />;
             case "online": return <Smartphone className="w-4 h-4" />;
             default: return <CreditCard className="w-4 h-4" />;
         }
@@ -71,20 +72,6 @@ export default function BookingCard({ booking }: BookingCardProps) {
                     <div>
                         <h3 className="text-white font-semibold">{booking.customerName}</h3>
                         <p className="text-slate-400 text-xs">{booking.customerEmail}</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
-                        {getStatusText(booking.status)}
-                    </span>
-                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ${booking.bookingMethod === "walk-in"
-                        ? "bg-orange-600/20 text-orange-400"
-                        : "bg-blue-600/20 text-blue-400"
-                        }`}>
-                        <div className="flex items-center gap-1">
-                            {getBookingMethodIcon(booking.bookingMethod)}
-                            {booking.bookingMethod === "walk-in" ? "Walk-in" : "Online"}
-                        </div>
                     </div>
                 </div>
             </div>
@@ -124,11 +111,6 @@ export default function BookingCard({ booking }: BookingCardProps) {
                         {getPaymentMethodIcon(booking.paymentMethod)}
                         <span className="capitalize">{booking.paymentMethod}</span>
                     </div>
-                    {booking.cashierName && (
-                        <div className="text-xs">
-                            Cashier: {booking.cashierName}
-                        </div>
-                    )}
                 </div>
                 <div className="text-right">
                     <div className="text-lg font-bold text-green-400">${booking.totalAmount.toFixed(2)}</div>

@@ -31,6 +31,9 @@ INSERT INTO theaters (id, name, cinema_id, created_at, updated_at) VALUES
 (9, 'Theater 9', 1, NOW(), NOW()),
 (10, 'Theater 10', 1, NOW(), NOW());
 
+-- Reset the sequence to continue from the highest ID + 1
+SELECT setval('theaters_id_seq', (SELECT MAX(id) FROM theaters));
+
 -- 3. SEATS DATA (80+ seats per theater, rectangular layout)
 -- Layout: Front rows (A-D) = Regular, Middle rows (E-F) = Premium, Back rows (G-H) = VIP
 -- Theater 1: 8 rows (A-H) x 12 seats = 96 seats
@@ -947,7 +950,7 @@ INSERT INTO screenings (movie_id, theater_id, screening_date, screening_time, re
 (8, 3, '2025-08-05', '11:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
 (8, 4, '2025-08-05', '14:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
 (8, 5, '2025-08-05', '17:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
-(8, 6, '2025-08-05', '20:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
+(8, 6, '2025-08-05', '20:30:00', 6.50, 9.50, 13.50, NOW(), NOW()),
 (9, 7, '2025-08-05', '11:30:00', 5.00, 8.00, 12.00, NOW(), NOW()),
 (9, 8, '2025-08-05', '14:30:00', 5.00, 8.00, 12.00, NOW(), NOW()),
 (9, 9, '2025-08-05', '17:30:00', 5.00, 8.00, 12.00, NOW(), NOW()),
@@ -1101,7 +1104,7 @@ INSERT INTO screenings (movie_id, theater_id, screening_date, screening_time, re
 (8, 3, '2025-08-12', '11:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
 (8, 4, '2025-08-12', '14:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
 (8, 5, '2025-08-12', '17:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
-(8, 6, '2025-08-12', '20:00:00', 6.50, 9.50, 13.50, NOW(), NOW()),
+(8, 6, '2025-08-12', '20:30:00', 6.50, 9.50, 13.50, NOW(), NOW()),
 (9, 7, '2025-08-12', '11:30:00', 5.00, 8.00, 12.00, NOW(), NOW()),
 (9, 8, '2025-08-12', '14:30:00', 5.00, 8.00, 12.00, NOW(), NOW()),
 (9, 9, '2025-08-12', '17:30:00', 5.00, 8.00, 12.00, NOW(), NOW()),

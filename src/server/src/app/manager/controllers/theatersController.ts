@@ -6,7 +6,13 @@ import { fn, col } from "sequelize";
 export const getTheaters = async (req: Request, res: Response) => {
   try {
     const theaters = await Theater.findAll({
-      attributes: ["id", "name", [fn("COUNT", col("seats.id")), "capacity"]],
+      attributes: [
+        "id",
+        "name",
+        [fn("COUNT", col("seats.id")), "capacity"],
+        [fn("COUNT", fn("DISTINCT", col("seats.row_number"))), "rows"],
+        [fn("MAX", col("seats.seat_number")), "seatsPerRow"],
+      ],
       include: [
         {
           model: Seat,
@@ -23,8 +29,8 @@ export const getTheaters = async (req: Request, res: Response) => {
         id: plain.id,
         name: plain.name,
         capacity: Number(plain.capacity),
-        rows: Math.ceil(Number(plain.capacity) / 10), // Assuming 10 seats per row
-        seatsPerRow: 10,
+        rows: Number(plain.rows), // Count of distinct row letters (A, B, C, etc.)
+        seatsPerRow: Number(plain.seatsPerRow), // Maximum seat number per row (columns)
         status: plain.status,
       };
     });
