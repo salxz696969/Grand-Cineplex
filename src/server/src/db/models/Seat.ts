@@ -45,7 +45,7 @@ class Seat extends Model {
         },
       ],
       where: {
-        "$tickets.booking.screeningId$": screeningId,
+        "$tickets.booking.screening_id$": screeningId,
       },
       order: [
         ["rowNumber", "ASC"],
@@ -66,6 +66,7 @@ export const initSeat = (sequelize: Sequelize) => {
       theaterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "theater_id",
         references: {
           model: "theaters",
           key: "id",
@@ -74,15 +75,18 @@ export const initSeat = (sequelize: Sequelize) => {
       rowNumber: {
         type: DataTypes.STRING(5),
         allowNull: false,
+        field: "row_number",
       },
       seatNumber: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "seat_number",
       },
       seatType: {
         type: DataTypes.ENUM(...Object.values(SeatType)),
         allowNull: false,
         defaultValue: SeatType.REGULAR,
+        field: "seat_type",
       },
     },
     {

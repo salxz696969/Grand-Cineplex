@@ -108,11 +108,13 @@ export const initStaff = (sequelize: Sequelize) => {
       hiredDate: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        field: "hired_date",
       },
       isActive: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
+        field: "is_active",
       },
     },
     {

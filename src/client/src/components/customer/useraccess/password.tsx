@@ -1,7 +1,5 @@
-// This components used in signup and signin to provide user to fill the password
-
 import { useState, ChangeEvent } from "react";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEye, FaRegEyeSlash, FaLock } from "react-icons/fa";
 
 interface PasswordProps {
   value: string;
@@ -16,26 +14,13 @@ const Password: React.FC<PasswordProps> = ({ value, onChange }) => {
   };
 
   return (
-    <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded mb-4">
-      <input
-        type={isShowPassword ? "text" : "password"}
-        placeholder="Password"
-        className="w-full text-sm bg-transparent py-3 mr-3 rounded outline-none"
-        value={value}
-        onChange={onChange}
-      />
+    <div className="flex items-center bg-gray-900 border border-gray-800 rounded-xl px-5">
+      <FaLock className="text-gray-400 mr-3" />
+      <input type={isShowPassword ? "text" : "password"} className="w-full text-sm bg-transparent py-3 mr-3 rounded-xl outline-none text-white placeholder:text-gray-500" value={value} onChange={onChange} />
       {isShowPassword ? (
-        <FaRegEye
-          size={22}
-          className="cursor-pointer text-blue-800"
-          onClick={toggleShowPassword}
-        />
+        <FaRegEye size={22} className="cursor-pointer text-blue-800 hover:text-blue-700 transition-colors" onClick={toggleShowPassword} />
       ) : (
-        <FaRegEyeSlash
-          size={22}
-          className="cursor-pointer text-slate-400"
-          onClick={toggleShowPassword}
-        />
+        <FaRegEyeSlash size={22} className="cursor-pointer text-gray-500 hover:text-blue-700 transition-colors" onClick={toggleShowPassword} />
       )}
     </div>
   );

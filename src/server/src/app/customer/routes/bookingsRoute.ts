@@ -1,18 +1,15 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import {
-  addBookingByStaff,
-  deleteBookingByStaff,
-  getAllBookingsForUser,
   getBookingBasedOnId,
-  updateBookingByStaff,
+  createBooking,
+  viewBookingHistory,
 } from "../controllers/bookingsController";
-import verifyToken from "../../../middleware/verifyToken";
+import authMiddleware from "../../../middleware/authMiddleware";
 
 const route = express.Router();
 
-route.get("/", verifyToken, getAllBookingsForUser);
-route.get("/:id", verifyToken, getBookingBasedOnId);
-route.post("/staff", verifyToken, addBookingByStaff);
-route.patch("/staff/:id", verifyToken, updateBookingByStaff);
-route.patch("/staff/:id", verifyToken, deleteBookingByStaff);
+route.get("/history", authMiddleware, viewBookingHistory);
+// route.get("/:id", authMiddleware, getBookingBasedOnId);
+route.post("/", authMiddleware, createBooking);
+
 export default route;

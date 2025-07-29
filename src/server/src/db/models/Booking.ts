@@ -1,5 +1,7 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
-
+import Customer from "./Customer";
+import Staff from "./Staff";
+import Screening from "./Screening";
 // Define booking status enum
 export enum BookingStatus {
   PENDING = "pending",
@@ -168,6 +170,7 @@ export const initBooking = (sequelize: Sequelize) => {
       customerId: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        field: "customer_id",
         references: {
           model: "customers",
           key: "id",
@@ -176,6 +179,7 @@ export const initBooking = (sequelize: Sequelize) => {
       screeningId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "screening_id",
         references: {
           model: "screenings",
           key: "id",
@@ -189,6 +193,7 @@ export const initBooking = (sequelize: Sequelize) => {
       createdByStaffId: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        field: "created_by_staff_id",
         references: {
           model: "staff",
           key: "id",
@@ -202,6 +207,16 @@ export const initBooking = (sequelize: Sequelize) => {
       underscored: true,
     }
   );
+  // In Booking.ts
+  // Booking.belongsTo(Customer, { as: "customer", foreignKey: "customerId" });
+  // Booking.belongsTo(Staff, {
+  // 	as: "createdByStaff",
+  // 	foreignKey: "createdByStaffId",
+  // });
+  // Booking.belongsTo(Screening, {
+  // 	as: "screening",
+  // 	foreignKey: "screeningId",
+  // });
 };
 
 export default Booking;

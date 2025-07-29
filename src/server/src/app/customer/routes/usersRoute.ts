@@ -1,17 +1,16 @@
 import express from "express";
 import {
   getUserInfo,
-  updateUserInfo,
-  addUser,
-  deleteUser,
+  login,
+  signup
 } from "../controllers/userController";
-import verifyToken from "../../../middleware/verifyToken";
+import authMiddleware from "../../../middleware/authMiddleware";
 
 const route = express.Router();
 
-route.get("/", verifyToken, getUserInfo);
-route.patch("/", verifyToken, updateUserInfo);
-route.post("/", addUser);
-route.delete("/:id", verifyToken, deleteUser);
+route.post("/signup", signup);
+route.post("/login", login);
+route.get("/", authMiddleware, getUserInfo);
+
 
 export default route;

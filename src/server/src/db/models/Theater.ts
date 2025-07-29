@@ -3,6 +3,7 @@ import { Model, DataTypes, Sequelize } from "sequelize";
 class Theater extends Model {
   declare id: number;
   declare name: string;
+  declare cinemaId: number;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -52,6 +53,15 @@ export const initTheater = (sequelize: Sequelize) => {
       name: {
         type: DataTypes.STRING(100),
         allowNull: false,
+      },
+      cinemaId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: "cinema_id",
+        references: {
+          model: "cinemas",
+          key: "id",
+        },
       },
     },
     {

@@ -5,18 +5,41 @@ import Screening from "../../../db/models/Screening";
 import Ticket from "../../../db/models/Ticket";
 import Booking from "../../../db/models/Booking";
 
+type ScreeningWithRelations = Screening & {
+  theater: {
+    name: string;
+    seats: Array<{
+      id: number;
+      rowNumber: string;
+      seatNumber: number;
+      seatType: string;
+      price: number;
+    }>;
+  };
+  movie: {
+    title: string;
+  };
+  screeningDate: string;
+  screeningTime: string;
+  price: number;
+};
+
 export const getAllSeatsBasedOnShowTime = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const showTimeId = parseInt(req.params.id);
+    const show_time_id = parseInt(req.params.id);
 
-    // Get all seats for the theater of this screening
-    const screening = await Screening.findByPk(showTimeId, {
+    const screening = (await Screening.findByPk(show_time_id, {
       include: [
         {
+          association: "movie",
+          attributes: ["title"],
+        },
+        {
           association: "theater",
+          attributes: ["name"],
           include: [
             {
               association: "seats",
@@ -25,104 +48,146 @@ export const getAllSeatsBasedOnShowTime = async (
           ],
         },
       ],
-    });
+    })) as ScreeningWithRelations | null;
 
-    if (!screening) {
+    if (!screening || !screening.theater || !screening.movie) {
       return res.status(404).json({ message: "Screening not found" });
     }
 
-    // Get booked seats for this screening
-    const bookedSeats = await Ticket.findAll({
+    const bookedTickets = await Ticket.findAll({
       include: [
         {
           association: "booking",
-          where: { screeningId: showTimeId },
-          attributes: ["id"],
+          attributes: [],
+          where: { screening_id: show_time_id },
         },
       ],
       attributes: ["seatId"],
     });
 
-    const bookedSeatIds = bookedSeats.map((ticket) => ticket.seatId);
+    const bookedSeatIds = bookedTickets.map((ticket) => ticket.seatId);
+    const theaterSeats = screening.theater.seats || [];
 
-    // Filter out booked seats - using type assertion for the association
-    const theaterSeats = (screening as any).theater?.seats || [];
-    const availableSeats = theaterSeats.filter(
-      (seat: any) => !bookedSeatIds.includes(seat.id)
-    );
+    const seatsWithStatus = theaterSeats.map((seat) => ({
+      id: seat.id,
+      rowNumber: seat.rowNumber,
+      seatNumber: seat.seatNumber,
+      seatType: seat.seatType,
+      isBooked: bookedSeatIds.includes(seat.id),
+    }));
 
-    res.status(200).json(availableSeats);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    res.status(200).json({
+      movieTitle: screening.movie.title,
+      theaterName: screening.theater.name,
+      screeningDate: screening.screeningDate,
+      screeningTime: screening.screeningTime,
+      regularSeatPrice: screening.regularSeatPrice,
+      premiumSeatPrice: screening.premiumSeatPrice,
+      vipSeatPrice: screening.vipSeatPrice,
+      seats: seatsWithStatus,
+    });
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error.message : error;
+    res.status(500).json({ error: err });
   }
 };
 
-export const addSeat = async (req: Request, res: Response) => {
+export const selectSeat = async (req: Request, res: Response) => {
   try {
-    const { seatNumber, theaterId, rowNumber, seatType } = req.body;
+    const { seat_ids, screening_id } = req.body;
 
-    if (!seatNumber || !theaterId || !rowNumber) {
-      return res.status(400).json({
-        message: "Seat number, theater ID, and row number are required",
+    if (!Array.isArray(seat_ids) || seat_ids.length === 0 || !screening_id) {
+      return res.status(400).json({ message: "Invalid seat selection" });
+    }
+
+    const seats = await Seat.findAll({ where: { id: seat_ids } });
+    if (seats.length !== seat_ids.length) {
+      return res.status(404).json({ message: "One or more seats not found" });
+    }
+
+    const booked = await Ticket.findAll({
+      where: { seatId: seat_ids },
+      include: [
+        {
+          association: "booking",
+          where: { screeningId: screening_id },
+        },
+      ],
+    });
+
+    if (booked.length > 0) {
+      return res.status(409).json({
+        message: "Some seats are already booked",
+        bookedSeatIds: booked.map((b) => b.seatId),
       });
     }
 
-    const newSeat = await Seat.create({
-      seatNumber,
-      theaterId,
-      rowNumber,
-      seatType: seatType || "regular",
-    });
-
-    res.status(201).json(newSeat);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    res.status(200).json({ message: "Seats available", selected: seat_ids });
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error.message : error;
+    res.status(500).json({ error: err });
   }
 };
 
-export const updateSeat = async (req: Request, res: Response) => {
+export const bookSeats = async (req: Request, res: Response) => {
+  const t = await Seat.sequelize?.transaction();
   try {
-    const seatId = parseInt(req.params.id);
-    const { seatNumber, rowNumber, seatType } = req.body;
+    const { userId, screeningId, seatIds } = req.body;
 
-    if (!seatNumber || !rowNumber) {
-      return res
-        .status(400)
-        .json({ message: "Seat number and row number are required" });
+    if (
+      !userId ||
+      !screeningId ||
+      !Array.isArray(seatIds) ||
+      seatIds.length === 0
+    ) {
+      return res.status(400).json({ message: "Invalid booking request" });
     }
 
-    const seat = await Seat.findByPk(seatId);
-
-    if (!seat) {
-      return res.status(404).json({ message: "Seat not found" });
-    }
-
-    await seat.update({
-      seatNumber,
-      rowNumber,
-      seatType,
+    const alreadyBooked = await Ticket.findAll({
+      where: { seatId: seatIds },
+      include: [
+        {
+          association: "booking",
+          where: { screeningId },
+        },
+      ],
     });
 
-    res.status(200).json(seat);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
-  }
-};
-
-export const deleteSeat = async (req: Request, res: Response) => {
-  try {
-    const seatId = parseInt(req.params.id);
-
-    const seat = await Seat.findByPk(seatId);
-
-    if (!seat) {
-      return res.status(404).json({ message: "Seat not found" });
+    if (alreadyBooked.length > 0) {
+      return res.status(409).json({
+        message: "Some seats already booked",
+        bookedSeatIds: alreadyBooked.map((b) => b.seatId),
+      });
     }
 
-    await seat.destroy();
+    const booking = await Booking.create(
+      {
+        userId,
+        screeningId,
+        bookingDate: new Date(),
+      },
+      { transaction: t }
+    );
 
-    res.status(200).json({ message: "Seat deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    const ticketPromises = seatIds.map((seat_id: number) =>
+      Ticket.create(
+        {
+          bookingId: booking.id,
+          seatId: seat_id,
+        },
+        { transaction: t }
+      )
+    );
+
+    await Promise.all(ticketPromises);
+    await t?.commit();
+
+    res
+      .status(201)
+      .json({ message: "Booking successful", bookingId: booking.id });
+  } catch (error: unknown) {
+    await t?.rollback();
+    const err = error instanceof Error ? error.message : error;
+    res.status(500).json({ error: err });
   }
 };

@@ -102,6 +102,7 @@ export const initCustomer = (sequelize: Sequelize) => {
       dateOfBirth: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        field: "date_of_birth",
       },
     },
     {

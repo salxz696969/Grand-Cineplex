@@ -6,8 +6,9 @@ class Movie extends Model {
   declare description: string | null;
   declare duration: number;
   declare genre: string | null;
-  declare rating: string | null;
+  declare rating: number | null;
   declare posterUrl: string | null;
+  declare trailerUrl: string | null;
   declare releaseDate: Date | null;
   declare createdAt: Date;
   declare updatedAt: Date;
@@ -66,16 +67,23 @@ export const initMovie = (sequelize: Sequelize) => {
         allowNull: true,
       },
       rating: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.FLOAT,
         allowNull: true,
       },
       posterUrl: {
         type: DataTypes.TEXT,
         allowNull: true,
+        field: "poster_url",
+      },
+      trailerUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "trailer_url",
       },
       releaseDate: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        field: "release_date",
       },
     },
     {

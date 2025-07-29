@@ -6,13 +6,15 @@ import {
   getBookingBasedOnId,
   updateBookingByStaff,
 } from "../controllers/bookingsController";
-import verifyToken from "../../../middleware/verifyToken";
+import authMiddlewareCashier from "../../../middleware/authMiddlewareCashier";
 
 const route = express.Router();
 
-route.get("/", verifyToken, getAllBookingsForUser);
-route.get("/:id", verifyToken, getBookingBasedOnId);
-route.post("/staff", verifyToken, addBookingByStaff);
-route.patch("/staff/:id", verifyToken, updateBookingByStaff);
-route.patch("/staff/:id", verifyToken, deleteBookingByStaff);
+route.use(authMiddlewareCashier);
+
+route.get("/", getAllBookingsForUser);
+route.get("/:id", getBookingBasedOnId);
+route.post("/booking", addBookingByStaff);
+route.patch("/staff/:id", updateBookingByStaff);
+route.patch("/staff/:id", deleteBookingByStaff);
 export default route;

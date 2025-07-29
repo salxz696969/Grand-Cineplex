@@ -5,8 +5,10 @@ import {
   getAllSeatsBasedOnShowTime,
   updateSeat,
 } from "../controllers/seatsController";
+import authMiddlewareManager from "../../../middleware/authMiddlewareManager";
 
 const route = express.Router();
+route.use(authMiddlewareManager)
 
 route.get("/available-seats/:id", getAllSeatsBasedOnShowTime);
 route.post("/", addSeat);

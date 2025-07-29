@@ -1,4 +1,5 @@
 import { Model, DataTypes, Op, Sequelize } from "sequelize";
+import Movie from "./Movie";
 
 class Screening extends Model {
   declare id: number;
@@ -6,7 +7,9 @@ class Screening extends Model {
   declare theaterId: number;
   declare screeningDate: Date;
   declare screeningTime: string;
-  declare price: number;
+  declare regularSeatPrice: number;
+  declare premiumSeatPrice: number;
+  declare vipSeatPrice: number;
   declare createdAt: Date;
   declare updatedAt: Date;
 
@@ -93,6 +96,7 @@ export const initScreening = (sequelize: Sequelize) => {
       movieId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "movie_id",
         references: {
           model: "movies",
           key: "id",
@@ -101,6 +105,7 @@ export const initScreening = (sequelize: Sequelize) => {
       theaterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "theater_id",
         references: {
           model: "theaters",
           key: "id",
@@ -109,14 +114,27 @@ export const initScreening = (sequelize: Sequelize) => {
       screeningDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
+        field: "screening_date",
       },
       screeningTime: {
         type: DataTypes.TIME,
         allowNull: false,
+        field: "screening_time",
       },
-      price: {
+      regularSeatPrice: {
         type: DataTypes.DECIMAL(8, 2),
         allowNull: false,
+        field: "regular_seat_price",
+      },
+      premiumSeatPrice: {
+        type: DataTypes.DECIMAL(8, 2),
+        allowNull: false,
+        field: "premium_seat_price",
+      },
+      vipSeatPrice: {
+        type: DataTypes.DECIMAL(8, 2),
+        allowNull: false,
+        field: "vip_seat_price",
       },
     },
     {
@@ -126,6 +144,7 @@ export const initScreening = (sequelize: Sequelize) => {
       underscored: true,
     }
   );
+  // Screening.belongsTo(Movie, { as: "movie", foreignKey: "movieId" });
 };
 
 export default Screening;

@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import Booking from "../../../db/models/Booking";
 import { BookingStatus } from "../../../db/models/Booking";
+import Ticket from "../../../db/models/Ticket";
+import Seat from "../../../db/models/Seat";
+import Payment from "../../../db/models/Payment";
 
 declare global {
   namespace Express {
@@ -125,6 +128,95 @@ export const deleteBookingByStaff = async (req: Request, res: Response) => {
     await booking.destroy();
 
     res.status(200).json({ message: "Booking deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error });
+  }
+};
+
+export const getAllBookings = async (req: Request, res: Response) => {
+  try {
+    const bookings = await Booking.findAll({
+      include: [
+        {
+          association: "customer",
+          attributes: ["id", "name", "email"],
+        },
+        {
+          association: "screening",
+          include: [
+            {
+              association: "movie",
+              attributes: ["id", "title"],
+            },
+            {
+              association: "theater",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+        {
+          association: "createdByStaff",
+          attributes: ["id", "name"],
+        },
+        {
+          model: Ticket,
+          as: "tickets",
+          attributes: ["id"],
+          include: [
+            {
+              model: Seat,
+              as: "seat",
+              attributes: ["id", "rowNumber", "seatNumber"],
+            },
+          ],
+        },
+        {
+          model: Payment,
+          as: "payments",
+          attributes: ["id", "amount", "method"],
+        },
+      ],
+    });
+    const formattedBookings = bookings.map((booking: any) => {
+      // Get all seat labels as "A1", "B5", etc.
+      const seats = (booking.tickets || [])
+        .map((ticket: any) =>
+          ticket.seat
+            ? `${ticket.seat.rowNumber}${ticket.seat.seatNumber}`
+            : undefined
+        )
+        .filter(Boolean);
+
+      // Sum all payment amounts (convert string to number)
+      const totalAmount = (booking.payments || []).reduce(
+        (sum: number, payment: any) => sum + parseFloat(payment.amount),
+        0
+      );
+
+      // Get payment method (first payment if exists, else undefined)
+      const paymentMethod =
+        booking.payments && booking.payments.length > 0
+          ? booking.payments[0].method
+          : undefined;
+
+      return {
+        id: booking.id,
+        customerName: booking.customer?.name,
+        customerEmail: booking.customer?.email,
+        movieTitle: booking.screening?.movie?.title,
+        theater: booking.screening?.theater?.name,
+        date: booking.updatedAt,
+        time: booking.screening?.screeningTime,
+        seats,
+        totalAmount,
+        bookingMethod: "online", // or "walk-in" if you have that info
+        status: booking.status,
+        bookingDate: new Date(booking.createdAt).toISOString(),
+        cashierName: booking.createdByStaff?.name,
+        paymentMethod,
+      };
+    });
+    res.status(200).json(formattedBookings);
   } catch (error) {
     res.status(500).json({ message: "Internal server error", error });
   }

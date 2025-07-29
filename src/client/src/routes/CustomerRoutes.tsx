@@ -1,25 +1,25 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/customer/Home";
-import TheatrePage from "../pages/customer/TheatrePage";
-import SignUp from "../pages/customer/SignUp";
-import SignIn from "../pages/customer/SignIn";
+import SignIn from "../pages/customer/Auth";
 import SeatContainer from "../pages/customer/SeatContainer";
 import PaymentContainer from "../pages/customer/PaymentContainer";
-import MovieChosen from "../pages/customer/MovieChose";
+import MovieSelectedContainer from "../pages/customer/MovieSelectedContainer";
+import ForgotPassword from "../pages/customer/ForgotPassword";
+import History from "../pages/customer/History";
 
 const CustomerRoutes = () => {
   return (
-      <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/theatres" element={<TheatrePage/>} />
-          <Route path="/seats/:movieId/:cinemaId/:time" element={<SeatContainer />} />
-          <Route path="/payment" element={<PaymentContainer />} />
-          <Route path="/SignUp" element={<SignUp />} />
-          <Route path="/SignIn" element={<SignIn />} />
-          <Route path="/movie/:id" element={<MovieChosen/>} />
-      </Routes>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/seats/:screeningId" element={<SeatContainer />} />
+      {/* <Route path="/payment/:bookingId" element={<PaymentContainer />} /> */}
+      <Route path="/payment" element={<PaymentContainer />} />
+      <Route path="/auth" element={<SignIn />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/movie/:id" element={<MovieSelectedContainer />} />
+      <Route path="/history" element={<History />} />
+    </Routes>
   );
 };
-
 export default CustomerRoutes;

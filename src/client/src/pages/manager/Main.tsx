@@ -38,11 +38,11 @@ export default function Main() {
         }
     }
     return (
-        <div>
+        <div className='bg-gray-950 relative overflow-y-auto overflow-x-hidden'>
             <Header />
-            <div className="relative flex flex-row h-screen w-screen">
+            <div className="relative flex flex-row min-h-screen w-full overflow-y-auto overflow-x-hidden">
                 <Sidebar tab={tab} setTab={setTab} />
-                <div className="w-full h-full lg:pl-82 lg:pt-22 pt-20 ">
+                <div className="w-full  lg:pl-88 lg:pt-30   lg:pr-6 px-4 pt-26 pb-20">
                     {getTabContent()}
                 </div>
             </div>

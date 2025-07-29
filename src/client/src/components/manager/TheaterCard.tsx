@@ -25,7 +25,7 @@ export default function TheaterCard({ theater, onEdit }: {
     };
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 hover:border-blue-500/50 transition-colors duration-300">
+        <div className="bg-gray-950 border border-gray-800 rounded-xl p-6 shadow-lg hover:shadow-blue-500/30 hover:border-blue-500 transition-all duration-200">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -34,29 +34,29 @@ export default function TheaterCard({ theater, onEdit }: {
                     </div>
                     <div>
                         <h3 className="text-white font-semibold text-lg">{theater.name}</h3>
-                        <p className="text-slate-400 text-sm">{theater.location}</p>
+                        <p className="text-gray-400 text-sm">{theater.location}</p>
                     </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(theater.status)}`}>
+                {/* <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(theater.status)}`}>
                     {getStatusText(theater.status)}
-                </span>
+                </span> */}
             </div>
 
             {/* Theater Info */}
             <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                     <Users className="w-4 h-4 text-slate-400" />
-                    <span>Capacity: {theater.capacity} seats</span>
+                    <span className="text-gray-300">Capacity: {theater.capacity} seats</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-300">
                     <Sofa className="w-4 h-4 text-slate-400" />
-                    <span>Layout: {theater.rows} rows × {theater.seatsPerRow} seats</span>
+                    <span className="text-gray-300">Layout: {theater.rows} rows × {theater.seatsPerRow} seats</span>
                 </div>
-                {/* Action Button */}
+                Action Button
                 <div className="flex items-center justify-start pt-4 border-t border-slate-800">
                     <button
                         onClick={() => onEdit(theater)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm rounded bg-sky-600 hover:bg-sky-700 text-white font-semibold transition"
+                        className="flex items-center gap-2 px-4 py-2 text-sm rounded bg-blue-800 hover:bg-blue-700 text-white font-semibold transition"
                     >
                         <Edit className="w-4 h-4" />
                         Edit Theater

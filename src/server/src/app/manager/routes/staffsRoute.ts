@@ -4,20 +4,24 @@ import {
   getStaffInfo,
   updateStaffInfo,
   deleteStaff,
+  getAllStaff,
 } from "../controllers/staffsController";
+import authMiddlewareManager from "../../../middleware/authMiddlewareManager";
 
-const router = Router();
+const route = Router();
+route.use(authMiddlewareManager);
 
 // Add a new staff member
-router.post("/", addStaff);
+route.post("/", addStaff);
+route.get("/", getAllStaff);
 
 // Get staff info by ID
-router.get("/:id", getStaffInfo);
+route.get("/:id", getStaffInfo);
 
 // Update staff info by ID
-router.put("/:id", updateStaffInfo);
+route.patch("/:id", updateStaffInfo);
 
 // Delete staff by ID
-router.delete("/:id", deleteStaff);
+route.delete("/:id", deleteStaff);
 
-export default router;
+export default route;

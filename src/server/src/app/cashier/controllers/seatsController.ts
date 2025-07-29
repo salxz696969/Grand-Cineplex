@@ -5,6 +5,26 @@ import Screening from "../../../db/models/Screening";
 import Ticket from "../../../db/models/Ticket";
 import Booking from "../../../db/models/Booking";
 
+type ScreeningWithRelations = Screening & {
+  theater: {
+    name: string;
+    seats: Array<{
+      id: number;
+      rowNumber: string;
+      seatNumber: number;
+      seatType: string;
+    }>;
+  };
+  movie: {
+    title: string;
+  };
+  screeningDate: string;
+  screeningTime: string;
+  regularSeatPrice: number;
+  premiumSeatPrice: number;
+  vipSeatPrice: number;
+};
+
 export const getAllSeatsBasedOnShowTime = async (
   req: Request,
   res: Response
@@ -12,11 +32,15 @@ export const getAllSeatsBasedOnShowTime = async (
   try {
     const showTimeId = parseInt(req.params.id);
 
-    // Get all seats for the theater of this screening
-    const screening = await Screening.findByPk(showTimeId, {
+    const screening = (await Screening.findByPk(showTimeId, {
       include: [
         {
+          association: "movie",
+          attributes: ["title"],
+        },
+        {
           association: "theater",
+          attributes: ["name"],
           include: [
             {
               association: "seats",
@@ -25,35 +49,47 @@ export const getAllSeatsBasedOnShowTime = async (
           ],
         },
       ],
-    });
+    })) as ScreeningWithRelations | null;
 
-    if (!screening) {
+    if (!screening || !screening.theater || !screening.movie) {
       return res.status(404).json({ message: "Screening not found" });
     }
 
-    // Get booked seats for this screening
-    const bookedSeats = await Ticket.findAll({
+    const bookedTickets = await Ticket.findAll({
       include: [
         {
           association: "booking",
+          attributes: [],
           where: { screeningId: showTimeId },
-          attributes: ["id"],
         },
       ],
       attributes: ["seatId"],
     });
 
-    const bookedSeatIds = bookedSeats.map((ticket) => ticket.seatId);
+    const bookedSeatIds = bookedTickets.map((ticket) => ticket.seatId);
+    const theaterSeats = screening.theater.seats || [];
 
-    // Filter out booked seats - using type assertion for the association
-    const theaterSeats = (screening as any).theater?.seats || [];
-    const availableSeats = theaterSeats.filter(
-      (seat: any) => !bookedSeatIds.includes(seat.id)
-    );
+    const seatsWithStatus = theaterSeats.map((seat) => ({
+      id: seat.id,
+      rowNumber: seat.rowNumber,
+      seatNumber: seat.seatNumber,
+      seatType: seat.seatType,
+      isBooked: bookedSeatIds.includes(seat.id),
+    }));
 
-    res.status(200).json(availableSeats);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    res.status(200).json({
+      movieTitle: screening.movie.title,
+      theaterName: screening.theater.name,
+      screeningDate: screening.screeningDate,
+      screeningTime: screening.screeningTime,
+      regularSeatPrice: screening.regularSeatPrice,
+      premiumSeatPrice: screening.premiumSeatPrice,
+      vipSeatPrice: screening.vipSeatPrice,
+      seats: seatsWithStatus,
+    });
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error.message : error;
+    res.status(500).json({ error: err });
   }
 };
 

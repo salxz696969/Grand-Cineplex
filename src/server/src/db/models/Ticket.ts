@@ -4,7 +4,6 @@ class Ticket extends Model {
   declare id: number;
   declare bookingId: number;
   declare seatId: number;
-  declare ticketType: string;
   declare createdAt: Date;
 
   // Custom instance methods
@@ -88,6 +87,7 @@ export const initTicket = (sequelize: Sequelize) => {
       bookingId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "booking_id",
         references: {
           model: "bookings",
           key: "id",
@@ -97,15 +97,11 @@ export const initTicket = (sequelize: Sequelize) => {
       seatId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "seat_id",
         references: {
           model: "seats",
           key: "id",
         },
-      },
-      ticketType: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-        defaultValue: "adult",
       },
     },
     {

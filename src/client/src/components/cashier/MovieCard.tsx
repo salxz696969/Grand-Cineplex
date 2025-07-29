@@ -6,20 +6,38 @@ interface MovieCardProps {
     title: string;
     releaseDate: string;
     duration: string;
-    image: string;
+    posterUrl: string;
+    screeningDate: string;
 }
 
-export default function MovieCard({ id, title, releaseDate, duration, image }: MovieCardProps) {
-    return (
-        <Link to={`/movie/${id}`}>
-            <div className="overflow-hidden shadow flex flex-col group hover:text-sky-800 transition-colors duration-300">
-                <div className="aspect-[9/16] w-full bg-center bg-cover  ease-in-out overflow-hidden ">
-                    <img src={image} alt={`${title} poster`} className="w-full h-full object-cover rounded-2xl group-hover:scale-105 cursor-pointer transition-transform duration-300 ease-in-out" />
+export default function MovieCard({ id, title, releaseDate, duration, screeningDate, posterUrl }: MovieCardProps) {
+    // Only render the link if we have a valid screening date
+    if (!screeningDate) {
+        return (
+            <div className="overflow-hidden shadow-lg flex flex-col group bg-gray-900/50 border border-gray-800 rounded-xl opacity-50 cursor-not-allowed">
+                <div className="aspect-[9/14] w-full bg-center bg-cover overflow-hidden">
+                    <img src={posterUrl} alt={`${title} poster`} className="w-full h-full object-cover" />
                 </div>
-                <div className="pt-4">
-                    <div className="text-sm text-white font-semibold group-hover:text-sky-800 transition-colors duration-300">{title}</div>
-                    <div className="text-xs text-neutral-400 mb-3 group-hover:text-sky-800 transition-colors duration-300">
-                        {releaseDate} &bull; {duration}
+                <div className="pt-3 px-3 pb-2 flex flex-col gap-1 flex-1">
+                    <div className="text-base text-white font-semibold truncate">{title}</div>
+                    <div className="text-xs text-gray-400 mb-1 truncate">
+                        {releaseDate} &bull; {duration} min
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <Link to={`/cashier/detail/movie/${id}/${screeningDate}`}>
+            <div className="overflow-hidden shadow-lg flex flex-col group bg-gray-900/50 border border-gray-800 rounded-xl hover:border-blue-800 hover:shadow-blue-500/30 transition-all duration-200">
+                <div className="aspect-[9/14] w-full bg-center bg-cover overflow-hidden">
+                    <img src={posterUrl} alt={`${title} poster`} className="w-full h-full object-cover group-hover:scale-105 cursor-pointer transition-transform duration-300 ease-in-out" />
+                </div>
+                <div className="pt-3 px-3 pb-2 flex flex-col gap-1 flex-1">
+                    <div className="text-base text-white font-semibold truncate group-hover:text-blue-600 transition-colors duration-200">{title}</div>
+                    <div className="text-xs text-gray-400 mb-1 truncate">
+                        {releaseDate} &bull; {duration} min
                     </div>
                 </div>
             </div>

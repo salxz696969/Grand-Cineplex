@@ -1,12 +1,15 @@
-
+// Enums / Union types
 export type PaymentType = "cash" | "card" | "digital_wallet" | "bank_transfer";
-
-export type BookingStatus = "pending" | "reserved" | "confirmed" | "cancelled" | "refunded";
-
+export type BookingStatus =
+  | "pending"
+  | "reserved"
+  | "confirmed"
+  | "cancelled"
+  | "refunded";
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
-
 export type SeatType = "regular" | "premium" | "vip";
 
+// Core Entities
 
 export interface Cinema {
   id: number;
@@ -17,9 +20,9 @@ export interface Cinema {
   country?: string;
   phone?: string;
   email?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Movie {
@@ -28,40 +31,50 @@ export interface Movie {
   description?: string;
   duration: number;
   genre?: string;
-  rating?: string;
-  poster_url?: string;
-  release_date?: string;
-  created_at: string;
-  updated_at: string;
+  rating?: number;
+  posterUrl?: string;
+  trailerUrl?: string;
+  releaseDate?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Theater {
   id: number;
   name: string;
-  cinema_id: number;
-  created_at: string;
-  updated_at: string;
+  cinemaId: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
+// export interface Seat {
+//   id: number;
+//   theaterId?: number;
+//   rowNumber: string;
+//   seatNumber: number;
+//   seatType: SeatType;
+// }
+
 export interface Seat {
-  id: number;
-  theater_id: number;
-  row_number: string;
-  seat_number: number;
-  seat_type: SeatType;
-  created_at: string;
-  updated_at: string;
+  id: string;
+  row: string;
+  number: number;
+  type: "regular" | "premium" | "vip";
+  price: number;
+  isBooked: boolean;
 }
 
 export interface Screening {
   id: number;
-  movie_id: number;
-  theater_id: number;
-  screening_date: string; // format: YYYY-MM-DD
-  screening_time: string; // format: HH:mm:ss
-  price: number;
-  created_at: string;
-  updated_at: string;
+  movieId: number;
+  theaterId: number;
+  screeningDate: string; // YYYY-MM-DD
+  screeningTime: string; // HH:mm:ss
+  regularSeatPrice: number;
+  premiumSeatPrice: number;
+  vipSeatPrice: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Customer {
@@ -69,34 +82,78 @@ export interface Customer {
   name: string;
   email: string;
   phone?: string;
-  date_of_birth?: string;
-  created_at: string;
-  updated_at: string;
+  dateOfBirth?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Booking {
   id: number;
-  customer_id?: number;
-  screening_id: number;
+  customerId: number; // Now always required (no guests)
+  screeningId: number;
   status: BookingStatus;
-  created_by_staff_id?: number;
-  created_at: string;
-  updated_at: string;
+  createdByStaffId?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Ticket {
   id: number;
-  booking_id: number;
-  seat_id: number;
-  created_at: string;
+  bookingId: number;
+  seatId: number;
+  createdAt: string;
 }
 
 export interface Payment {
   id: number;
-  booking_id: number;
+  bookingId: number;
   amount: number;
   method: PaymentType;
   status: PaymentStatus;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Extensions
+
+export interface MovieWithScreenings extends Movie {
+  screenings: Screening[];
+}
+
+export interface ApiSeat {
+  id: number;
+  rowNumber: string;
+  seatNumber: number;
+  seatType: SeatType;
+  isBooked: boolean;
+}
+
+export interface BookingSummary {
+  movieTitle: string;
+  theaterName: string;
+  date: string;
+  time: string;
+  seats: {
+    seatNumber: string;
+    price: number;
+  }[];
+  totalAmount: number;
+  customerName: string;
+  customerPhone: string;
+  screeningId?: number;
+}
+
+export interface ScreeningSeatData {
+  movieTitle: string;
+  theaterName: string;
+  screeningDate: string;
+  screeningTime: string;
+  regularSeatPrice: number;
+  premiumSeatPrice: number;
+  vipSeatPrice: number;
+  seats: ApiSeat[];
+}
+
+export interface ScreeningWithTheaterName extends Screening {
+  theaterName: string;
 }
