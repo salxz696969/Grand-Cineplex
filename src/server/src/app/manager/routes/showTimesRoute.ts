@@ -11,7 +11,7 @@ import { getComingSoonMovies } from "../controllers/moviesController";
 import authMiddlewareManager from "../../../middleware/authMiddlewareManager";
 
 const route = express.Router();
-route.use(authMiddlewareManager)
+route.use(authMiddlewareManager);
 
 route.get("/", getAllShowTimes);
 route.get("/today", getTodayShowTimes);

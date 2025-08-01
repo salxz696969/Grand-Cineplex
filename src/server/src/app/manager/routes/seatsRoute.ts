@@ -8,10 +8,11 @@ import {
 import authMiddlewareManager from "../../../middleware/authMiddlewareManager";
 
 const route = express.Router();
-route.use(authMiddlewareManager)
+route.use(authMiddlewareManager);
 
-route.get("/available-seats/:id", getAllSeatsBasedOnShowTime);
-route.post("/", addSeat);
-route.patch("/:id", updateSeat);
-route.delete("/:id", deleteSeat);
+// All seat routes are unused in manager interface
+// route.get("/available-seats/:id", getAllSeatsBasedOnShowTime); // UNUSED
+// route.post("/", addSeat); // UNUSED
+// route.patch("/:id", updateSeat); // UNUSED
+// route.delete("/:id", deleteSeat); // UNUSED
 export default route;
